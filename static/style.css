@@ -1,0 +1,27 @@
+.primary-colors {
+    color: #48B!important;
+    background-color: #D8D!important;
+}
+.primary-font{
+    color: #48B!important;
+}
+.main{
+    display: block!important;
+}
+.block {
+    display: block!important;
+}
+#forgotpassword, #apologymsg {
+    background-color: #fff;
+    border: none!important;
+    font-size: 10px;
+    color: #48B;
+    outline: none!important;
+    text-decoration: none;
+}
+.width10{
+    width: 10%;
+}
+.width15{
+    width: 15%
+}

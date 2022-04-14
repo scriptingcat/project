@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In or Sign Up
+{% endblock %}
+
+{% block main %}
+        <div class="main mx-auto w-auto">
+            <div class="mb-5 margin-bottom">
+                <img src="../static/android-chrome-192x192.png" >
+            </div>
+            <form action="/login" method="post">
+                <div class="mb-3">
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+                </div>
+                <div class="mb-3">
+                    <input class="form-control mx-auto w-auto mb-2" id="password" name="password" placeholder="Password" type="password">
+                   
+                </div>
+                <div class="mb-3">
+                    <button class="block btn mx-auto primary-colors" type="submit">Log In</button>
+                    <input id="forgotpassword" class="primary-font mx-auto w-auto" type="submit" name="forgotpassword" value="Forgot Password">
+                </div>
+            </form>
+            <hr class="mx-auto width10 primary-font">
+            <form action="/signup" method="get">
+                <div class="mb-3">
+                   <button class="btn primary-colors" type="submit">Sign Up</button>
+                </div>
+            </form>
+        </div>
+{% endblock %}

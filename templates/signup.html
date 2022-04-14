@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Sign Up
+{% endblock %}
+
+{% block main %}
+        <div class="main mx-auto w-auto">
+            <div class="mb-5 margin-bottom">
+                <img src="../static/android-chrome-192x192.png" >
+            </div>
+            <form action="/signup" method="post">
+                
+                <div class="mb-3">
+                    {% if apologymsg %}
+                    <p id="apologymsg" class="primary-font mx-auto width15" type="submit" name="apologymsg"> {{apologymsg}} </p> 
+                    {% endif %}
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+                </div>
+                <div class="mb-3">
+                    <input class="form-control mx-auto w-auto mb-2"  name="email" placeholder="Email" type="email">
+                </div>
+                <div class="mb-3">
+                    <input class="form-control mx-auto w-auto mb-2" id="password" name="password" placeholder="Password" type="password">
+                </div>
+                <div class="mb-3">
+                    <input class="form-control mx-auto w-auto mb-2"  name="confirmationpassword" placeholder="Confirmation Password" type="password">
+                </div>
+                <div class="mb-3">
+                    <button class="block btn mx-auto primary-colors" type="submit">Sign In</button>
+                </div>
+            </form>
+            
+        </div>
+{% endblock %}
