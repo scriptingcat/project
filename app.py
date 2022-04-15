@@ -50,18 +50,22 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            return ("must provide username")
+            apologymsg = "must provide username"
+            return render_template("login.html", apologymsg=apologymsg.capitalize())
+
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return ("must provide password")
+            apologymsg = "must provide username"
+            return render_template("login.html", apologymsg=apologymsg.capitalize())
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            return ("invalid username and/or password")
+            apologymsg = "invalid username and/or password"
+            return render_template("login.html", apologymsg=apologymsg.capitalize())
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -142,15 +146,11 @@ def signup():
         return redirect("/")
 
     else:
-        frgtpsswrd = request.get("forgotpassword")
-        
-        if frgtpsswrd:
-            return redirect("/forgotpassword")
-
         return render_template("signup.html")
 
 @app.route("/forgotpassword", methods=["GET","POST"])
 def forgotpassword():
+    #TODO
     if request.method == "POST":
         return redirect("/")
     return render_template("forgotpassword.html")

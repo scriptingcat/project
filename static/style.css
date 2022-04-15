@@ -1,3 +1,7 @@
+nav .navbar-brand
+{
+    font-size: x-large;
+}
 .primary-colors {
     color: #48B!important;
     background-color: #D8D!important;
@@ -24,4 +28,27 @@
 }
 .width15{
     width: 15%
+}
+.logoshadow {
+    -webkit-filter: drop-shadow(10px 0px 15px #48B);
+    filter: drop-shadow();
+}
+.shadow {
+    box-shadow: 2px 2px 15px 1px #48B!important;
+}
+.knewavefont {
+    font-family: 'Knewave', cursive;
+    font-weight: 200;
+}
+button.shadow:hover{
+    background-color: rgb(243, 160, 243)!important;
+    box-shadow: 2px 2px 15px 1px rgb(83, 169, 235)!important;
+
+}
+.noborder{
+    border: none!important;
+}
+
+.width100{
+    width: 100%;
 }
