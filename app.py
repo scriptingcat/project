@@ -8,7 +8,7 @@ from tempfile import mkdtemp
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, validEmail
+from helpers import login_required, validCharPass, validLenPass
 from email_validator import validate_email
 
 # configure application
@@ -134,7 +134,7 @@ def signup():
         # create the account
         hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
         db.execute("INSERT INTO users (username, email, hash) VALUES (?, ?, ?)", username, email, hash)  
-
+        rows = db.execute("SELECT * FROM users WHERE username = ?", username)
         # remember which user has logged in
         session["user_id"] = rows[0]["id"]
         return redirect("/")
