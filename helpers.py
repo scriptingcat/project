@@ -2,8 +2,6 @@
 import os
 import requests
 import urllib.parse
-import re
-
 from flask import redirect, render_template, request, session
 from functools import wraps
 
@@ -46,14 +44,4 @@ def validCharPass (password):
             special += 1
         if alpha >= 1 and capital >= 1 and digit >= 1 and special >= 1:
             return True
-    return False
-
-# check valid email expression
-def validEmail(email):
-    # valid regular expression
-    # r at the beginning makes sure it's a raw string
-    # \b makes sure there are any char among []-> \b[] stars with, []\b ends with
-    valid = r'\b[a-zA-Z0-9._*-]+@[a-zA-Z0-9.-]+\.[a-z|A-Z]\b'
-    if re.fullmatch(valid, email):
-        return True
     return False

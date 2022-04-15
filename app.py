@@ -9,6 +9,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from helpers import login_required, validCharPass, validLenPass, validEmail
+from email_validator import validate_email
 
 # configure application
 app = Flask(__name__)
@@ -105,7 +106,7 @@ def signup():
         if not email:
             apologymsg = "must provide email"
             return render_template("signup.html", apologymsg=apologymsg.capitalize())
-        if not validEmail(email):
+        if not validate_email(email):
             apologymsg = "invalid email format"
             return render_template("signup.html", apologymsg=apologymsg.capitalize())
         if not password:
