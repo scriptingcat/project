@@ -50,18 +50,18 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            return ("must provide username", 403)
+            return ("must provide username")
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return ("must provide password", 403)
+            return ("must provide password")
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            return ("invalid username and/or password", 403)
+            return ("invalid username and/or password")
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -93,7 +93,7 @@ def signup():
         email = request.form.get("email")
         password = request.form.get("password")
         confirmation = request.form.get("confirmationpassword")
-
+        
         # check input is not null
         # create an apology message for each and render it
         apologymsg = ""
@@ -125,11 +125,13 @@ def signup():
         
         # check username and email are not already used
         rows = db.execute("SELECT * FROM users WHERE username = ?", username)
-        if len(rows) >= 1:
+        if len(rows) > 0:
             apologymsg = "username not available"
+            return render_template("signup.html", apologymsg=apologymsg.capitalize())
         rows = db.execute("SELECT * FROM users WHERE email = ?", email)
-        if len(rows) >= 1:
+        if len(rows) > 0:
             apologymsg = "email already used"
+            return render_template("signup.html", apologymsg=apologymsg.capitalize())
         
         # create the account
         hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
@@ -140,4 +142,15 @@ def signup():
         return redirect("/")
 
     else:
+        frgtpsswrd = request.get("forgotpassword")
+        
+        if frgtpsswrd:
+            return redirect("/forgotpassword")
+
         return render_template("signup.html")
+
+@app.route("/forgotpassword", methods=["GET","POST"])
+def forgotpassword():
+    if request.method == "POST":
+        return redirect("/")
+    return render_template("forgotpassword.html")
