@@ -52,3 +52,20 @@ button.shadow:hover{
 .width100{
     width: 100%;
 }
+.btnfocus:focus{
+    background-color: rgb(243, 160, 243)!important;
+    /*box-shadow: 2px 2px 15px 1px rgb(83, 169, 235)!important;*/
+    box-shadow: 0 0 0 0.25rem rgb(83 169 235 / 50%)!important;
+}
+
+.fontw100 {
+    font-weight: 100;
+}
+
+.margindropdown{
+    margin: 10px -65px 2px !important;
+}
+.shadow-item:hover{
+    background-color: rgb(243, 160, 243)!important;
+
+}

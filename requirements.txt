@@ -1,2 +1,10 @@
 flask
 cs50
+tempfile
+werkzeug.security
+datetime
+email_validator
+urllib.parse
+fubctools
+itsdangerous
+flask_mail

@@ -4,11 +4,13 @@ import os
 from flask import Flask,redirect, request, render_template, session
 from flask_session import Session
 from tempfile import mkdtemp
+from flask_mail import Mail, Message
+
 
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token
 from email_validator import validate_email
 
 # configure application
@@ -21,6 +23,16 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
+# configure session to use filesystem to send email
+app.config['MAIL_DEFAULT_SENDER'] = os.environ["MAIL_DEFAULT_SENDER"]
+app.config['MAIL_PASSWORD'] = os.environ["MAIL_PASSWORD"]
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ["MAIL_USERNAME"]
+mail=Mail(app)
+
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///keeptrack.db")
@@ -148,9 +160,134 @@ def signup():
     else:
         return render_template("signup.html")
 
-@app.route("/forgotpassword", methods=["GET","POST"])
-def forgotpassword():
-    #TODO
+@app.route("/changepassword", methods=["GET","POST"])
+@login_required
+def changepassword():
     if request.method == "POST":
-        return redirect("/")
-    return render_template("forgotpassword.html")
+        currentpassword = request.form.get("currentpassword")
+        newpassword = request.form.get("newpassword")
+        confirmationpassword = request.form.get("confirmationpassword")
+
+        # check input is not null
+        # create an apology message for each and render it
+        if not currentpassword and not newpassword and not confirmationpassword:
+            apologymsg = "all fields are required"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        if not currentpassword:
+            apologymsg = "must insert your current password to be able to change it"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        if not newpassword:
+            apologymsg = "must provide a new password"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        # check pass lenght and char
+        if not validLenPass(newpassword) or not validCharPass(newpassword):
+            apologymsg = "password must be at least 8 char long and include at least 1 digits, 1 letter, 1 capital letter and 1 special char among @!#$%^&*?,:"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        if not confirmationpassword:
+            apologymsg = "must provide confirmation"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        if not newpassword == confirmationpassword:
+            apologymsg = "new password and confirmation must match"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        
+        # select id info
+        rows = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])
+        # check it exists and current password is valid
+        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], currentpassword):
+            apologymsg = "Invalid Current Password"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        # change password
+        hash = generate_password_hash(newpassword, method='pbkdf2:sha256', salt_length=8)
+        db.execute("UPDATE users SET hash=? WHERE id=?", hash, session['user_id'])
+        apologymsg = "Password successfully changed!"
+        return render_template("changepassword.html", apologymsg=apologymsg)
+    else:
+        return render_template("changepassword.html")
+
+@app.route("/forgotpassword", methods=["GET","POST"])
+def requesttoken():
+    # this is the route by which user requests token to change password
+    if request.method == "POST":
+        username = request.form.get("username")
+        email = request.form.get("email")
+
+        # check at least one field has been post
+        if not username and not email:
+            apologymsg = "must provide username or email"
+            return render_template("forgotpassword.html", apologymsg=apologymsg)
+        if not username:
+            if not email or not validate_email(email):
+                    apologymsg = "Invalid email"
+                    return render_template("forgotpassword.html", apologymsg=apologymsg)
+            rows = db.execute("SELECT * FROM users WHERE email=?", email)
+            if len(rows) <= 0:
+                apologymsg = "email not found"
+                return render_template("forgotpassword.html", apologymsg=apologymsg)
+            id = rows[0]["id"]
+            email = rows[0]["email"]
+        else:
+            rows = db.execute("SELECT * FROM users WHERE username=?", username)
+            if len(rows) <= 0:
+                apologymsg = "username not found3"
+                return render_template("forgotpassword.html", apologymsg=apologymsg)
+            id = rows[0]["id"]
+            email = rows[0]["email"]
+
+        # send by email the token
+        # func send_reset_email geneates token and sends via email
+        send_reset_email(id, email)
+        apologymsg = "Reset Password Request Sent"
+
+        return render_template("forgotpassword.html", apologymsg=apologymsg)
+    else:
+        return render_template("forgotpassword.html")
+
+@app.route('/resetpassword/<token>', methods=["GET","POST"])
+def resetpassword(token):
+    #reset the password
+
+    # verify token is valid
+    user_id = verify_token(token)
+    # if it doesn't return a user, return to forgot password
+    if user_id is None:
+        apologymsg = "Expired Token"
+        return render_template("forgotpassword.html", apologymsg=apologymsg)
+    
+    # check request method
+    if request.method == "POST":
+        newpassword = request.form.get("newpassword")
+        confirmationpassword = request.form.get("confirmationpassword")
+
+        # check input is not null
+        # create an apology message for each and render it
+        if not newpassword and not confirmationpassword:
+            apologymsg = "all fields are required"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        if not newpassword:
+            apologymsg = "must provide a new password"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        # check pass lenght and char
+        if not validLenPass(newpassword) or not validCharPass(newpassword):
+            apologymsg = "password must be at least 8 char long and include at least 1 digits, 1 letter, 1 capital letter and 1 special char among @!#$%^&*?,:"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        if not confirmationpassword:
+            apologymsg = "must provide confirmation"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        if not newpassword == confirmationpassword:
+            apologymsg = "new password and confirmation must match"
+            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
+        
+        # select id info
+        rows = db.execute("SELECT * FROM users WHERE id=?", user_id)
+        # check id exists
+        if len(rows) != 1:
+            apologymsg = "Invalid Id"
+            return render_template("resetpassword.html", apologymsg=apologymsg.capitalize())
+        # change password
+        hash = generate_password_hash(newpassword, method='pbkdf2:sha256', salt_length=8)
+        db.execute("UPDATE users SET hash=? WHERE id=?", hash, user_id)
+        apologymsg = "Password successfully changed!"
+        return render_template("login.html", apologymsg=apologymsg)
+
+    else:
+        return render_template("resetpassword/<token>")

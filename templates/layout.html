@@ -37,15 +37,15 @@
                     <span><img src="/static/favicon.ico"></span>
                     <span class="knewavefont primary-font">keep track: {% block span %} {% endblock %}</span>
                 </a>
-                <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+                <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler btnfocus" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <!--right part-->
                 <div class="dropdown">
-                    <button class="btn btn-secondary knewavefont dropdown-toggle noborder primary-colors width100" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">Account</button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                        <li><button class="dropdown-item" type="button">Change Password</button></li>
-                        <li><button class="dropdown-item" type="button">Log out</button></li>
+                    <button class="btn btnfocus btn-secondary fontw100 knewavefont dropdown-toggle noborder primary-colors width100" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">Account</button>
+                    <ul class="dropdown-menu knewavefont margindropdown primary-font" aria-labelledby="dropdownMenu2">
+                        <li><form action="/changepassword" method="get"><button class="dropdown-item shadow-item" type="submit">Change Password</button></form></li>
+                        <li><form action="/logout" method="get"><button class="dropdown-item shadow-item" type="submit">Log out</button></form></li>
                     </ul>
                 </div> 
             </div>
