@@ -10,7 +10,7 @@ from flask_mail import Mail, Message
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status
 from email_validator import validate_email
 
 
@@ -220,9 +220,13 @@ def requesttoken():
             apologymsg = "must provide username or email"
             return render_template("forgotpassword.html", apologymsg=apologymsg)
         if not username:
-            if not email or not validate_email(email):
-                    apologymsg = "Invalid email"
-                    return render_template("forgotpassword.html", apologymsg=apologymsg)
+            # handle exception from validate_email
+            try:
+                validate_email(email)
+            except:
+                apologymsg = "Invalid email"
+                return render_template("forgotpassword.html", apologymsg=apologymsg)
+
             rows = db.execute("SELECT * FROM users WHERE email=?", email)
             if len(rows) <= 0:
                 apologymsg = "email not found"
@@ -232,19 +236,26 @@ def requesttoken():
         else:
             rows = db.execute("SELECT * FROM users WHERE username=?", username)
             if len(rows) <= 0:
-                apologymsg = "username not found3"
+                apologymsg = "username not found"
                 return render_template("forgotpassword.html", apologymsg=apologymsg)
             id = rows[0]["id"]
             email = rows[0]["email"]
 
         # send by email the token
         # func send_reset_email geneates token and sends via email
-        send_reset_email(id, email)
+        # changes on db have to be commited together with sending email
+        db.execute("BEGIN TRANSACTION")
+        token = send_reset_email(id, email)
+        tokentype = "resetpassword"
+        insert_token_in_db(id, token, tokentype)
+        db.execute("COMMIT")
+
         apologymsg = "Reset Password Request Sent"
 
         return render_template("forgotpassword.html", apologymsg=apologymsg)
     else:
         return render_template("forgotpassword.html")
+
 
 @app.route('/resetpassword', methods=["GET","POST"])
 def resetpassword():
@@ -261,11 +272,18 @@ def resetpassword():
             # try-except to handle error exception
             try:
                 user_id = verify_token(token)
+                # if it returns no user_id
                 if user_id <= 0:
                     apologymsg = "No User associated with this Token"
                     return render_template("forgotpassword.html", apologymsg=apologymsg.capitalize())
                 else:
-                    return render_template("resetpassword.html", id=token)
+                    # if it returns an user_id
+                    # check token status in db to know whether it has already used or not to reset password
+                    if check_token_status(user_id, token, "resetpassword") == "expired":
+                        apologymsg = "Expired Token"
+                        return render_template("forgotpassword.html", apologymsg=apologymsg.capitalize())
+                    else:
+                        return render_template("resetpassword.html", id=token)
             except:
                 # if it returns an error, return to forgot password
                 apologymsg = "Expired Token"
@@ -306,10 +324,17 @@ def resetpassword():
             if len(rows) != 1:
                 apologymsg = "Invalid Id"
                 return render_template("resetpassword.html", apologymsg=apologymsg.capitalize())
+            
             # change password
+            # changes on db have to be commited together
+            db.execute("BEGIN TRANSACTION")
             hash = generate_password_hash(newpassword, method='pbkdf2:sha256', salt_length=8)
             db.execute("UPDATE users SET hash=? WHERE id=?", hash, user_id)
             apologymsg = "Password successfully changed!"
+
+            # make token expire 
+            expire_token_status_in_db(user_id, token)
+            db.execute("COMMIT")
             return render_template("login.html", apologymsg=apologymsg)
         except:
             # if it returns an error, return to forgot password
@@ -318,4 +343,3 @@ def resetpassword():
 
 
 # TODO
-# see jwt jti claims to understand how to use only once the token

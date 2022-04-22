@@ -1,6 +1,7 @@
 # helpers for main app.py
 import os
 import requests
+from cs50 import SQL
 import datetime
 
 # library to create url
@@ -27,6 +28,11 @@ mail=Mail(app)
 
 # configure private key
 SECRET = os.environ['SECRET']
+
+
+# Configure CS50 Library to use SQLite database
+db = SQL("sqlite:///keeptrack.db")
+
 
 # from finance pset9
 # ensure user is already logged in
@@ -110,5 +116,28 @@ def send_reset_email(id, email):
     msg.body = f'To reset your password, visit the following link: \n{url}\nIf you did not make this request, please ignore this message.'
     # send email
     mail.send(msg)
+    token = token.decode('utf-8')
+    return token
+
+#func to insert/update the token in db not to make accessible once password has been changed but the token has not expired yet
+def insert_token_in_db(user_id, token, tokentype):
+    rows = db.execute("SELECT * FROM tokens WHERE user_id=? AND type=?", user_id, tokentype)
+    status = 'active'
+    if len(rows) <= 0:
+        db.execute("INSERT INTO tokens (user_id, token, type, status) VALUES (?,?,?,?)", user_id, token, tokentype, status)
+    else:
+        db.execute("UPDATE tokens SET token=?, status=? WHERE user_id=?", token, status, user_id)
     return
 
+# func to change status of token when password is successfully reset
+def expire_token_status_in_db(user_id, token):
+    status = 'expired'
+    rows = db.execute("SELECT * FROM tokens WHERE user_id=? AND token=?", user_id, token)
+    db.execute("UPDATE tokens SET status=? WHERE user_id=? AND token=?", status, user_id, token)
+    return
+
+#func to check token status in db
+def check_token_status(user_id, token, tokentype):
+    rows = db.execute("SELECT * FROM tokens WHERE user_id=? AND token=?", user_id, token)
+    status = rows[0]['status']
+    return status
