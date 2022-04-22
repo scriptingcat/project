@@ -1,13 +1,32 @@
 # helpers for main app.py
 import os
 import requests
+import datetime
+
+# library to create url
 import urllib.parse
-from flask import redirect, render_template, request, session
+from urllib.parse import urljoin
+
+from flask import Flask, redirect, render_template, request, session
 from flask_mail import Mail, Message
 from functools import wraps
-# library to create token
-from itsdangerous import Serializer
 
+# library to create jwt token 
+import jwt
+
+# configure application
+app = Flask(__name__)
+
+app.config['MAIL_DEFAULT_SENDER'] = os.environ["MAIL_DEFAULT_SENDER"]
+app.config['MAIL_PASSWORD'] = os.environ["MAIL_PASSWORD"]
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ["MAIL_USERNAME"]
+mail=Mail(app)
+
+# configure private key
+SECRET = os.environ['SECRET']
 
 # from finance pset9
 # ensure user is already logged in
@@ -51,29 +70,45 @@ def validCharPass (password):
     return False
 
 # func to generate a token
-def  generate_token(id, valid_sec=1800):
-    serialized = Serializer(app.config['SECRET_KEY'], expires_in=valid_sec)
-    return serialized.dump({'user_id': id}).decode('utf-8')
+def generate_token(payload_data):
+    token = jwt.encode(payload=payload_data,key=SECRET)
+    return token
 
 # func to verify token validation
-def verify_token(token):
-    serialized = Serializer(app.config['SECRET_KEY'], expires_in=1800)
-    user_id = serialized.loads(token)['user_id']
-    if user_id <= 0:
-        return None
+def verify_token(token): 
+    # token is passed as string but needs to be bytes to be decoded as jwt object
+    token = bytes(token, 'utf-8')
+    payload_data = jwt.decode(jwt=token, key=SECRET, algorithm='HS256')
+    user_id = payload_data['id']
     return user_id
 
-# func to send email
+# func to create an url
+def createforgotpassurl(token):
+    # take the url and join the token
+    # token is bytes class so needs to be decoded to be joined
+    url = urljoin('http://127.0.0.1:5000/resetpassword','?validation='+ token.decode('utf-8'))
+    print(url)
+    return url
+
+
+# func to send email 
 def send_reset_email(id, email):
+    payload_data = {
+        "id": id,
+        "email": email,
+        # to give an expiration in 300 seconds from the creation
+        "exp": datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(seconds=300)
+    }
+
     # create a token
-    token = generate_token(id)
+    token = generate_token(payload_data)
+    # create url
+    url = createforgotpassurl(token)
     # create an email object, sender and recipient 
-    msg = Message('Reset Your Password', sender = 'appkeeptrack@gmail.com, recipients=[email]')
+    msg = Message('Reset Your Password', sender = 'MAIL_DEFAULT_SENDER', recipients=[email])
     # create body of email
-    msg.body = '''To reset your password, visit the following link:
-    {url_for('reset_token', token=token, _external=True)} 
-    If you did not make this request, please ignore this message.
-    '''
+    msg.body = f'To reset your password, visit the following link: \n{url}\nIf you did not make this request, please ignore this message.'
     # send email
     mail.send(msg)
     return
+

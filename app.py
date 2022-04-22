@@ -10,8 +10,12 @@ from flask_mail import Mail, Message
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email
 from email_validator import validate_email
+
+
+# library to create jwt token 
+import jwt
 
 # configure application
 app = Flask(__name__)
@@ -242,52 +246,76 @@ def requesttoken():
     else:
         return render_template("forgotpassword.html")
 
-@app.route('/resetpassword/<token>', methods=["GET","POST"])
-def resetpassword(token):
+@app.route('/resetpassword', methods=["GET","POST"])
+def resetpassword():
     #reset the password
 
-    # verify token is valid
-    user_id = verify_token(token)
-    # if it doesn't return a user, return to forgot password
-    if user_id is None:
-        apologymsg = "Expired Token"
-        return render_template("forgotpassword.html", apologymsg=apologymsg)
-    
+    if request.method == "GET":
+        # take the query string
+        token = request.args.get('validation')
+        # if there is no query
+        if not token:
+            return redirect('/')
+        else:
+            # verify token is valid
+            # try-except to handle error exception
+            try:
+                user_id = verify_token(token)
+                if user_id <= 0:
+                    apologymsg = "No User associated with this Token"
+                    return render_template("forgotpassword.html", apologymsg=apologymsg.capitalize())
+                else:
+                    return render_template("resetpassword.html", id=token)
+            except:
+                # if it returns an error, return to forgot password
+                apologymsg = "Expired Token"
+                return render_template("forgotpassword.html", apologymsg=apologymsg)
+
     # check request method
     if request.method == "POST":
-        newpassword = request.form.get("newpassword")
-        confirmationpassword = request.form.get("confirmationpassword")
+        # handle exception from verifying token to get user_id back
+        try:
+            newpassword = request.form.get("newpassword")
+            confirmationpassword = request.form.get("confirmationpassword")
+            token = request.form.get("id")
+            
+            user_id = verify_token(token)
 
-        # check input is not null
-        # create an apology message for each and render it
-        if not newpassword and not confirmationpassword:
-            apologymsg = "all fields are required"
-            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
-        if not newpassword:
-            apologymsg = "must provide a new password"
-            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
-        # check pass lenght and char
-        if not validLenPass(newpassword) or not validCharPass(newpassword):
-            apologymsg = "password must be at least 8 char long and include at least 1 digits, 1 letter, 1 capital letter and 1 special char among @!#$%^&*?,:"
-            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
-        if not confirmationpassword:
-            apologymsg = "must provide confirmation"
-            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
-        if not newpassword == confirmationpassword:
-            apologymsg = "new password and confirmation must match"
-            return render_template("changepassword.html", apologymsg=apologymsg.capitalize())
-        
-        # select id info
-        rows = db.execute("SELECT * FROM users WHERE id=?", user_id)
-        # check id exists
-        if len(rows) != 1:
-            apologymsg = "Invalid Id"
-            return render_template("resetpassword.html", apologymsg=apologymsg.capitalize())
-        # change password
-        hash = generate_password_hash(newpassword, method='pbkdf2:sha256', salt_length=8)
-        db.execute("UPDATE users SET hash=? WHERE id=?", hash, user_id)
-        apologymsg = "Password successfully changed!"
-        return render_template("login.html", apologymsg=apologymsg)
+            # check input is not null
+            # create an apology message for each and render it
+            if not newpassword and not confirmationpassword:
+                apologymsg = "all fields are required"
+                return render_template("resetpassword.html", apologymsg=apologymsg.capitalize(), id=token)
+            if not newpassword:
+                apologymsg = "must provide a new password"
+                return render_template("resetpassword.html", apologymsg=apologymsg.capitalize(), id=token)
+            # check pass lenght and char
+            if not validLenPass(newpassword) or not validCharPass(newpassword):
+                apologymsg = "password must be at least 8 char long and include at least 1 digits, 1 letter, 1 capital letter and 1 special char among @!#$%^&*?,:"
+                return render_template("resetpassword.html", apologymsg=apologymsg.capitalize(), id=token)
+            if not confirmationpassword:
+                apologymsg = "must provide confirmation"
+                return render_template("resetpassword.html", apologymsg=apologymsg.capitalize(), id=token)
+            if not newpassword == confirmationpassword:
+                apologymsg = "new password and confirmation must match"
+                return render_template("resetpassword.html", apologymsg=apologymsg.capitalize(), id=token)
+            
+            # select id info
+            rows = db.execute("SELECT * FROM users WHERE id=?", user_id)
+            # check id exists
+            if len(rows) != 1:
+                apologymsg = "Invalid Id"
+                return render_template("resetpassword.html", apologymsg=apologymsg.capitalize())
+            # change password
+            hash = generate_password_hash(newpassword, method='pbkdf2:sha256', salt_length=8)
+            db.execute("UPDATE users SET hash=? WHERE id=?", hash, user_id)
+            apologymsg = "Password successfully changed!"
+            return render_template("login.html", apologymsg=apologymsg)
+        except:
+            # if it returns an error, return to forgot password
+            apologymsg = "Expired Token"
+            return render_template("forgotpassword.html", apologymsg=apologymsg)
 
-    else:
-        return render_template("resetpassword/<token>")
+
+# TODO
+# see jwt jti claims to understand how to use only once the token
