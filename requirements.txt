@@ -1,10 +1,13 @@
+os
 flask
 cs50
 tempfile
+flask_session
+requests
 werkzeug.security
 datetime
 email_validator
 urllib.parse
-fubctools
-itsdangerous
+functools
 flask_mail
+jwt
