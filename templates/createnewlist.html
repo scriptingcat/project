@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block title %}
+create a new list
+{% endblock %}
+
+{% block span %}
+create a new list
+{% endblock %}
+
+{% block main %}
+<form action="/createnewlist" class="knewavefont mx-auto text-start" method="post">
+    <div class="form-group mb-3">
+        <label class="" for="listname">List Name</label>
+        <input type="text" class="form-control w-auto" id="listname" aria-describedby="listnamehelp"
+            placeholder="Enter a list name">
+        <small id="listnamehelp" class="form-text text-muted">how you want to name this list</small>
+    </div>
+    <div class="mb-3">
+        <p class="w-auto">Element Features</p>
+        <p class="form-text text-align-left text-muted ">Choose the features for each element of this list</p>
+    </div>
+    <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
+        {% for key, value in listelements.items() %}
+        <div class="border form-group p-3">
+            <input type="checkbox" class="form-check-input primary-colors-checkbox" id="{{key}}" aria-describedby="{{key}}help">
+            <label class="primary-font" for="{{key}}">{{key}}</label>
+            <small id="{{key}}help" class="block-small form-text text-muted">{{value}}</small>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="form-group mb-3">
+        <button type="submit" class="btn btn-primary margin-top-w2">Create list</button>
+    </div>
+</form>
+
+
+
+
+<!--
+
+    <div class="mb-3">
+        {% if apologymsg %}
+        <p id="apologymsg" class="primary-font mx-auto width15" type="submit" name="apologymsg"> {{apologymsg}} </p> 
+        {% endif %}
+    </div>
+       
+-->
+{% endblock %}

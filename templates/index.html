@@ -10,5 +10,22 @@
 {% endblock %}
 
 {% block main %}
+<div class="dropdown">
+    <form action="/createnewlist" method="get">
+        <button class="bkground-color-box btn btnfocus btn-secondary knewavefont border primary-font round-corner text-align-left width05vw" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <p class="inline line-height text-align-left">Add a new list</p>
+        <p class="fontsize22em margin-right-inline20 margin-top-inline130 text-align-right">+</p>
+    </button>
+    <ul class=".bkground-color-box-white dropdown-menu knewavefont margindropdown primary-font" aria-labelledby="dropdownMenu2">
+        {% for element in listtypes %}
+            {% for key,value in element.items() %}
+                <li><form action="/createnewlist" method="get"><button class=".bkground-color-box-white dropdown-item shadow-item" name={{value}} type="submit" value="{{value}}">{{value}}</button></form></li>
+            {% endfor%}
+        {% endfor%}
+        <li><form action="/customizedtype" method="get"><button class="dropdown-item shadow-item" type="submit" value="customizedtype">Customized type of list</button></form></li>
+    </ul>
+</div>
+</form>
 
 {% endblock %}
+

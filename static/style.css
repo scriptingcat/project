@@ -57,15 +57,68 @@ button.shadow:hover{
     /*box-shadow: 2px 2px 15px 1px rgb(83, 169, 235)!important;*/
     box-shadow: 0 0 0 0.25rem rgb(83 169 235 / 50%)!important;
 }
-
 .fontw100 {
     font-weight: 100;
 }
-
 .margindropdown{
     margin: 10px -65px 2px !important;
 }
+.shadow-item{
+    background-color: #f8f9fA!important;
+}
 .shadow-item:hover{
     background-color: rgb(243, 160, 243)!important;
-
+}
+.fontsize10vw{
+    font-size: 10vw;
+}
+.border{
+    outline:solid 2px #D8D;
+}
+.bkground-color-box{
+    background-color: #f8f9fA;
+}
+.bkground-color-box:hover{
+    background-color: rgb(243, 160, 243)!important;
+}
+.round-corner{
+    border-radius: 2.25rem;
+}
+.width05vw{
+    width: 4.3em;
+}
+.text-align-left{
+    text-align: left;
+}
+.text-align-right{
+    text-align: right;
+}
+.inline{
+    display: inline;
+}
+.fontsize22em{
+    font-size: 2.2em;
+}
+.margin-top-inline130{
+    margin-top: -130%;
+}
+.line-height{
+    line-height: 140%;
+}
+.margin-right-inline20{
+    margin-right: -20%;
+}
+.block-small{
+    display: block!important;
+}
+.margin-top-w2{
+    margin-top: 2%;
+}
+.primary-colors-checkbox{
+    color: #48B!important;
+    background-color: #f8f9fA!important;
+}
+.primary-colors-checkbox:checked{
+    color: #48B!important;
+    background-color: #D8D!important;
 }

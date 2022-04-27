@@ -10,7 +10,7 @@ from flask_mail import Mail, Message
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, add_element_movies_tvseries
 from email_validator import validate_email
 
 
@@ -41,6 +41,24 @@ mail=Mail(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///keeptrack.db")
 
+
+listelements = {
+    "Name": "a name for the element",
+    "Title": "a title for the element",
+    "Description" : "a brief text describing the element",
+    "Author": "the author of the element",
+    "Director": "the director of the movie/tv serie",
+    "Datetime": "datetime of particular meaning for the element",
+    "Image/Cover": "an image to associate with the element",
+    "Link": "a link to assciate with the element",
+    "Coordinates": "geographical coordinates to assciate with the element",
+    "Note": "a brief text to assciate with the element",
+    "Qty": "a number for quantity of the element",
+    "Price": "price of the element",
+    "Sum": "sum of price * quantity (must include price)",
+    "Total": "total of sums of price * quantity of all elements (must include price and sum)"
+}
+
 @app.after_request
 def after_request(response):
     # ensure responses aren't cached
@@ -52,7 +70,9 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    return render_template("index.html")
+
+    listtypes = db.execute("SELECT nametable FROM list_types")
+    return render_template("index.html", listtypes=listtypes)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -342,4 +362,11 @@ def resetpassword():
             return render_template("forgotpassword.html", apologymsg=apologymsg)
 
 
-# TODO
+@app.route("/createnewlist", methods=["GET", "POST"])
+@login_required
+def createnewlist():
+    if request.method == "POST":
+        return redirect("/")
+    else:
+        
+        return render_template("customizedtype.html", listelements=listelements)

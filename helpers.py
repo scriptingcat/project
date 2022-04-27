@@ -15,6 +15,9 @@ from functools import wraps
 # library to create jwt token 
 import jwt
 
+# library to conver img into a string
+import base64
+
 # configure application
 app = Flask(__name__)
 
@@ -141,3 +144,36 @@ def check_token_status(user_id, token, tokentype):
     rows = db.execute("SELECT * FROM tokens WHERE user_id=? AND token=?", user_id, token)
     status = rows[0]['status']
     return status
+
+# func to convert img into a string to save in db
+def imgtostr(img):
+    with open(img, "rb") as file:
+        imageinstr = base64.b64encode(file.read())
+    return imageinstr
+
+#func to create a new list in db
+def addlist(nametable, namelist,user_id):
+    # take the id from table of all types of list
+    rows=db.execute("SELECT * FROM list_types WHERE nametable=?", nametable)
+    list_type_id = rows[0]['id']
+    # insert the element
+    db.execute("INSERT INTO lists (user_id,list_type_id,namelist) VALUES (?,?,?)", user_id, list_type_id, namelist)
+    return 
+
+#func to add a new element to list in db
+def add_element_movies_tvseries(nametable, namelist,user_id,title,year,director,description,cover,link,note):
+    db.execute("BEGIN TRANSACTION")
+    # take the id from table of all types of list
+    rows=db.execute("SELECT * FROM list_types WHERE nametable=?", nametable)
+    list_type_id = rows[0]['id']
+    # insert the element
+    db.execute("INSERT INTO movies_tvseries (namelist,list_type_id,user_id,title,year,director,description,cover,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist, list_type_id, user_id,title,year,author,description,cover,link,note)
+    db.execute("COMMIT")
+    return 
+
+#CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
+
+#CREATE TABLE movies_tvseries (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), director TEXT, description TEXT, cover TEXT, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+#CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), author TEXT, description TEXT, cover TEXT, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
+#CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, place TEXT NOT NULL, address TEXT, coordinates TEXT, description TEXT, image TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
+#CREATE TABLE shopping (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, item TEXT NOT NULL, brand TEXT, collection TEXT, quantity INTEGER, price FLOAT, description TEXT, image TEXT, wheretobuy TEXT, note TEXT, status CHECK(status in ('to buy', 'bought')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
