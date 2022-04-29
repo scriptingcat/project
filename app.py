@@ -10,7 +10,7 @@ from flask_mail import Mail, Message
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, add_element_movies_tvseries
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, addlist, add_element_movies_tvseries
 from email_validator import validate_email
 
 
@@ -59,6 +59,7 @@ listelements = {
     "Total": "total of sums of price * quantity of all elements (must include price and sum)"
 }
 
+
 @app.after_request
 def after_request(response):
     # ensure responses aren't cached
@@ -67,12 +68,49 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-
+    # select list of types can be chosen
     listtypes = db.execute("SELECT nametable FROM list_types")
-    return render_template("index.html", listtypes=listtypes)
+
+    # select user's lists already created
+    userslists = db.execute("SELECT namelist FROM lists WHERE user_id=?", session['user_id'])
+
+    if request.method == "POST":
+        typeoflist = request.form.get('typeoflist')
+        namelist = request.form.get('namelist')
+
+        # check values for creating new list
+        if not typeoflist and not namelist:
+            apologymsg = "All fields required"
+            return render_template("index.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+        if not typeoflist:
+            apologymsg = "Type of list selection required"
+            return render_template("index.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+        
+        # not allowing user to manipulate the selections
+        checktype=False
+        for element in listtypes:
+            for key,value in element.items():
+                if typeoflist == value:
+                    checktype = True
+                    break
+            if checktype == True:
+                break
+        if checktype == False:
+            apologymsg = "Type of list selected not recognized"
+            return render_template("index.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+
+        if not namelist:
+            apologymsg = "Name list required"
+            return render_template("index.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+
+        addlist(typeoflist, namelist, session['user_id'])
+        return redirect("/")
+
+    else:
+        return render_template("index.html", listtypes=listtypes, userslists=userslists)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -362,11 +400,12 @@ def resetpassword():
             return render_template("forgotpassword.html", apologymsg=apologymsg)
 
 
-@app.route("/createnewlist", methods=["GET", "POST"])
+@app.route("/list", methods=["GET", "POST"])
 @login_required
-def createnewlist():
+def showlist():
     if request.method == "POST":
-        return redirect("/")
+        return redirect("/list")
     else:
+
         
-        return render_template("customizedtype.html", listelements=listelements)
+        return render_template("list.html",)

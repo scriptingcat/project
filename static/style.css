@@ -78,9 +78,13 @@ button.shadow:hover{
 .bkground-color-box{
     background-color: #f8f9fA;
 }
+.bkground-color-box-white{
+    background-color: #f8f9fA;
+}
 .bkground-color-box:hover{
     background-color: rgb(243, 160, 243)!important;
 }
+
 .round-corner{
     border-radius: 2.25rem;
 }
@@ -121,4 +125,22 @@ button.shadow:hover{
 .primary-colors-checkbox:checked{
     color: #48B!important;
     background-color: #D8D!important;
+}
+.margin-left-85{
+    margin-left: -85%;
+}
+.margin-left-88{
+    margin-left: -88%;
+}
+.margin-left-10{
+    margin-left: 10%;
+}
+.margin-left-15{
+    margin-left: 15%;
+}
+.margin-right-3{
+    margin-right: 3%;
+}
+.margin-left-1{
+    margin-left: 1%;
 }

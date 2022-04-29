@@ -2,17 +2,17 @@
 
 
 {% block title %}
-Your Lists
+Your 
 {% endblock %}
 
 {% block span %}
-your lists
+your 
 {% endblock %}
 
 {% block main %}
 <div>
     <div class="">
-        <form action="/" method="post">
+        <form action="/" method="get">
             <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
                 <div class="mb-3">
                     <button
@@ -52,11 +52,6 @@ your lists
                 </div>
             </div>
         </form>
-        {% if apologymsg %}
-        <div class="mb-3">
-            <p id="apologymsg" class="primary-font mx-auto width15" type="submit" name="apologymsg"> {{apologymsg}} </p>
-            {% endif %}
-        </div>
     </div>
     {% if userslists %}
     <div class="bkground-color-box-white mt-5">

@@ -154,11 +154,23 @@ def imgtostr(img):
 #func to create a new list in db
 def addlist(nametable, namelist,user_id):
     # take the id from table of all types of list
-    rows=db.execute("SELECT * FROM list_types WHERE nametable=?", nametable)
+    rows = db.execute("SELECT * FROM list_types WHERE nametable=?", nametable)
     list_type_id = rows[0]['id']
     # insert the element
     db.execute("INSERT INTO lists (user_id,list_type_id,namelist) VALUES (?,?,?)", user_id, list_type_id, namelist)
     return 
+
+#func to delete a list from db
+def deletelist(nametable, namelist,user_id):
+    # take the id from table of all types of list
+    rows = db.execute("SELECT * FROM list_types WHERE nametable=?", nametable)
+    list_type_id = rows[0]['id']
+    rows2 = db.execute("SELECT * FROM lists WHERE user_id=? AND list_type_id=? AND namelist=?")
+    id = rows2[0]['id']
+    # delete the list from lists
+    db.execute("DELETE FROM lists WHERE id=?", id)
+    # return the lists(id) in order to delete its elements from the specific table
+    return lists_id
 
 #func to add a new element to list in db
 def add_element_movies_tvseries(nametable, namelist,user_id,title,year,director,description,cover,link,note):
@@ -174,6 +186,7 @@ def add_element_movies_tvseries(nametable, namelist,user_id,title,year,director,
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 
 #CREATE TABLE movies_tvseries (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), director TEXT, description TEXT, cover TEXT, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+
 #CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), author TEXT, description TEXT, cover TEXT, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 #CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, place TEXT NOT NULL, address TEXT, coordinates TEXT, description TEXT, image TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 #CREATE TABLE shopping (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, item TEXT NOT NULL, brand TEXT, collection TEXT, quantity INTEGER, price FLOAT, description TEXT, image TEXT, wheretobuy TEXT, note TEXT, status CHECK(status in ('to buy', 'bought')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
