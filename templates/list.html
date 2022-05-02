@@ -1,79 +1,110 @@
 {% extends "layout.html" %}
 
-
 {% block title %}
-Your 
+ {{namelist.capitalize()}} list
 {% endblock %}
 
 {% block span %}
-your 
+{{namelist.capitalize()}}
 {% endblock %}
 
 {% block main %}
+
 <div>
     <div class="">
-        <form action="/" method="get">
             <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
                 <div class="mb-3">
-                    <button
-                        class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
-                        type="button" data-bs-toggle="collapse" data-bs-target="#selecttypelist" aria-expanded="false"
-                        aria-controls="selecttypelist">
-                        Add a new List +
+                    <button class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto" type="button" data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false" aria-controls="addelementinfo"> Add New Element +
                     </button>
                 </div>
-                <div class="collapse" id="selecttypelist">
-                    <div class="d-flex flex-row">
+                <div class="collapse" id="addelementinfo">
+                    <form action="/list?id={{lists_id}}" method="get">
+                    <div class="d-flex flex-row flex-wrap">
+                        <input type="hidden" name="addelement" value="addelement">
+                        {% for element in listelements %}
+                        {% if element['type'] == nametable %}
                         <div class="mb-3 margin-left-15">
-                            <select
-                                class="bkground-color-box-white border form-select mx-auto w-auto knewavefont primary-font"
-                                name="typeoflist">
-                                <option disable selected>Type of List</option>
-                                {% for element in listtypes %}
-                                {% for key,value in element.items() %}
-                                <option value="{{value}}">
-                                    {{value}}
-                                </option>
-                                {% endfor %}
-                                {% endfor %}
-                            </select>
+                            <input
+                                class="bkground-color-box-white border form-control mx-auto w-auto knewavefont primary-font"
+                                name="nametable" disabled type="Text" value={{nametable}}>
                         </div>
+                        {% for key,value in element.items() %}
+                        {% if key != "type" %}
                         <div class="mb-3 margin-left-15">
                             <input
                                 class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                                autocomplete="off" autofocus name="namelist" placeholder="Enter a list name"
+                                autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}" title="{{value}}"
                                 type="text">
                         </div>
-                        <div class="mb-3 margin-left-10">
-                            <button class="block btn knewavefont mx-auto primary-colors shadow"
-                                type="submit">Create</button>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+
+                        <div class="mb-3 margin-left-15">
+                            <input class="block btn knewavefont mx-auto primary-colors shadow"
+                                type="submit" value="Create">
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
-        </form>
+            </div>
     </div>
-    {% if userslists %}
+    
     <div class="bkground-color-box-white mt-5">
         <div class="mb-3 margin-left-88 ">
-            <h2 class="knewavefont primary-font">your lists</h2>
+            <h2 class="knewavefont primary-font">{{namelist}}</h2>
+        </div>
+        <div class="collapse" id="showelementinfo">
+            <div class="d-flex flex-row flex-wrap">
+                {% for element in elements %}
+                <div class="mb-3">
+                    <h3 class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"> Cover: {{element['cover']}}
+                    </h3>
+                </div>
+                <div class="mb-3 inline d-flex flex-row flex-wrap">
+                {% for key,value in element.items() %}
+                {% if key != 'cover' %}
+                <div class="mb-3 margin-left-15">
+                    <h3 class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"> {{key}}: {{value}}
+                    </h3>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </div>
+            </div>
         </div>
         <div class="d-flex flex-row">
-            {% for element in userslists %}
+            {% for element in elements %}            
             <div class="mb-3 margin-left-1 margin-right-3">
-                <form action="/list" method="get">
-                    <button
-                        class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
-                        type="submit" value="{{element['namelist']}}">
-                        {{element['namelist'].capitalize()}}</p>
-                    </button>
-                </form>
+                <button
+                    class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo" aria-expanded="false" aria-controls="showelementinfo"
+                    type="submit" value="">
+                    <div class="mb-3 fontsize10pc">
+                        <div class="width10">
+                            <img src="" alt="">
+                        </div>
+                        <div class="width10">
+                            <h4>
+                                Title: {{element['title']}}
+                            </h4>
+                            <h5>
+                                Year: {{element['year']}}
+                            </h5>
+                            <h5>
+                                Director: {{element['director']}}
+                            </h5>
+                        </div>
+                    </div>
+                </button>
             </div>
             {% endfor %}
         </div>
     </div>
 
-    {% endif %}
+    
 
 </div>
 {% endblock %}

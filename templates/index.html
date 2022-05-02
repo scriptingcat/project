@@ -19,7 +19,7 @@ your lists
                         class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
                         type="button" data-bs-toggle="collapse" data-bs-target="#selecttypelist" aria-expanded="false"
                         aria-controls="selecttypelist">
-                        Add a new List +
+                        Add New List +
                     </button>
                 </div>
                 <div class="collapse" id="selecttypelist">
@@ -66,11 +66,13 @@ your lists
         <div class="d-flex flex-row">
             {% for element in userslists %}
             <div class="mb-3 margin-left-1 margin-right-3">
-                <form action="/list" method="get">
+               
+                <form action="/list?id={{element['id']}}" method="get">
+                    <input name="lists_id" type="hidden" value="{{element['id']}}">
                     <button
                         class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
                         type="submit" value="{{element['namelist']}}">
-                        {{element['namelist'].capitalize()}}</p>
+                        {{element['namelist'].capitalize()}}
                     </button>
                 </form>
             </div>

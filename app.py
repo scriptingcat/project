@@ -10,7 +10,7 @@ from flask_mail import Mail, Message
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, addlist, add_element_movies_tvseries
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, addlist, deletelist, deleteelements, add_element_movies_tvseries
 from email_validator import validate_email
 
 
@@ -42,7 +42,22 @@ mail=Mail(app)
 db = SQL("sqlite:///keeptrack.db")
 
 
-listelements = {
+listelements = [ 
+        {
+            "type": "movies_tvseries",
+            "title": "a title for the element",
+            "year": "year of release",
+            "director": "the director of the movie/tv serie",
+            "description" : "a brief text describing the element",
+            "cover": "an image to associate with the element",
+            "link": "a link to assciate with the element",
+            "note": "a brief text to assciate with the element"
+        },
+
+]
+
+
+'''
     "Name": "a name for the element",
     "Title": "a title for the element",
     "Description" : "a brief text describing the element",
@@ -58,7 +73,7 @@ listelements = {
     "Sum": "sum of price * quantity (must include price)",
     "Total": "total of sums of price * quantity of all elements (must include price and sum)"
 }
-
+'''
 
 @app.after_request
 def after_request(response):
@@ -75,8 +90,7 @@ def index():
     listtypes = db.execute("SELECT nametable FROM list_types")
 
     # select user's lists already created
-    userslists = db.execute("SELECT namelist FROM lists WHERE user_id=?", session['user_id'])
-
+    userslists = db.execute("SELECT namelist, id FROM lists WHERE user_id=?", session['user_id'])
     if request.method == "POST":
         typeoflist = request.form.get('typeoflist')
         namelist = request.form.get('namelist')
@@ -399,13 +413,56 @@ def resetpassword():
             apologymsg = "Expired Token"
             return render_template("forgotpassword.html", apologymsg=apologymsg)
 
+# TODO
+@app.route("/delete", methods=["GET", "POST"])
+@login_required
+def delete():
+    if request.method == "POST":
+
+        return redirect("/")
+    else:
+        return render_template("list.html",)
+
 
 @app.route("/list", methods=["GET", "POST"])
 @login_required
 def showlist():
-    if request.method == "POST":
-        return redirect("/list")
-    else:
+    # show list elements
 
-        
-        return render_template("list.html",)
+    # query for id of list to be shown
+    lists_id = request.args.get('lists_id')
+    # select the list from lists
+    lists = db.execute("SELECT * FROM lists WHERE id=?", lists_id)
+    namelist = lists[0]['namelist']
+    # select the list from list_types
+    list_types = db.execute("SELECT * FROM list_types WHERE id=?", lists[0]['list_type_id'])
+    nametable = list_types [0]['nametable']
+    # select all the element contained in that list
+    elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, lists_id, session['user_id'])
+
+    # input
+    addelement = request.form.get("addelement")
+    title = request.args.get('title')
+    year = request.form.get('year')
+    director = request.form.get('director')
+    description = request.form.get('description')
+    cover = request.form.get('cover')
+    link = request.form.get('link')
+    note = request.form.get('note')
+    
+    print(addelement)
+    print(title)
+    print(year)
+    print(director)
+    #db.execute("INSERT INTO movies_tvseries (namelist,list_type_id,user_id,title,year,director,description,cover,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",elements['namelist'], list_types[0]['id'], session['user_id'],title,year,author,description,cover,link,note)
+
+    #if addelement == "addelement": add_element_movies_tvseries(nametable, elements['namelist'], session['user_id'], title, year, director, description, cover, link, note)
+
+    #return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements)
+
+
+    #return redirect("/list?id=" + lists_id)
+    
+
+    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
+

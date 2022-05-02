@@ -172,6 +172,12 @@ def deletelist(nametable, namelist,user_id):
     # return the lists(id) in order to delete its elements from the specific table
     return lists_id
 
+# func to delete list's elements
+def deleteelements(nametable, lists_id):
+    #delete elements
+    db.execute("DELETE FROM ? WHERE id=?", nametable, lists_id)
+    return 
+
 #func to add a new element to list in db
 def add_element_movies_tvseries(nametable, namelist,user_id,title,year,director,description,cover,link,note):
     db.execute("BEGIN TRANSACTION")
