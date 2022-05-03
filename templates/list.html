@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
- {{namelist.capitalize()}} list
+{{namelist.capitalize()}} list
 {% endblock %}
 
 {% block span %}
@@ -12,15 +12,18 @@
 
 <div>
     <div class="">
-            <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
-                <div class="mb-3">
-                    <button class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto" type="button" data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false" aria-controls="addelementinfo"> Add New Element +
-                    </button>
-                </div>
-                <div class="collapse" id="addelementinfo">
-                    <form action="/list?id={{lists_id}}" method="get">
+        <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
+            <div class="mb-3">
+                <button class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false"
+                    aria-controls="addelementinfo"> Add New Element +
+                </button>
+            </div>
+            <div class="collapse" id="addelementinfo">
+                <form action="/list?lists_id={{lists_id}}" method="post">
                     <div class="d-flex flex-row flex-wrap">
                         <input type="hidden" name="addelement" value="addelement">
+                        <input type="hidden" name="lists_id" value="{{lists_id}}">
                         {% for element in listelements %}
                         {% if element['type'] == nametable %}
                         <div class="mb-3 margin-left-15">
@@ -33,8 +36,8 @@
                         <div class="mb-3 margin-left-15">
                             <input
                                 class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                                autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}" title="{{value}}"
-                                type="text">
+                                autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
+                                title="{{value}}" type="text">
                         </div>
                         {% endif %}
                         {% endfor %}
@@ -42,46 +45,55 @@
                         {% endfor %}
 
                         <div class="mb-3 margin-left-15">
-                            <input class="block btn knewavefont mx-auto primary-colors shadow"
-                                type="submit" value="Create">
+                            <input class="block btn knewavefont mx-auto primary-colors shadow" type="submit"
+                                value="Create">
                         </div>
                     </div>
                 </form>
             </div>
+        </div>
+        {% if apologymsg %}
+            <div class="mb-3">
+                <p id="apologymsg" class="primary-font mx-auto w-auto" type="submit" name="apologymsg"> {{apologymsg}}
+                </p>
             </div>
+            {% endif %}
     </div>
-    
+
     <div class="bkground-color-box-white mt-5">
         <div class="mb-3 margin-left-88 ">
             <h2 class="knewavefont primary-font">{{namelist}}</h2>
         </div>
-        <div class="collapse" id="showelementinfo">
+        {% for element in elements %}
+        <div class="collapse" id="showelementinfo{{element['id']}}">
             <div class="d-flex flex-row flex-wrap">
-                {% for element in elements %}
                 <div class="mb-3">
-                    <h3 class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"> Cover: {{element['cover']}}
+                    <h3 class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font">
+                        Cover: {{element['cover']}}
                     </h3>
                 </div>
                 <div class="mb-3 inline d-flex flex-row flex-wrap">
-                {% for key,value in element.items() %}
-                {% if key != 'cover' %}
-                <div class="mb-3 margin-left-15">
-                    <h3 class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"> {{key}}: {{value}}
-                    </h3>
+                    {% for key,value in element.items() %}
+                    {% if key != 'cover' %}
+                    <div class="mb-3 margin-left-15">
+                        <h3
+                            class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font">
+                            {{key}}: {{value}}
+                        </h3>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
                 </div>
-                {% endif %}
-                {% endfor %}
-                {% endfor %}
-            </div>
             </div>
         </div>
+        {% endfor %}
         <div class="d-flex flex-row">
-            {% for element in elements %}            
+            {% for element in elements %}
             <div class="mb-3 margin-left-1 margin-right-3">
                 <button
                     class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo" aria-expanded="false" aria-controls="showelementinfo"
-                    type="submit" value="">
+                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
+                    aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
                     <div class="mb-3 fontsize10pc">
                         <div class="width10">
                             <img src="" alt="">
@@ -104,7 +116,7 @@
         </div>
     </div>
 
-    
+
 
 </div>
 {% endblock %}

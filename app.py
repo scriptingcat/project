@@ -10,7 +10,7 @@ from flask_mail import Mail, Message
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, addlist, deletelist, deleteelements, add_element_movies_tvseries
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, addlist, deletelist, deleteelements, add_element_movies_tvseries, checkinput
 from email_validator import validate_email
 
 
@@ -432,37 +432,42 @@ def showlist():
     # query for id of list to be shown
     lists_id = request.args.get('lists_id')
     # select the list from lists
-    lists = db.execute("SELECT * FROM lists WHERE id=?", lists_id)
+    lists = db.execute("SELECT * FROM lists WHERE id=?", int(lists_id))
     namelist = lists[0]['namelist']
     # select the list from list_types
     list_types = db.execute("SELECT * FROM list_types WHERE id=?", lists[0]['list_type_id'])
-    nametable = list_types [0]['nametable']
+    nametable = list_types[0]['nametable']
     # select all the element contained in that list
-    elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, lists_id, session['user_id'])
+    elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
 
-    # input
-    addelement = request.form.get("addelement")
-    title = request.args.get('title')
-    year = request.form.get('year')
-    director = request.form.get('director')
-    description = request.form.get('description')
-    cover = request.form.get('cover')
-    link = request.form.get('link')
-    note = request.form.get('note')
+    if request.method == 'POST':
+        # take all the inputs and save them in a dict 
+        # according to the type of list (nametable)
+        # save in a dict keys needed for that type checking from the global listelements
+        dictofrequests = {}
+        for dictionary in listelements:
+            if dictionary['type'] == nametable:
+                dictofrequests['type'] = nametable
+                for key,value in dictionary.items():
+                    elementinput = request.form.get(key)
+                    #if not elementinput:elementinput == 'null'
+                    dictofrequests[key] = elementinput
+                break
+
+        # be sure the form is for adding an element
+        addelement = request.form.get('addelement')
+
+        # check the title input to handle void request
+        if not dictofrequests['title'] or dictofrequests['title'] == None:
+            apologymsg = "Element Title Is Required"
+            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+
+        # add element to movies_tvseries table
+        if addelement == "addelement": 
+            add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],dictofrequests['cover'],dictofrequests['link'], dictofrequests['note'])
+
+        return redirect("/list?lists_id=" + lists_id)
     
-    print(addelement)
-    print(title)
-    print(year)
-    print(director)
-    #db.execute("INSERT INTO movies_tvseries (namelist,list_type_id,user_id,title,year,director,description,cover,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",elements['namelist'], list_types[0]['id'], session['user_id'],title,year,author,description,cover,link,note)
-
-    #if addelement == "addelement": add_element_movies_tvseries(nametable, elements['namelist'], session['user_id'], title, year, director, description, cover, link, note)
-
-    #return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements)
-
-
-    #return redirect("/list?id=" + lists_id)
-    
-
-    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
+    else:
+        return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
 

@@ -179,15 +179,18 @@ def deleteelements(nametable, lists_id):
     return 
 
 #func to add a new element to list in db
-def add_element_movies_tvseries(nametable, namelist,user_id,title,year,director,description,cover,link,note):
+def add_element_movies_tvseries(nametable,namelist,lists_id,user_id,title,year,director,description,cover,link,note):
     db.execute("BEGIN TRANSACTION")
-    # take the id from table of all types of list
-    rows=db.execute("SELECT * FROM list_types WHERE nametable=?", nametable)
-    list_type_id = rows[0]['id']
     # insert the element
-    db.execute("INSERT INTO movies_tvseries (namelist,list_type_id,user_id,title,year,director,description,cover,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist, list_type_id, user_id,title,year,author,description,cover,link,note)
+    db.execute("INSERT INTO movies_tvseries (namelist,lists_id,user_id,title,year,director,description,cover,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist,lists_id, user_id,title,year,director,description,cover,link,note)
     db.execute("COMMIT")
     return 
+
+# func to check input
+def checkinput(input):
+    if input == None:
+        input == 'null'
+    return input
 
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 
