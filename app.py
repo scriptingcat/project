@@ -10,7 +10,7 @@ from flask_mail import Mail, Message
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, addlist, deletelist, deleteelements, add_element_movies_tvseries, checkinput
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, addlist, deletelist, deleteoneelement, add_element_movies_tvseries
 from email_validator import validate_email
 
 
@@ -454,20 +454,61 @@ def showlist():
                     dictofrequests[key] = elementinput
                 break
 
-        # be sure the form is for adding an element
-        addelement = request.form.get('addelement')
+        # actions from this route 
 
-        # check the title input to handle void request
-        if not dictofrequests['title'] or dictofrequests['title'] == None:
-            apologymsg = "Element Title Is Required"
+        # input from the form for request "adding an element"
+        actiononelement = request.form.get('actiononelement')
+
+        # add element to table
+        if actiononelement == "addelement": 
+
+            # call function according to type of table
+            if nametable == "movies_tvseries":
+                # check the title input to handle void request
+                if not dictofrequests['title'] or dictofrequests['title'] == None:
+                    apologymsg = "Element Title Is Required"
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+                add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],dictofrequests['cover'],dictofrequests['link'], dictofrequests['note'])
+                return redirect("/list?lists_id=" + lists_id)
+        # delete one element from table
+        elif actiononelement == "deleteelement":
+            iddeleteelement = request.form.get('iddeleteelement')
+            # check id element to be deleted exists
+            if iddeleteelement:
+                # check id element to be deleted matches user_id
+                checkuser = db.execute("SELECT * FROM ? WHERE id=?",nametable, int(iddeleteelement))
+                checkuser = checkuser[0]['user_id']
+                if checkuser == session['user_id']:
+                    deleteoneelement(nametable, int(iddeleteelement))
+                    return redirect("/list?lists_id=" + lists_id)
+                else:
+                    apologymsg = "Id element does not match user id"
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+            else:
+                apologymsg = "Id element required"
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+        # delete the whole table
+        elif actiononelement == "deletelist":
+            # check lists_id to be deleted matches user_id
+            checkuser = db.execute("SELECT * FROM lists WHERE id=?", lists_id)
+            checkuser = checkuser[0]['user_id']
+            if checkuser == session['user_id']:
+                # check the response submited
+                responsedeletelist = request.form.get('responsedeletelist')
+                if responsedeletelist == 'Yes':
+                    deletelist(lists_id, nametable)
+                    return redirect("/")
+                else:
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
+            else:
+                apologymsg = "Id list does not match user id"
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+
+        else:
+            apologymsg = "Type of Request not recognized"
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
 
-        # add element to movies_tvseries table
-        if addelement == "addelement": 
-            add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],dictofrequests['cover'],dictofrequests['link'], dictofrequests['note'])
-
         return redirect("/list?lists_id=" + lists_id)
-    
+
     else:
         return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
-

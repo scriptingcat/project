@@ -13,57 +13,87 @@
 <div>
     <div class="">
         <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
+            <!--toggle for addelement elements-->
             <div class="mb-3">
                 <button class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
                     type="button" data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false"
                     aria-controls="addelementinfo"> Add New Element +
                 </button>
             </div>
-            <div class="collapse" id="addelementinfo">
-                <form action="/list?lists_id={{lists_id}}" method="post">
-                    <div class="d-flex flex-row flex-wrap">
-                        <input type="hidden" name="addelement" value="addelement">
-                        <input type="hidden" name="lists_id" value="{{lists_id}}">
-                        {% for element in listelements %}
-                        {% if element['type'] == nametable %}
-                        <div class="mb-3 margin-left-15">
-                            <input
-                                class="bkground-color-box-white border form-control mx-auto w-auto knewavefont primary-font"
-                                name="nametable" disabled type="Text" value={{nametable}}>
-                        </div>
-                        {% for key,value in element.items() %}
-                        {% if key != "type" %}
-                        <div class="mb-3 margin-left-15">
-                            <input
-                                class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                                autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
-                                title="{{value}}" type="text">
-                        </div>
-                        {% endif %}
-                        {% endfor %}
-                        {% endif %}
-                        {% endfor %}
-
-                        <div class="mb-3 margin-left-15">
-                            <input class="block btn knewavefont mx-auto primary-colors shadow" type="submit"
-                                value="Create">
-                        </div>
-                    </div>
-                </form>
+            <!--toggle for deletelist-->
+            <div class="mb-3 margin-left-8 ">
+                <button class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#deletelistinfo" aria-expanded="false"
+                    aria-controls="deletelistinfo"> Delete List +
+                </button>
             </div>
         </div>
+        <!-- addelement elements -->
+        <div class="collapse" id="addelementinfo">
+            <form action="/list?lists_id={{lists_id}}" method="post">
+                <div class="d-flex flex-row flex-wrap">
+                    <input type="hidden" name="actiononelement" value="addelement">
+                    <input type="hidden" name="lists_id" value="{{lists_id}}">
+                    {% for element in listelements %}
+                    {% if element['type'] == nametable %}
+                    <div class="mb-3 margin-left-15">
+                        <input
+                            class="bkground-color-box-white border form-control mx-auto w-auto knewavefont primary-font"
+                            name="nametable" disabled type="Text" value={{nametable}}>
+                    </div>
+                    {% for key,value in element.items() %}
+                    {% if key != "type" %}
+                    <div class="mb-3 margin-left-15">
+                        <input
+                            class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
+                            autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
+                            title="{{value}}" type="text">
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+
+                    <div class="mb-3 margin-left-15">
+                        <input class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow" type="submit"
+                            value="Create">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- deletelist elements-->
+        <div class="collapse" id="deletelistinfo">
+            <form action="/list?lists_id={{lists_id}}" method="post">
+                <div class="d-flex flex-row flex-wrap">
+                    <input type="hidden" name="actiononelement" value="deletelist">
+                    <div class="mb-3 margin-left-15 width20 ">
+                        <input class="bkground-color-box-white border form-control mx-auto knewavefont primary-font" disabled type="Text" value="Do you want to delete this list?">
+                    </div>
+                    <div class="mb-3 margin-left-8 ">
+                        <input class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow" name="responsedeletelist" type="submit"
+                        value="Yes">
+                    </div>
+                    <div class="mb-3 margin-left-3">
+                        <input class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow" name="responsedeletelist" type="submit"
+                        value="No">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!--apology -->
         {% if apologymsg %}
-            <div class="mb-3">
-                <p id="apologymsg" class="primary-font mx-auto w-auto" type="submit" name="apologymsg"> {{apologymsg}}
-                </p>
-            </div>
-            {% endif %}
+        <div class="mb-3">
+            <p id="apologymsg" class="primary-font mx-auto w-auto" type="submit" name="apologymsg"> {{apologymsg}}
+            </p>
+        </div>
+        {% endif %}
     </div>
 
     <div class="bkground-color-box-white mt-5">
         <div class="mb-3 margin-left-88 ">
             <h2 class="knewavefont primary-font">{{namelist}}</h2>
         </div>
+        <!-- showelementinfo elements-->
         {% for element in elements %}
         <div class="collapse" id="showelementinfo{{element['id']}}">
             <div class="d-flex flex-row flex-wrap">
@@ -72,22 +102,35 @@
                         Cover: {{element['cover']}}
                     </h3>
                 </div>
-                <div class="mb-3 inline d-flex flex-row flex-wrap">
-                    {% for key,value in element.items() %}
-                    {% if key != 'cover' %}
-                    <div class="mb-3 margin-left-15">
-                        <h3
-                            class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font">
-                            {{key}}: {{value}}
-                        </h3>
+                <div class="mb3-3 inline">
+                    <div class="d-flex flex-row flex-wrap">
+                        {% for key,value in element.items() %}
+                        {% if key != 'cover' %}
+                        <div class="mb-3 margin-left-8 text-align-left width12">
+                            <h3 class="border form-control mx-auto bkground-color-box-white knewavefont primary-font">
+                                {{key}}: {{value}}
+                            </h3>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
                     </div>
-                    {% endif %}
-                    {% endfor %}
+                </div>
+                <!--Delete element-->
+                <div class="mb-3 inline">
+                    <div class="margin-left-70">
+                        <form action="/list?lists_id={{lists_id}}" method="post">
+                            <input name="actiononelement" type="hidden" value="deleteelement">
+                            <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
+                            <input class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow" type="submit"
+                                value="Delete">
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
         {% endfor %}
         <div class="d-flex flex-row">
+            <!-- showelementinfo toggle-->
             {% for element in elements %}
             <div class="mb-3 margin-left-1 margin-right-3">
                 <button

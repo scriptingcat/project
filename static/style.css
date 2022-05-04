@@ -50,7 +50,7 @@ button.shadow:hover{
 }
 
 .width100{
-    width: 100%;
+    width: 100%!important;
 }
 .btnfocus:focus{
     background-color: rgb(243, 160, 243)!important;
@@ -83,6 +83,15 @@ button.shadow:hover{
 }
 .bkground-color-box:hover{
     background-color: rgb(243, 160, 243)!important;
+}
+.bkground-color-box-delete:hover{
+    background-color: rgb(233, 71, 93)!important;
+}
+.bkground-color-box-create:hover{
+    background-color: rgb(71, 233, 184)!important;
+}
+button.bkground-color-box-create:hover{
+    background-color: rgb(71, 233, 184)!important;
 }
 
 .round-corner{
@@ -144,7 +153,21 @@ button.shadow:hover{
 .margin-left-1{
     margin-left: 1%;
 }
-
+.margin-left-70{
+    margin-left: 70%;
+}
+.margin-left-8{
+    margin-left: 8%;
+}
+.margin-left-3{
+    margin-left: 3%;
+}
 .fontsize10pc{
     font-size: 10%;
+}
+.width12{
+    width: 12%
+}
+.width20{
+    width: 20%
 }

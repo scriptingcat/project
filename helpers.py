@@ -160,22 +160,20 @@ def addlist(nametable, namelist,user_id):
     db.execute("INSERT INTO lists (user_id,list_type_id,namelist) VALUES (?,?,?)", user_id, list_type_id, namelist)
     return 
 
-#func to delete a list from db
-def deletelist(nametable, namelist,user_id):
-    # take the id from table of all types of list
-    rows = db.execute("SELECT * FROM list_types WHERE nametable=?", nametable)
-    list_type_id = rows[0]['id']
-    rows2 = db.execute("SELECT * FROM lists WHERE user_id=? AND list_type_id=? AND namelist=?")
-    id = rows2[0]['id']
-    # delete the list from lists
-    db.execute("DELETE FROM lists WHERE id=?", id)
-    # return the lists(id) in order to delete its elements from the specific table
-    return lists_id
+#func to delete a list from db and all its element in nametable db
+def deletelist(lists_id, nametable):
+    db.execute("BEGIN TRANSACTION")
+    # delete the list from table of all of user's lists
+    db.execute("DELETE FROM lists WHERE id=?", lists_id)
+    # delete all its elements in nametable db
+    db.execute("DELETE FROM ? WHERE lists_id=?", nametable, lists_id)
+    db.execute("COMMIT")
+    return
 
-# func to delete list's elements
-def deleteelements(nametable, lists_id):
+# func to delete one list's element
+def deleteoneelement(nametable, elementid):
     #delete elements
-    db.execute("DELETE FROM ? WHERE id=?", nametable, lists_id)
+    db.execute("DELETE FROM ? WHERE id=?", nametable, elementid)
     return 
 
 #func to add a new element to list in db
@@ -186,11 +184,6 @@ def add_element_movies_tvseries(nametable,namelist,lists_id,user_id,title,year,d
     db.execute("COMMIT")
     return 
 
-# func to check input
-def checkinput(input):
-    if input == None:
-        input == 'null'
-    return input
 
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 
