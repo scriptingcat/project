@@ -124,7 +124,11 @@ def index():
         return redirect("/")
 
     else:
-        return render_template("index.html", listtypes=listtypes, userslists=userslists)
+        showmessage = request.args.get('message')
+        if len(showmessage) == 0:
+            return render_template("index.html", listtypes=listtypes, userslists=userslists)
+        else:
+            return render_template("index.html", listtypes=listtypes, userslists=userslists, showmessage=showmessage)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -413,16 +417,6 @@ def resetpassword():
             apologymsg = "Expired Token"
             return render_template("forgotpassword.html", apologymsg=apologymsg)
 
-# TODO
-@app.route("/delete", methods=["GET", "POST"])
-@login_required
-def delete():
-    if request.method == "POST":
-
-        return redirect("/")
-    else:
-        return render_template("list.html",)
-
 
 @app.route("/list", methods=["GET", "POST"])
 @login_required
@@ -475,14 +469,14 @@ def showlist():
             iddeleteelement = request.form.get('iddeleteelement')
             # check id element to be deleted exists
             if iddeleteelement:
-                # check id element to be deleted matches user_id
+                # check user of id element to be deleted matches session's user_id
                 checkuser = db.execute("SELECT * FROM ? WHERE id=?",nametable, int(iddeleteelement))
                 checkuser = checkuser[0]['user_id']
                 if checkuser == session['user_id']:
                     deleteoneelement(nametable, int(iddeleteelement))
                     return redirect("/list?lists_id=" + lists_id)
                 else:
-                    apologymsg = "Id element does not match user id"
+                    apologymsg = "Id element does not match user id. Action on this id denied"
                     return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
             else:
                 apologymsg = "Id element required"
@@ -511,4 +505,12 @@ def showlist():
         return redirect("/list?lists_id=" + lists_id)
 
     else:
-        return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
+        # check lists_id user matches session's user_id
+        # prevent from showing other users' lists by manipulating html code
+        user_id = lists[0]['user_id']
+        if session['user_id'] == user_id:
+            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
+        else:
+            apologymsg = "Something went wrong. Access to list Denied"
+            return redirect("/?message=" + apologymsg)
+

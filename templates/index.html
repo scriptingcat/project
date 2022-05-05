@@ -11,6 +11,11 @@ your lists
 
 {% block main %}
 <div>
+    {% if showmessage %}
+        <div class="mb-3">
+            <p id="apologymsg" class="primary-font mx-auto width15" type="text" name="showmessage"> {{showmessage}} </p>
+        </div>
+        {% endif %}
     <div class="">
         <form action="/" method="post">
             <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
