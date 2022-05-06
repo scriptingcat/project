@@ -30,7 +30,7 @@
         </div>
         <!-- addelement elements -->
         <div class="collapse" id="addelementinfo">
-            <form action="/list?lists_id={{lists_id}}" method="post">
+            <form action="/list?lists_id={{lists_id}}" method="post" enctype="multipart/form-data">
                 <div class="d-flex flex-row flex-wrap">
                     <input type="hidden" name="actiononelement" value="addelement">
                     <input type="hidden" name="lists_id" value="{{lists_id}}">
@@ -42,14 +42,23 @@
                             name="nametable" disabled type="Text" value={{nametable}}>
                     </div>
                     {% for key,value in element.items() %}
-                    {% if key != "type" %}
-                    <div class="mb-3 margin-left-15">
-                        <input
-                            class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                            autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
-                            title="{{value}}" type="text">
-                    </div>
-                    {% endif %}
+                        {% if key != "type" %}
+                            {% if key == "cover" or key == 'image' %}
+                            <div class="mb-3 margin-left-15">
+                                <input
+                                    class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
+                                     name="inputimage" placeholder="Enter a {{key.capitalize()}}"
+                                    title="{{value}}" type="file">
+                            </div>
+                            {% else %}
+                            <div class="mb-3 margin-left-15">
+                                <input
+                                    class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
+                                    autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
+                                    title="{{value}}" type="text">
+                            </div>
+                            {% endif %}
+                        {% endif %}
                     {% endfor %}
                     {% endif %}
                     {% endfor %}
@@ -98,9 +107,8 @@
         <div class="collapse" id="showelementinfo{{element['id']}}">
             <div class="d-flex flex-row flex-wrap">
                 <div class="mb-3">
-                    <h3 class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font">
-                        Cover: {{element['cover']}}
-                    </h3>
+                    <img class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font" src="data:image/jpeg;base64, {{element['cover']}}">
+                    
                 </div>
                 <div class="mb3-3 inline">
                     <div class="d-flex flex-row flex-wrap">

@@ -18,6 +18,7 @@ import jwt
 # library to conver img into a string
 import base64
 
+
 # configure application
 app = Flask(__name__)
 
@@ -145,11 +146,22 @@ def check_token_status(user_id, token, tokentype):
     status = rows[0]['status']
     return status
 
-# func to convert img into a string to save in db
-def imgtostr(img):
-    with open(img, "rb") as file:
-        imageinstr = base64.b64encode(file.read())
-    return imageinstr
+# func to convert img into large binary object to save in db
+def imgtoblob(img):
+    # read the file as binary
+    fileinblob = img.stream.read()
+    print('2')
+    print(type(fileinblob))
+    print(fileinblob)
+    '''with open(fileinblob, 'rb') as file:
+        reader = file.read()'''
+    return reader
+
+# func to convert img string into bytes to be shown
+def blobtoimg(imgblob):
+    # convert
+    image = b64encode(imgblob).decode("utf-8")
+    return image
 
 #func to create a new list in db
 def addlist(nametable, namelist,user_id):
@@ -163,10 +175,10 @@ def addlist(nametable, namelist,user_id):
 #func to delete a list from db and all its element in nametable db
 def deletelist(lists_id, nametable):
     db.execute("BEGIN TRANSACTION")
-    # delete the list from table of all of user's lists
-    db.execute("DELETE FROM lists WHERE id=?", lists_id)
-    # delete all its elements in nametable db
+    # first delete all its elements in nametable db
     db.execute("DELETE FROM ? WHERE lists_id=?", nametable, lists_id)
+    # then, delete the list from table of all of user's lists
+    db.execute("DELETE FROM lists WHERE id=?", lists_id)
     db.execute("COMMIT")
     return
 

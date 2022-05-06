@@ -10,7 +10,7 @@ from flask_mail import Mail, Message
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtostr, addlist, deletelist, deleteoneelement, add_element_movies_tvseries
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtoblob, blobtoimg, addlist, deletelist, deleteoneelement, add_element_movies_tvseries
 from email_validator import validate_email
 
 
@@ -125,7 +125,7 @@ def index():
 
     else:
         showmessage = request.args.get('message')
-        if len(showmessage) == 0:
+        if showmessage is None or len(showmessage) == 0:
             return render_template("index.html", listtypes=listtypes, userslists=userslists)
         else:
             return render_template("index.html", listtypes=listtypes, userslists=userslists, showmessage=showmessage)
@@ -435,26 +435,42 @@ def showlist():
     elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
 
     if request.method == 'POST':
-        # take all the inputs and save them in a dict 
-        # according to the type of list (nametable)
-        # save in a dict keys needed for that type checking from the global listelements
-        dictofrequests = {}
-        for dictionary in listelements:
-            if dictionary['type'] == nametable:
-                dictofrequests['type'] = nametable
-                for key,value in dictionary.items():
-                    elementinput = request.form.get(key)
-                    #if not elementinput:elementinput == 'null'
-                    dictofrequests[key] = elementinput
-                break
 
         # actions from this route 
 
-        # input from the form for request "adding an element"
+        # input from the form for request 
         actiononelement = request.form.get('actiononelement')
-
+        
         # add element to table
         if actiononelement == "addelement": 
+            
+            # handle inputs based on type of table
+
+            # initialize a void dict where to save all the input
+            dictofrequests = {}
+            # check in global listelements which types of input are needed for that particular table
+            for dictionary in listelements:
+                # when found the table type that matches the nametable of lists_id showing
+                if dictionary['type'] == nametable:
+                    # save that nametable value for key type in dict of inputs requests
+                    dictofrequests['type'] = nametable
+                    # for each key in this dict add value equals to input
+                    for key,value in dictionary.items():
+                        # first check whether its a text input or image/file
+                        if key == 'cover' or key == 'image':
+                            # take the object
+                            file = request.files['inputimage']
+                            # check is not none
+                            if file == None:
+                                elementinput = 'null'
+                            else:
+                                # encode
+                                elementinput = imgtoblob(file)
+                                print(type(elementinput))
+                        else:
+                            elementinput = request.form.get(key)
+                        dictofrequests[key] = elementinput
+                    break
 
             # call function according to type of table
             if nametable == "movies_tvseries":
@@ -464,6 +480,7 @@ def showlist():
                     return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
                 add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],dictofrequests['cover'],dictofrequests['link'], dictofrequests['note'])
                 return redirect("/list?lists_id=" + lists_id)
+
         # delete one element from table
         elif actiononelement == "deleteelement":
             iddeleteelement = request.form.get('iddeleteelement')
@@ -481,6 +498,7 @@ def showlist():
             else:
                 apologymsg = "Id element required"
                 return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+        
         # delete the whole table
         elif actiononelement == "deletelist":
             # check lists_id to be deleted matches user_id
@@ -502,13 +520,18 @@ def showlist():
             apologymsg = "Type of Request not recognized"
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
 
-        return redirect("/list?lists_id=" + lists_id)
+        #return redirect("/list?lists_id=" + lists_id)
 
     else:
         # check lists_id user matches session's user_id
         # prevent from showing other users' lists by manipulating html code
         user_id = lists[0]['user_id']
         if session['user_id'] == user_id:
+            '''for element in elements:
+                for key,value in element.items():
+                    if key == 'image' or key == 'cover':
+                        element[key] = blobtoimg(element[key])
+            #print(type(element['cover']))'''
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
         else:
             apologymsg = "Something went wrong. Access to list Denied"
