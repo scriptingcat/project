@@ -106,11 +106,15 @@
         {% for element in elements %}
         <div class="collapse" id="showelementinfo{{element['id']}}">
             <div class="d-flex flex-row flex-wrap">
-                <div class="mb-3">
-                    <img class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font" src="data:image/jpeg;base64, {{element['cover']}}">
-                    
+                {% for image in images%}
+                {% if image['nametable_id'] == element['id'] %}
+                <div class="mb-3 width15">
+                    <img class="border form-control bkground-color-box-white knewavefont primary-font" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
                 </div>
-                <div class="mb3-3 inline">
+
+               {% endif %}
+                {% endfor %}
+                <div class="mb-3 inline width60">
                     <div class="d-flex flex-row flex-wrap">
                         {% for key,value in element.items() %}
                         {% if key != 'cover' %}
@@ -124,7 +128,7 @@
                     </div>
                 </div>
                 <!--Delete element-->
-                <div class="mb-3 inline">
+                <div class="mb-3 inline width15" >
                     <div class="margin-left-70">
                         <form action="/list?lists_id={{lists_id}}" method="post">
                             <input name="actiononelement" type="hidden" value="deleteelement">

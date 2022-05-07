@@ -146,22 +146,6 @@ def check_token_status(user_id, token, tokentype):
     status = rows[0]['status']
     return status
 
-# func to convert img into large binary object to save in db
-def imgtoblob(img):
-    # read the file as binary
-    fileinblob = img.stream.read()
-    print('2')
-    print(type(fileinblob))
-    print(fileinblob)
-    '''with open(fileinblob, 'rb') as file:
-        reader = file.read()'''
-    return reader
-
-# func to convert img string into bytes to be shown
-def blobtoimg(imgblob):
-    # convert
-    image = b64encode(imgblob).decode("utf-8")
-    return image
 
 #func to create a new list in db
 def addlist(nametable, namelist,user_id):
@@ -175,8 +159,11 @@ def addlist(nametable, namelist,user_id):
 #func to delete a list from db and all its element in nametable db
 def deletelist(lists_id, nametable):
     db.execute("BEGIN TRANSACTION")
+
     # first delete all its elements in nametable db
     db.execute("DELETE FROM ? WHERE lists_id=?", nametable, lists_id)
+    # second delete all its imgs in imgs db
+    db.execute("DELETE FROM imgs WHERE lists_id=?", lists_id)
     # then, delete the list from table of all of user's lists
     db.execute("DELETE FROM lists WHERE id=?", lists_id)
     db.execute("COMMIT")
@@ -185,16 +172,28 @@ def deletelist(lists_id, nametable):
 # func to delete one list's element
 def deleteoneelement(nametable, elementid):
     #delete elements
+    # first delete its image in imgs db
+    db.execute("DELETE FROM imgs WHERE nametable=? AND nametable_id=?", nametable, elementid)
     db.execute("DELETE FROM ? WHERE id=?", nametable, elementid)
     return 
 
-#func to add a new element to list in db
-def add_element_movies_tvseries(nametable,namelist,lists_id,user_id,title,year,director,description,cover,link,note):
+# func to add a new element to list in db
+def add_element_movies_tvseries(nametable,namelist,lists_id,user_id,title,year,director,description,img_id,link,note):
     db.execute("BEGIN TRANSACTION")
-    # insert the element
-    db.execute("INSERT INTO movies_tvseries (namelist,lists_id,user_id,title,year,director,description,cover,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist,lists_id, user_id,title,year,director,description,cover,link,note)
+    # insert the element data
+    # 0 value is value for null since db column only takes integers
+    # if img_id == 'null':
+        #img_id == 0;
+    db.execute("INSERT INTO movies_tvseries (namelist,lists_id,user_id,title,year,director,description,img_id,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist,lists_id, user_id,title,year,director,description,img_id,link,note)
+    rows = db. execute("SELECT * FROM movies_tvseries WHERE namelist=? AND lists_id=? AND user_id=? AND title=?", namelist, lists_id, user_id, title)
+    nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
     db.execute("COMMIT")
-    return 
+    return nametable_id
+
+# func to add an img in imgs db
+def addimage(img, name, mimetype, nametable, nametable_id, lists_id):
+    db.execute("INSERT INTO imgs (img, name, mimetype, nametable, nametable_id, lists_id) VALUES (?,?,?, ?,?, ?)", img, name, mimetype, nametable, nametable_id, lists_id)
+    return
 
 
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));

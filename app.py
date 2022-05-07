@@ -1,7 +1,7 @@
 #app
 
 import os
-from flask import Flask,redirect, request, render_template, session
+from flask import Flask,redirect, request, render_template, session, Response, send_file
 from flask_session import Session
 from tempfile import mkdtemp
 from flask_mail import Mail, Message
@@ -9,13 +9,20 @@ from flask_mail import Mail, Message
 
 from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, imgtoblob, blobtoimg, addlist, deletelist, deleteoneelement, add_element_movies_tvseries
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage
 from email_validator import validate_email
+
+from io import BytesIO
 
 
 # library to create jwt token 
 import jwt
+
+# library to encode/decode img 
+import base64
+
 
 # configure application
 app = Flask(__name__)
@@ -433,6 +440,7 @@ def showlist():
     nametable = list_types[0]['nametable']
     # select all the element contained in that list
     elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
+    images = db.execute("SELECT * FROM imgs WHERE lists_id=?", lists_id)
 
     if request.method == 'POST':
 
@@ -461,12 +469,12 @@ def showlist():
                             # take the object
                             file = request.files['inputimage']
                             # check is not none
-                            if file == None:
-                                elementinput = 'null'
+                            if not file:
+                                print('NONe')
+                                elementinput == None
                             else:
-                                # encode
-                                elementinput = imgtoblob(file)
-                                print(type(elementinput))
+                                print('notnone')
+                                elementinput = file
                         else:
                             elementinput = request.form.get(key)
                         dictofrequests[key] = elementinput
@@ -477,8 +485,28 @@ def showlist():
                 # check the title input to handle void request
                 if not dictofrequests['title'] or dictofrequests['title'] == None:
                     apologymsg = "Element Title Is Required"
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
-                add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],dictofrequests['cover'],dictofrequests['link'], dictofrequests['note'])
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg.capitalize())
+                # check whether there's an img to save in db:
+                if not dictofrequests['cover']:
+                    add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],0,dictofrequests['link'], dictofrequests['note'])
+                else:
+                    db.execute("BEGIN TRANSACTION")
+                    # take all the info from filestorage obj
+                    #data
+                    img = dictofrequests['cover'].read()
+                    #filename - how suggested by the guidelines
+                    filename = secure_filename(dictofrequests['cover'].filename)
+                    #mimetype
+                    mimetype = dictofrequests['cover'].mimetype
+                    # add the element to the nametable type table and take nametable_id to pass to addimage
+                    nametable_id_info = add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],'null',dictofrequests['link'], dictofrequests['note'])
+                    # add the image to image db
+                    addimage(img, filename, mimetype, nametable_id_info['nametable'], nametable_id_info['nametable_id'], nametable_id_info['lists_id'])
+                    img_id = db.execute("SELECT * FROM imgs WHERE img=? AND name=? AND mimetype=?", img, filename, mimetype)
+                    img_id = img_id[0]['id']
+                    # update img_id in nametbale db
+                    db.execute("UPDATE movies_tvseries SET img_id=? WHERE id=?",img_id, nametable_id_info['nametable_id'])
+                    db.execute("COMMIT")
                 return redirect("/list?lists_id=" + lists_id)
 
         # delete one element from table
@@ -494,10 +522,10 @@ def showlist():
                     return redirect("/list?lists_id=" + lists_id)
                 else:
                     apologymsg = "Id element does not match user id. Action on this id denied"
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg.capitalize())
             else:
                 apologymsg = "Id element required"
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
         
         # delete the whole table
         elif actiononelement == "deletelist":
@@ -511,14 +539,14 @@ def showlist():
                     deletelist(lists_id, nametable)
                     return redirect("/")
                 else:
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images)
             else:
                 apologymsg = "Id list does not match user id"
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
 
         else:
             apologymsg = "Type of Request not recognized"
-            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, apologymsg=apologymsg.capitalize())
+            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
 
         #return redirect("/list?lists_id=" + lists_id)
 
@@ -527,13 +555,24 @@ def showlist():
         # prevent from showing other users' lists by manipulating html code
         user_id = lists[0]['user_id']
         if session['user_id'] == user_id:
-            '''for element in elements:
-                for key,value in element.items():
-                    if key == 'image' or key == 'cover':
-                        element[key] = blobtoimg(element[key])
-            #print(type(element['cover']))'''
-            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id)
+            for image in images:
+                image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
+            print(type(images))
+            print(type(images[0]))
+            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images)
         else:
             apologymsg = "Something went wrong. Access to list Denied"
             return redirect("/?message=" + apologymsg)
 
+@app.route('/image')
+def image():
+    img = db.execute("SELECT * FROM imgs WHERE id=?", 5)
+    image = base64.b64encode(img[0]['img']).decode('ascii')
+    print(type(image))
+    return render_template('image.html',data=img[0]['mimetype'], image=image)
+
+
+@app.route('/download')
+def download():
+    img = db.execute("SELECT * FROM imgs WHERE id=?", 5)
+    return send_file(BytesIO(img[0]['img']), attachment_filename='test.jpg',as_attachment=True) 
