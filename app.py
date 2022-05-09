@@ -508,6 +508,29 @@ def showlist():
                     db.execute("UPDATE movies_tvseries SET img_id=? WHERE id=?",img_id, nametable_id_info['nametable_id'])
                     db.execute("COMMIT")
                 return redirect("/list?lists_id=" + lists_id)
+        
+        # change list name
+        elif actiononelement == "changenamelist":
+            newnamelist = request.form.get('newnamelist')
+            responsechangenamelist = request.form.get('responsechangenamelist')
+            # check lists_id to be deleted matches user_id
+            checkuser = db.execute("SELECT * FROM lists WHERE id=?", lists_id)
+            checkuser = checkuser[0]['user_id']
+            if checkuser == session['user_id']:
+                # check the response submited
+                if responsechangenamelist == "Change":
+                    # make sure a new list name is provided when submiting for change
+                    if not newnamelist:
+                        apologymsg = "New List Name required"
+                        return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg.capitalize())
+                    else:
+                        db.execute("BEGIN TRANSACTION")
+                        db.execute("UPDATE lists SET namelist=? WHERE id=?",newnamelist, lists_id)
+                        db.execute("UPDATE ? SET namelist=? WHERE lists_id=?",nametable, newnamelist, lists_id)
+                        db.execute("COMMIT")
+                        return redirect("/list?lists_id=" + lists_id)
+                else:
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images)
 
         # delete one element from table
         elif actiononelement == "deleteelement":
@@ -587,14 +610,14 @@ def image():
     try:
         # hande input
         if not nametable_id or not nametable:
-            apologymsg = "Something went wrong. Access to element Denied 1"
+            apologymsg = "Something went wrong. Access to element Denied"
             return redirect("/?message=" + apologymsg)
         
         rows = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(nametable_id))
         print(rows)
         # check user requesting is owner of the element
         if rows[0]['user_id'] != session['user_id']:
-            apologymsg = "Something went wrong. Access to element Denied 2"
+            apologymsg = "Something went wrong. Access to element Denied"
             return redirect("/?message=" + apologymsg)
 
         img = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=?", int(nametable_id), nametable)
