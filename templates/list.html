@@ -108,9 +108,15 @@
             <div class="d-flex flex-row flex-wrap">
                 {% for image in images%}
                 {% if image['nametable_id'] == element['id'] %}
-                <div class="mb-3 width15">
-                    <img class="border form-control bkground-color-box-white knewavefont primary-font" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
-                </div>
+                <div class="mb-3 width14">
+                <form action="/image?{{image['nametable']}}&{{image['nametable_id']}} " method="get">
+                    <input name="nametable_id" type="hidden" value="{{image['nametable_id']}}">
+                    <input name="nametable" type="hidden" value="{{image['nametable']}}">
+                    <button class="noborder" type="submit">
+                        <img class="border form-control bkground-color-box-white knewavefont primary-font" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
+                    </button>
+            </form>
+        </div>
 
                {% endif %}
                 {% endfor %}
@@ -126,9 +132,21 @@
                         {% endif %}
                         {% endfor %}
                     </div>
+                </div class="mb-3 inline width14">
+                <div>
+                <!--Download element-->
+                <div class="mb-3" >
+                    <div class="margin-left-70">
+                        <form action="/list?lists_id={{lists_id}}" method="post">
+                            <input name="actiononelement" type="hidden" value="downloadelement">
+                            <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
+                            <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow" type="submit"
+                                value="Download">
+                        </form>
+                    </div>
                 </div>
                 <!--Delete element-->
-                <div class="mb-3 inline width15" >
+                <div class="mb-3" >
                     <div class="margin-left-70">
                         <form action="/list?lists_id={{lists_id}}" method="post">
                             <input name="actiononelement" type="hidden" value="deleteelement">
@@ -138,6 +156,7 @@
                         </form>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
         {% endfor %}

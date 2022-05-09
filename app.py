@@ -543,7 +543,21 @@ def showlist():
             else:
                 apologymsg = "Id list does not match user id"
                 return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+        # download element
+        elif actiononelement == 'downloadelement':
+            iddownloadelement = request.form.get('iddownloadelement')
+            # handle id request
+            if not iddownloadelement:
+                apologymsg = "Id element required"
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+            img_id = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(iddownloadelement))
+            # check id element belongs to session's user
+            if img_id[0]['user_id'] != session['user_id']:
+                apologymsg = "Id does not match user id"
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
 
+            img = db.execute("SELECT * FROM imgs WHERE id=?", int(img_id[0]['img_id']))
+            return send_file(BytesIO(img[0]['img']), attachment_filename='download.jpg',as_attachment=True) 
         else:
             apologymsg = "Type of Request not recognized"
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
@@ -557,22 +571,38 @@ def showlist():
         if session['user_id'] == user_id:
             for image in images:
                 image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
-            print(type(images))
-            print(type(images[0]))
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images)
         else:
             apologymsg = "Something went wrong. Access to list Denied"
             return redirect("/?message=" + apologymsg)
 
 @app.route('/image')
+@login_required
 def image():
-    img = db.execute("SELECT * FROM imgs WHERE id=?", 5)
-    image = base64.b64encode(img[0]['img']).decode('ascii')
-    print(type(image))
-    return render_template('image.html',data=img[0]['mimetype'], image=image)
 
+    # open image
+    nametable_id = request.args.get('nametable_id')
+    nametable = request.args.get('nametable')
+    
+    try:
+        # hande input
+        if not nametable_id or not nametable:
+            apologymsg = "Something went wrong. Access to element Denied 1"
+            return redirect("/?message=" + apologymsg)
+        
+        rows = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(nametable_id))
+        print(rows)
+        # check user requesting is owner of the element
+        if rows[0]['user_id'] != session['user_id']:
+            apologymsg = "Something went wrong. Access to element Denied 2"
+            return redirect("/?message=" + apologymsg)
 
-@app.route('/download')
-def download():
-    img = db.execute("SELECT * FROM imgs WHERE id=?", 5)
-    return send_file(BytesIO(img[0]['img']), attachment_filename='test.jpg',as_attachment=True) 
+        img = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=?", int(nametable_id), nametable)
+        image = base64.b64encode(img[0]['img']).decode('ascii')
+        return render_template('image.html',data=img[0]['mimetype'], image=image)
+
+    # for any other type of exception
+    except:
+        apologymsg = "Something went wrong"
+        return redirect("/?message=" + apologymsg)
+
