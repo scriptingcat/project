@@ -1,0 +1,28 @@
+    
+    {% for element in elements %}
+    <li class="p-2 style-li-notype">
+    <div class="mb-3">
+    <button
+        class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
+        type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
+        aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
+        <div class="mb-3 fontsize10pc">
+            <div class="width10">
+                <img src="" alt="">
+            </div>
+            <div class="width10">
+                <h4>
+                    Title: {{element['title']}}
+                </h4>
+                <h5>
+                    Year: {{element['year']}}
+                </h5>
+                <h5>
+                    Director: {{element['director']}}
+                </h5>
+            </div>
+        </div>
+    </button>
+    </div>
+    </li>
+    {% endfor %}

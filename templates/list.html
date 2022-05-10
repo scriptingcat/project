@@ -70,7 +70,8 @@
                 </div>
                 <!--sortby-->
                 <div class="p-2 ">
-                    <select
+                    <input id="listsid" type="hidden" value={{lists_id}}>
+                    <select id="sortselect"
                         class="bkground-color-box-white border form-select knewavefont mx-auto primary-font"
                         name="typeoflist">
                         <option disable selected>sort by</option>
@@ -254,9 +255,58 @@
             </div>
         </div>
         {% endfor %}
-        <!--list's items-->
         <div class="max-width100">
-            <!-- showelementinfo toggle-->
+            <ul id="elementsul" class="d-flex align-items-start flex-wrap">
+            </ul>
+            <ul id="elementsdefault" class="d-flex align-items-start flex-wrap">
+                {% for element in elements %}
+                <li class="p-2 style-li-notype">
+                <div class="mb-3">
+                <button
+                    class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
+                    aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
+                    <div class="mb-3 fontsize10pc">
+                        <div class="width10">
+                            <img src="" alt="">
+                        </div>
+                        <div class="width10">
+                            <h4>
+                                Title: {{element['title']}}
+                            </h4>
+                            <h5>
+                                Year: {{element['year']}}
+                            </h5>
+                            <h5>
+                                Director: {{element['director']}}
+                            </h5>
+                        </div>
+                    </div>
+                </button>
+                </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <script>
+                let listsid = document.getElementById('listsid')
+                let sortselect = document.getElementById('sortselect')
+                let elementsdefault = document.getElementById('elementsdafault');
+                sortselect.addEventListener('change', async function() {
+                    
+                    let response = await fetch('/elements?lists_id=' + listsid.value + '&sortby=' + sortselect.value);
+                    let elements = await response.text();
+                    document.getElementById('elementsul').innerHTML = elements;
+                    document.getElementById('elementsdefault').innerHTML = null;
+                    ;
+
+                    }
+                );
+            </script>
+        </div>
+        <!--
+        list's items
+        <div class="max-width100">
+             showelementinfo toggle
             <ul class="d-flex align-items-start flex-wrap">
                 {% for element in elements %}
                 <li class="p-2 style-li-notype">
@@ -283,10 +333,10 @@
                     </div>
                 </button>
                 </div>
-            </li>
+                </li>
                 {% endfor %}
             </ul>
-        </div>
+        </div> -->
     </div>
 
 

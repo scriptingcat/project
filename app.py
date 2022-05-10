@@ -616,7 +616,6 @@ def image():
             return redirect("/?message=" + apologymsg)
         
         rows = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(nametable_id))
-        print(rows)
         # check user requesting is owner of the element
         if rows[0]['user_id'] != session['user_id']:
             apologymsg = "Something went wrong. Access to element Denied"
@@ -649,3 +648,25 @@ def search():
         return render_template("search.html", entry=entry)
     else:
         return render_template("search.html", apologymsg="no result")
+
+@app.route('/elements')
+@login_required
+def elements():
+    sortby = request.args.get('sortby')
+    lists_id = request.args.get('lists_id')
+    lists = db.execute("SELECT * FROM lists WHERE id=?", int(lists_id))
+    namelist = lists[0]['namelist']
+    # select the list from list_types
+    list_types = db.execute("SELECT * FROM list_types WHERE id=?", lists[0]['list_type_id'])
+    nametable = list_types[0]['nametable']
+    # select all the element contained in that list
+    elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
+    if sortby:
+        if sortby == 'title':
+            elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY title ASC", nametable, int(lists_id), session['user_id'])
+        elif sortby == 'author':
+            elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY director ASC", nametable, int(lists_id), session['user_id'])
+        else:
+            elementssorted = elements
+        elements = elementssorted
+    return render_template("elements.html", elements=elements)
