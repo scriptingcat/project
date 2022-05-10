@@ -12,36 +12,64 @@
 
 <div>
     <div class="">
-        <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
-            <!--toggle for change namelist elements-->
-            <div class="mb-3">
-                <button class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#changenamelistinfo" aria-expanded="false"
-                    aria-controls="changenamelistinfo"> Change List Name +
-                </button>
+        <div class="d-flex justify-content-between">
+            <!--div left-->
+            <div class="p-2 d-flex justify-content-between">
+                <!--toggle for change namelist elements-->
+                <div class="p-2">
+                    <button
+                        class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#changenamelistinfo"
+                        aria-expanded="false" aria-controls="changenamelistinfo"> Change List Name +
+                    </button>
+                </div>
+                <!--toggle for addelement elements-->
+                <div class="p-2">
+                    <button
+                        class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false"
+                        aria-controls="addelementinfo"> Add New Element +
+                    </button>
+                </div>
+                <!--toggle for deletelist-->
+                <div class="p-2">
+                    <button
+                        class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#deletelistinfo" aria-expanded="false"
+                        aria-controls="deletelistinfo"> Delete List +
+                    </button>
+                </div>
             </div>
-            <!--toggle for addelement elements-->
-            <div class="mb-3 margin-left-8">
-                <button class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false"
-                    aria-controls="addelementinfo"> Add New Element +
-                </button>
+            <!--div right-->
+            <div class="p-2 d-flex justify-content-between">
+                <!--search-->
+                <div class="p-2 ">
+                    <input id="lists_id" type="hidden" value="{{lists_id}}">
+                    <input id="search"
+                        class="bkground-color-box-white border form-control mx-auto knewavefont primary-font"
+                        name="searchbar" autocomplete="off" autofocus type="search" placeholder="search">
+                    <ul id="result"></ul>
+                    <script>
+                        let lists_id = document.getElementById('lists_id')
+                        let input_search = document.getElementById('search')
+                        input_search.addEventListener('input', async function() {
+                            let response = await fetch('/search?lists_id=' + lists_id.value + '&q=' + input_search.value);
+                            if (input_search.value == '') {
+                                document.getElementById('result').innerHTML = null;
+                                return;
+                            }
+                            else {
+                                let entry = await response.text();
+                                document.getElementById('result').innerHTML = entry;
+                                return;
+                            }
+                        });
+                    </script>
+                </div>
+                <div class="p-2 ">
+                    <input id="lists_id" type="text" value="{{lists_id}}">
+                </div>
             </div>
-            <!--toggle for deletelist-->
-            <div class="mb-3 margin-left-8 ">
-                <button class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#deletelistinfo" aria-expanded="false"
-                    aria-controls="deletelistinfo"> Delete List +
-                </button>
-            </div>
-            <!--search
-            <div class="mb-3 margin-left-8 ">
-                <form action="/search" method="get">
-                    <input class="bkground-color-box-white border form-control mx-auto knewavefont primary-font" name="searchbar" autocomplete="off" autofocus type="search" placeholder="query">
-                    <input type="submit" value="search">
-                </form>
-            </div>
-        -->
         </div>
         <!-- changenamelist elements-->
         <div class="collapse" id="changenamelistinfo">
@@ -49,15 +77,16 @@
                 <div class="d-flex flex-row flex-wrap">
                     <input type="hidden" name="actiononelement" value="changenamelist">
                     <div class="mb-3 margin-left-15 width20 ">
-                        <input class="bkground-color-box-white border form-control mx-auto knewavefont primary-font" name="newnamelist" autocomplete="off" autofocus type="Text" placeholder="{{namelist}}">
+                        <input class="bkground-color-box-white border form-control mx-auto knewavefont primary-font"
+                            name="newnamelist" autocomplete="off" autofocus type="Text" placeholder="{{namelist}}">
                     </div>
                     <div class="mb-3 margin-left-8 ">
-                        <input class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow" name="responsechangenamelist" type="submit"
-                        value="Change">
+                        <input class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow"
+                            name="responsechangenamelist" type="submit" value="Change">
                     </div>
                     <div class="mb-3 margin-left-3">
-                        <input class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow" name="responsechangenamelist" type="submit"
-                        value="Cancel">
+                        <input class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow"
+                            name="responsechangenamelist" type="submit" value="Cancel">
                     </div>
                 </div>
             </form>
@@ -76,30 +105,29 @@
                             name="nametable" disabled type="Text" value={{nametable}}>
                     </div>
                     {% for key,value in element.items() %}
-                        {% if key != "type" %}
-                            {% if key == "cover" or key == 'image' %}
-                            <div class="mb-3 margin-left-15">
-                                <input
-                                    class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                                     name="inputimage" placeholder="Enter a {{key.capitalize()}}"
-                                    title="{{value}}" type="file">
-                            </div>
-                            {% else %}
-                            <div class="mb-3 margin-left-15">
-                                <input
-                                    class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                                    autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
-                                    title="{{value}}" type="text">
-                            </div>
-                            {% endif %}
-                        {% endif %}
+                    {% if key != "type" %}
+                    {% if key == "cover" or key == 'image' %}
+                    <div class="mb-3 margin-left-15">
+                        <input
+                            class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
+                            name="inputimage" placeholder="Enter a {{key.capitalize()}}" title="{{value}}" type="file">
+                    </div>
+                    {% else %}
+                    <div class="mb-3 margin-left-15">
+                        <input
+                            class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
+                            autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
+                            title="{{value}}" type="text">
+                    </div>
+                    {% endif %}
+                    {% endif %}
                     {% endfor %}
                     {% endif %}
                     {% endfor %}
 
                     <div class="mb-3 margin-left-15">
-                        <input class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow" type="submit"
-                            value="Create">
+                        <input class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow"
+                            type="submit" value="Create">
                     </div>
                 </div>
             </form>
@@ -110,15 +138,16 @@
                 <div class="d-flex flex-row flex-wrap">
                     <input type="hidden" name="actiononelement" value="deletelist">
                     <div class="mb-3 margin-left-15 width20 ">
-                        <input class="bkground-color-box-white border form-control mx-auto knewavefont primary-font" disabled type="Text" value="Do you want to delete this list?">
+                        <input class="bkground-color-box-white border form-control mx-auto knewavefont primary-font"
+                            disabled type="Text" value="Do you want to delete this list?">
                     </div>
                     <div class="mb-3 margin-left-8 ">
-                        <input class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow" name="responsedeletelist" type="submit"
-                        value="Yes">
+                        <input class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow"
+                            name="responsedeletelist" type="submit" value="Yes">
                     </div>
                     <div class="mb-3 margin-left-3">
-                        <input class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow" name="responsedeletelist" type="submit"
-                        value="No">
+                        <input class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow"
+                            name="responsedeletelist" type="submit" value="No">
                     </div>
                 </div>
             </form>
@@ -143,16 +172,17 @@
                 {% for image in images%}
                 {% if image['nametable_id'] == element['id'] %}
                 <div class="mb-3 width14">
-                <form action="/image?{{image['nametable']}}&{{image['nametable_id']}} " method="get">
-                    <input name="nametable_id" type="hidden" value="{{image['nametable_id']}}">
-                    <input name="nametable" type="hidden" value="{{image['nametable']}}">
-                    <button class="noborder" type="submit">
-                        <img class="border form-control bkground-color-box-white knewavefont primary-font" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
-                    </button>
-            </form>
-        </div>
+                    <form action="/image?{{image['nametable']}}&{{image['nametable_id']}} " method="get">
+                        <input name="nametable_id" type="hidden" value="{{image['nametable_id']}}">
+                        <input name="nametable" type="hidden" value="{{image['nametable']}}">
+                        <button class="noborder" type="submit">
+                            <img class="border form-control bkground-color-box-white knewavefont primary-font"
+                                src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
+                        </button>
+                    </form>
+                </div>
 
-               {% endif %}
+                {% endif %}
                 {% endfor %}
                 <div class="mb-3 inline width60">
                     <div class="d-flex flex-row flex-wrap">
@@ -168,40 +198,41 @@
                     </div>
                 </div>
                 <div class="mb-3 inline">
-                <!--Edit element-->
-                <div class="mb-3" >
-                    <div class="margin-left-70">
-                        <form action="/list?lists_id={{lists_id}}" method="post">
-                            <input name="actiononelement" type="hidden" value="editelement">
-                            <input name="ideditelement" type="hidden" value="{{element['id']}}">
-                            <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow" type="submit"
-                                value="Edit">
-                        </form>
+                    <!--Edit element-->
+                    <div class="mb-3">
+                        <div class="margin-left-70">
+                            <form action="/list?lists_id={{lists_id}}" method="post">
+                                <input name="actiononelement" type="hidden" value="editelement">
+                                <input name="ideditelement" type="hidden" value="{{element['id']}}">
+                                <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow"
+                                    type="submit" value="Edit">
+                            </form>
+                        </div>
+                    </div>
+                    <!--Download element-->
+                    <div class="mb-3">
+                        <div class="margin-left-70">
+                            <form action="/list?lists_id={{lists_id}}" method="post">
+                                <input name="actiononelement" type="hidden" value="downloadelement">
+                                <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
+                                <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow"
+                                    type="submit" value="Download">
+                            </form>
+                        </div>
+                    </div>
+                    <!--Delete element-->
+                    <div class="mb-3">
+                        <div class="margin-left-70">
+                            <form action="/list?lists_id={{lists_id}}" method="post">
+                                <input name="actiononelement" type="hidden" value="deleteelement">
+                                <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
+                                <input
+                                    class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow"
+                                    type="submit" value="Delete">
+                            </form>
+                        </div>
                     </div>
                 </div>
-                <!--Download element-->
-                <div class="mb-3" >
-                    <div class="margin-left-70">
-                        <form action="/list?lists_id={{lists_id}}" method="post">
-                            <input name="actiononelement" type="hidden" value="downloadelement">
-                            <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
-                            <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow" type="submit"
-                                value="Download">
-                        </form>
-                    </div>
-                </div>
-                <!--Delete element-->
-                <div class="mb-3" >
-                    <div class="margin-left-70">
-                        <form action="/list?lists_id={{lists_id}}" method="post">
-                            <input name="actiononelement" type="hidden" value="deleteelement">
-                            <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
-                            <input class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow" type="submit"
-                                value="Delete">
-                        </form>
-                    </div>
-                </div>
-            </div>
             </div>
         </div>
         {% endfor %}

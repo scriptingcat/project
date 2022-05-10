@@ -629,3 +629,21 @@ def image():
         apologymsg = "Something went wrong"
         return redirect("/?message=" + apologymsg)
 
+@app.route('/search')
+@login_required
+def search():
+    # search element in list with a specific name or title
+    query = request.args.get('q')
+    lists_id = request.args.get('lists_id')
+
+    # select the list from lists
+    lists = db.execute("SELECT * FROM lists WHERE id=?", int(lists_id))
+    # select the list from list_types
+    list_types = db.execute("SELECT * FROM list_types WHERE id=?", lists[0]['list_type_id'])
+    nametable = list_types[0]['nametable']
+
+    entry = db.execute('SELECT * FROM ? WHERE title LIKE ? AND user_id=?', nametable, '%'+ query + '%', session['user_id'])
+    if len(entry)>0:
+        return render_template("search.html", entry=entry)
+    else:
+        return render_template("search.html", apologymsg="no result")

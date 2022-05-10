@@ -177,3 +177,11 @@ button.bkground-color-box-create:hover{
 .width20{
     width: 20%
 }
+.style-li{
+    list-style-type: none;
+    list-style-position: outside;
+    color: #48B;
+    padding: 0%;
+    margin:0%;
+    text-align: left;
+}

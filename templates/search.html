@@ -1,0 +1,11 @@
+<ul class="bold bkground-color-box primary-font style-li ">
+    {% if entry %}
+    {% for element in entry %}
+    <li class="margin-left-8">{{element['title']}}</li>
+    {% endfor %}
+    {% endif %}
+    {% if apologymsg %}
+    <li class="margin-left-8">{{apologymsg}}</li>
+    {% endif %}
+
+</ul>
