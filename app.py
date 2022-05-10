@@ -63,6 +63,9 @@ listelements = [
 
 ]
 
+sorttypes = { 
+    'movies_tvseries': ['title','most recent', 'least recent', 'author']
+    }
 
 '''
     "Name": "a name for the element",
@@ -441,7 +444,7 @@ def showlist():
     # select all the element contained in that list
     elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
     images = db.execute("SELECT * FROM imgs WHERE lists_id=?", lists_id)
-
+    print(nametable)
     if request.method == 'POST':
 
         # actions from this route 
@@ -465,19 +468,18 @@ def showlist():
                     # for each key in this dict add value equals to input
                     for key,value in dictionary.items():
                         # first check whether its a text input or image/file
-                        if key == 'cover' or key == 'image':
+                        if key in ['cover','key']:
                             # take the object
                             file = request.files['inputimage']
+                            elementinput = file
                             # check is not none
-                            if not file:
-                                print('NONe')
-                                elementinput == None
-                            else:
-                                print('notnone')
-                                elementinput = file
-                        else:
+                            if len(file.filename)<=0:
+                                elementinput = 0
+                            dictofrequests[key] = elementinput
+                        if key not in ['image', 'cover']:
                             elementinput = request.form.get(key)
-                        dictofrequests[key] = elementinput
+                            dictofrequests[key] = elementinput
+                        print(f'dictofrequests[{key}] = {elementinput}')
                     break
 
             # call function according to type of table
@@ -485,9 +487,9 @@ def showlist():
                 # check the title input to handle void request
                 if not dictofrequests['title'] or dictofrequests['title'] == None:
                     apologymsg = "Element Title Is Required"
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg.capitalize())
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,sorttypes= sorttypes, images=images, apologymsg=apologymsg.capitalize())
                 # check whether there's an img to save in db:
-                if not dictofrequests['cover']:
+                if not dictofrequests['cover'] or dictofrequests['cover'] == 0:
                     add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],0,dictofrequests['link'], dictofrequests['note'])
                 else:
                     db.execute("BEGIN TRANSACTION")
@@ -522,7 +524,7 @@ def showlist():
                     # make sure a new list name is provided when submiting for change
                     if not newnamelist:
                         apologymsg = "New List Name required"
-                        return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg.capitalize())
+                        return render_template('list.html', nametable=nametable, namelist=namelist, sorttypes= sorttypes,elements=elements, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg.capitalize())
                     else:
                         db.execute("BEGIN TRANSACTION")
                         db.execute("UPDATE lists SET namelist=? WHERE id=?",newnamelist, lists_id)
@@ -530,7 +532,7 @@ def showlist():
                         db.execute("COMMIT")
                         return redirect("/list?lists_id=" + lists_id)
                 else:
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images)
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, sorttypes= sorttypes, listelements=listelements, lists_id=lists_id,images=images)
 
         # delete one element from table
         elif actiononelement == "deleteelement":
@@ -545,10 +547,10 @@ def showlist():
                     return redirect("/list?lists_id=" + lists_id)
                 else:
                     apologymsg = "Id element does not match user id. Action on this id denied"
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg.capitalize())
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg.capitalize())
             else:
                 apologymsg = "Id element required"
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+                return render_template('list.html', nametable=nametable, sorttypes= sorttypes, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
         
         # delete the whole table
         elif actiononelement == "deletelist":
@@ -562,28 +564,28 @@ def showlist():
                     deletelist(lists_id, nametable)
                     return redirect("/")
                 else:
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images)
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, sorttypes= sorttypes, listelements=listelements, lists_id=lists_id,images=images)
             else:
                 apologymsg = "Id list does not match user id"
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, sorttypes= sorttypes, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
         # download element
         elif actiononelement == 'downloadelement':
             iddownloadelement = request.form.get('iddownloadelement')
             # handle id request
             if not iddownloadelement:
                 apologymsg = "Id element required"
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+                return render_template('list.html', nametable=nametable, sorttypes= sorttypes, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
             img_id = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(iddownloadelement))
             # check id element belongs to session's user
             if img_id[0]['user_id'] != session['user_id']:
                 apologymsg = "Id does not match user id"
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, sorttypes= sorttypes, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
 
             img = db.execute("SELECT * FROM imgs WHERE id=?", int(img_id[0]['img_id']))
             return send_file(BytesIO(img[0]['img']), attachment_filename='download.jpg',as_attachment=True) 
         else:
             apologymsg = "Type of Request not recognized"
-            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, sorttypes= sorttypes, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
 
         #return redirect("/list?lists_id=" + lists_id)
 
@@ -594,7 +596,7 @@ def showlist():
         if session['user_id'] == user_id:
             for image in images:
                 image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
-            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id, images=images)
+            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images)
         else:
             apologymsg = "Something went wrong. Access to list Denied"
             return redirect("/?message=" + apologymsg)

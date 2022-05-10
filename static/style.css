@@ -1,3 +1,7 @@
+body{
+    max-width: 100vw;
+}
+
 nav .navbar-brand
 {
     font-size: x-large;
@@ -184,4 +188,10 @@ button.bkground-color-box-create:hover{
     padding: 0%;
     margin:0%;
     text-align: left;
+}
+.style-li-notype{
+    list-style-type: none;
+}
+ul.max-width-100{
+    max-width: 100vw;
 }
