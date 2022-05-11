@@ -54,7 +54,7 @@
                     <script>
                         let lists_id = document.getElementById('lists_id')
                         let input_search = document.getElementById('search')
-                        input_search.addEventListener('input', async function() {
+                        input_search.addEventListener('input', async function () {
                             let response = await fetch('/search?lists_id=' + lists_id.value + '&q=' + input_search.value);
                             if (input_search.value == '') {
                                 document.getElementById('result').innerHTML = null;
@@ -68,24 +68,7 @@
                         });
                     </script>
                 </div>
-                <!--sortby-->
-                <div class="p-2 ">
-                    <input id="listsid" type="hidden" value={{lists_id}}>
-                    <select id="sortselect"
-                        class="bkground-color-box-white border form-select knewavefont mx-auto primary-font"
-                        name="typeoflist">
-                        <option disable selected>sort by</option>
-                        {% for key,value in sorttypes.items() %}
-                        {% if key == nametable %}
-                        {% for element in value %}
-                        <option class="knewavefont primary-font" value="{{element}}">
-                            {{element}}
-                        </option>
-                        {% endfor %}
-                        {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
+
             </div>
         </div>
         <!-- toggle elements -->
@@ -179,15 +162,50 @@
         {% endif %}
     </div>
     <!--list elements-->
-    <div class="bkground-color-box-white mt-5 width100">
-        <!--name-->
-        <div class="mb-3 margin-left-88 ">
-            <h2 class="knewavefont primary-font">{{namelist}}</h2>
+    <div class="bkground-color-box-white margin0 mt-5 width100">
+        <!-- upper elements bar-->
+        <div class="d-flex justify-content-between ">
+            <!--name-->
+            <div class="margin2 mb-3 w-auto">
+                <h2 class="knewavefont primary-font">{{namelist}}</h2>
+            </div>
+            <!-- button viewstyle +sortby -->
+            <div class="d-flex margin2 mb-3 w-auto">
+                <!--sortby-->
+                <div class="p-2">
+                    <input id="listsid" type="hidden" value={{lists_id}}>
+                    <select id="sortselect"
+                        class="bkground-color-box-white border form-select knewavefont mx-auto primary-font"
+                        name="typeoflist">
+                        <option disable selected>sort by</option>
+                        {% for key,value in sorttypes.items() %}
+                        {% if key == nametable %}
+                        {% for element in value %}
+                        <option class="knewavefont primary-font" value="{{element}}">
+                            {{element}}
+                        </option>
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- viewstyle-->
+                <div class="btn-group p-2 inline">
+                    <button id="viewstyletable" name="viewstyle"
+                        class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
+                        type="button" value="table"><i class=" bi bi-list-ul"></i>
+                    </button>
+                    <button id="viewstylegrid" name="viewstyle"
+                        class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
+                        type="button" value="grid"><i class=" bi bi-grid"></i>
+                    </button>
+                </div>
+            </div>
         </div>
         <!-- showelementinfo elements-->
         {% for element in elements %}
         <div class="collapse" id="showelementinfo{{element['id']}}">
-            <div class="d-flex flex-row flex-wrap">
+            <div class="d-flex flex-row flex-wrap margin2">
                 {% for image in images%}
                 {% if image['nametable_id'] == element['id'] %}
                 <div class="mb-3 width14">
@@ -200,7 +218,6 @@
                         </button>
                     </form>
                 </div>
-
                 {% endif %}
                 {% endfor %}
                 <div class="mb-3 inline width60">
@@ -258,85 +275,84 @@
         <div class="max-width100">
             <ul id="elementsul" class="d-flex align-items-start flex-wrap">
             </ul>
+            <table id="table">
+            </table>
             <ul id="elementsdefault" class="d-flex align-items-start flex-wrap">
                 {% for element in elements %}
                 <li class="p-2 style-li-notype">
-                <div class="mb-3">
-                <button
-                    class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
-                    aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
-                    <div class="mb-3 fontsize10pc">
-                        <div class="width10">
-                            <img src="" alt="">
-                        </div>
-                        <div class="width10">
-                            <h4>
-                                Title: {{element['title']}}
-                            </h4>
-                            <h5>
-                                Year: {{element['year']}}
-                            </h5>
-                            <h5>
-                                Director: {{element['director']}}
-                            </h5>
-                        </div>
+                    <div class="mb-3">
+                        <button
+                            class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
+                            aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit"
+                            value="">
+                            <div class="mb-3 fontsize10pc">
+                                <div class="width10">
+                                    <img src="" alt="">
+                                </div>
+                                <div class="width10">
+                                    <h4>
+                                        Title: {{element['title']}}
+                                    </h4>
+                                    <h5>
+                                        Year: {{element['year']}}
+                                    </h5>
+                                    <h5>
+                                        Director: {{element['director']}}
+                                    </h5>
+                                </div>
+                            </div>
+                        </button>
                     </div>
-                </button>
-                </div>
                 </li>
                 {% endfor %}
             </ul>
+
             <script>
                 let listsid = document.getElementById('listsid')
                 let sortselect = document.getElementById('sortselect')
-                let elementsdefault = document.getElementById('elementsdafault');
-                sortselect.addEventListener('change', async function() {
-                    
-                    let response = await fetch('/elements?lists_id=' + listsid.value + '&sortby=' + sortselect.value);
-                    let elements = await response.text();
-                    document.getElementById('elementsul').innerHTML = elements;
-                    document.getElementById('elementsdefault').innerHTML = null;
-                    ;
+                let elementsdefault = document.getElementById('elementsdafault')
+                let viewstyletable = document.getElementById('viewstyletable')
+                let viewstylegrid = document.getElementById('viewstylegrid')
+                
+                let currentstyleview ='grid'
+                let currentsortby = sortselect.input
 
+                sortselect.addEventListener('change', async function () {
+                    let response = await fetch('/elements?lists_id=' + listsid.value + '&sortby=' + sortselect.value + '&styleview=' + currentstyleview);
+                    let elements = await response.text();
+                    document.getElementById('elementsdefault').innerHTML = null;
+                    if (currentstyleview == 'table') {
+                        document.getElementById('table').innerHTML = elements;
+                        document.getElementById('elementsul').innerHTML = null;
                     }
+                    else {
+                        document.getElementById('table').innerHTML = null;
+                        document.getElementById('elementsul').innerHTML = elements;
+                    }
+                    currentsortby = sortselect.value
+                }
                 );
+
+                viewstyletable.addEventListener('click', async function () {
+                    let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'table' + '&sortby=' + currentsortby);
+                    let elements = await response.text();
+                    document.getElementById('table').innerHTML = elements;
+                    document.getElementById('elementsdefault').innerHTML = null;
+                    document.getElementById('elementsul').innerHTML = null;
+                    currentstyleview = 'table'
+                })
+                viewstylegrid.addEventListener('click', async function () {
+                    let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'grid'+ '&sortby=' + currentsortby);
+                    let elements = await response.text();
+                    document.getElementById('table').innerHTML = null;
+                    document.getElementById('elementsdefault').innerHTML = elements;
+                    document.getElementById('elementsul').innerHTML = null;
+                    currentstyleview = 'grid'
+                })
+
             </script>
         </div>
-        <!--
-        list's items
-        <div class="max-width100">
-             showelementinfo toggle
-            <ul class="d-flex align-items-start flex-wrap">
-                {% for element in elements %}
-                <li class="p-2 style-li-notype">
-                <div class="mb-3">
-                <button
-                    class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
-                    aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
-                    <div class="mb-3 fontsize10pc">
-                        <div class="width10">
-                            <img src="" alt="">
-                        </div>
-                        <div class="width10">
-                            <h4>
-                                Title: {{element['title']}}
-                            </h4>
-                            <h5>
-                                Year: {{element['year']}}
-                            </h5>
-                            <h5>
-                                Director: {{element['director']}}
-                            </h5>
-                        </div>
-                    </div>
-                </button>
-                </div>
-                </li>
-                {% endfor %}
-            </ul>
-        </div> -->
     </div>
 
 

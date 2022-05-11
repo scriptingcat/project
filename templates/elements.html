@@ -1,4 +1,29 @@
-    
+    {% if style and elements %}
+    {% if style == 'table' %}
+    <thead>
+        <tr>
+            <th> title</th>
+            <th> year</th>
+            <th> director</th>
+            <th> show element</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for element in elements %}
+        <tr>
+            <td>{{element['title']}}</td>
+            <td>{{element['year']}}</td>
+            <td>{{element['director']}}</td>
+            <td>{{element['description']}}</td>
+            <td><button
+                class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
+                type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
+                aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value=""></button></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    {% else %}
+
     {% for element in elements %}
     <li class="p-2 style-li-notype">
     <div class="mb-3">
@@ -26,3 +51,11 @@
     </div>
     </li>
     {% endfor %}
+    {% endif %}
+    {% endif %}
+    {% if apologymsg %}
+        <li class="p-2 style-li-notype width100"><div class="mb-3 width100">
+            <p id="apologymsg" class="primary-font mx-auto width100" type="text" name="apologymsg"> {{apologymsg}} </p>
+        </div></li>
+        {% endif %}
+    

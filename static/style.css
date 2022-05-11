@@ -198,3 +198,9 @@ ul.max-width-100{
 ul.none-display{
     display: none!important;
 }
+.margin0 {
+    margin: 0%;
+}
+.margin2 {
+    margin: 2%;
+}

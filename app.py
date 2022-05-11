@@ -444,7 +444,6 @@ def showlist():
     # select all the element contained in that list
     elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
     images = db.execute("SELECT * FROM imgs WHERE lists_id=?", lists_id)
-    print(nametable)
     if request.method == 'POST':
 
         # actions from this route 
@@ -479,7 +478,6 @@ def showlist():
                         if key not in ['image', 'cover']:
                             elementinput = request.form.get(key)
                             dictofrequests[key] = elementinput
-                        print(f'dictofrequests[{key}] = {elementinput}')
                     break
 
             # call function according to type of table
@@ -584,6 +582,12 @@ def showlist():
             img = db.execute("SELECT * FROM imgs WHERE id=?", int(img_id[0]['img_id']))
             return send_file(BytesIO(img[0]['img']), attachment_filename='download.jpg',as_attachment=True) 
         else:
+            # check lists_id user matches session's user_id
+            # prevent from showing other users' lists by manipulating html code
+            user_id = lists[0]['user_id']
+            if session['user_id'] == user_id:
+                for image in images:
+                    image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
             apologymsg = "Type of Request not recognized"
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, sorttypes= sorttypes, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
 
@@ -653,6 +657,8 @@ def search():
 @login_required
 def elements():
     sortby = request.args.get('sortby')
+    styleview = request.args.get('styleview')
+
     lists_id = request.args.get('lists_id')
     lists = db.execute("SELECT * FROM lists WHERE id=?", int(lists_id))
     namelist = lists[0]['namelist']
@@ -661,12 +667,19 @@ def elements():
     nametable = list_types[0]['nametable']
     # select all the element contained in that list
     elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
-    if sortby:
-        if sortby == 'title':
-            elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY title ASC", nametable, int(lists_id), session['user_id'])
-        elif sortby == 'author':
-            elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY director ASC", nametable, int(lists_id), session['user_id'])
-        else:
-            elementssorted = elements
-        elements = elementssorted
-    return render_template("elements.html", elements=elements)
+    try:
+        if sortby and styleview:
+            if sortby == 'title':
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY title ASC", nametable, int(lists_id), session['user_id'])
+            elif sortby == 'author':
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY director ASC", nametable, int(lists_id), session['user_id'])
+            else:
+                elementssorted = elements
+            elements = elementssorted
+            if styleview == 'table':
+                style = 'table'
+            else:
+                style ='grid'
+            return render_template("elements.html", elements=elements, style=style)
+    except:
+        return render_template("elements.html", apologymsg="Something went wrong")
