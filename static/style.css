@@ -204,3 +204,15 @@ ul.none-display{
 .margin2 {
     margin: 2%;
 }
+.padding2{
+    padding: 2%;
+}
+.border-top-tbody{
+    border-top: #D8D 5px solid!important;
+}
+.padding-left-5{
+    padding-left: 5%!important;
+}
+.padding-left-4{
+    padding-left: 4.5%!important;
+}

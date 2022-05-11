@@ -1,27 +1,30 @@
     {% if style and elements %}
     {% if style == 'table' %}
-    <thead>
-        <tr>
-            <th> title</th>
-            <th> year</th>
-            <th> director</th>
-            <th> show element</th>
+    <table class=" knewavefont padding2 primary-font table table-hover table-sm text-align-left width60 ">
+    <thead class="fontw100 margin-left-15 padding2">
+        <tr class="w-auto">
+            <th class="padding-left-5" scope="col"> title</th>
+            <th class="padding-left-5" scope="col"> year</th>
+            <th class="padding-left-5" scope="col"> director</th>
+            <th class="padding-left-5" scope="col"> description</th>
+            <th class="padding-left-4" scope="col"> show</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="border-top-tbody padding2">
         {% for element in elements %}
-        <tr>
-            <td>{{element['title']}}</td>
-            <td>{{element['year']}}</td>
-            <td>{{element['director']}}</td>
-            <td>{{element['description']}}</td>
-            <td><button
+        <tr class="">
+            <td class="padding-left-5">{{element['title']}}</td>
+            <td class="padding-left-5" >{{element['year']}}</td>
+            <td class="padding-left-5" >{{element['director']}}</td>
+            <td class="padding-left-5" >{{element['description']}}</td>
+            <td class="padding-left-5" ><button
                 class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
                 type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
                 aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value=""></button></td>
         </tr>
         {% endfor %}
     </tbody>
+</table>
     {% else %}
 
     {% for element in elements %}
