@@ -224,11 +224,12 @@
                     <div class="d-flex flex-row flex-wrap">
                         {% for key,value in element.items() %}
                         {% if key != 'cover' %}
+                        {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' %}
                         <div class="mb-3 margin-left-8 text-align-left width12">
-                            <h3 class="border form-control mx-auto bkground-color-box-white knewavefont primary-font">
-                                {{key}}: {{value}}
-                            </h3>
+                            <label class="knewavefont" for="edit{{key}}">{{key}}</label>
+                            <input name="edit{{value}}" class="border form-control mx-auto bkground-color-box-white knewavefont primary-font" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
                         </div>
+                        {% endif %}
                         {% endif %}
                         {% endfor %}
                     </div>
