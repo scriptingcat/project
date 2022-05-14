@@ -60,7 +60,18 @@ listelements = [
             "link": "a link to assciate with the element",
             "note": "a brief text to assciate with the element"
         },
+]
 
+listelementstoedit= [ 
+        {
+            "type": "movies_tvseries",
+            "title": "a title for the element",
+            "year": "year of release",
+            "director": "the director of the movie/tv serie",
+            "description" : "a brief text describing the element",
+            "link": "a link to assciate with the element",
+            "note": "a brief text to assciate with the element"
+        },
 ]
 
 sorttypes = { 
@@ -366,13 +377,13 @@ def resetpassword():
                     # if it returns an user_id
                     # check token status in db to know whether it has already used or not to reset password
                     if check_token_status(user_id, token, "resetpassword") == "expired":
-                        apologymsg = "Expired Token"
+                        apologymsg = "Expired Token 4"
                         return render_template("forgotpassword.html", apologymsg=apologymsg.capitalize())
                     else:
                         return render_template("resetpassword.html", id=token)
             except:
                 # if it returns an error, return to forgot password
-                apologymsg = "Expired Token"
+                apologymsg = "Expired Token 5"
                 return render_template("forgotpassword.html", apologymsg=apologymsg)
 
     # check request method
@@ -384,7 +395,7 @@ def resetpassword():
             token = request.form.get("id")
             
             user_id = verify_token(token)
-
+            print('verified')
             # check input is not null
             # create an apology message for each and render it
             if not newpassword and not confirmationpassword:
@@ -417,11 +428,13 @@ def resetpassword():
             hash = generate_password_hash(newpassword, method='pbkdf2:sha256', salt_length=8)
             db.execute("UPDATE users SET hash=? WHERE id=?", hash, user_id)
             apologymsg = "Password successfully changed!"
+            db.execute("COMMIT")
 
             # make token expire 
             expire_token_status_in_db(user_id, token)
-            db.execute("COMMIT")
+
             return render_template("login.html", apologymsg=apologymsg)
+        
         except:
             # if it returns an error, return to forgot password
             apologymsg = "Expired Token"
@@ -566,17 +579,20 @@ def showlist():
                     deletelist(lists_id, nametable)
                     return redirect("/")
                 else:
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, sorttypes= sorttypes, listelements=listelements, lists_id=lists_id,images=images)
+                    apologymsg="This list has not been deleted"
+                    return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
             else:
                 apologymsg = "Id list does not match user id"
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, sorttypes= sorttypes, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+
         # download element
         elif actiononelement == 'downloadelement':
             iddownloadelement = request.form.get('iddownloadelement')
             # handle id request
             if not iddownloadelement:
                 apologymsg = "Id element required"
-                return render_template('list.html', nametable=nametable, sorttypes= sorttypes, namelist=namelist,elements=elements, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+
             img_id = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(iddownloadelement))
             # check there's an image to be downloaded
             if img_id[0]['img_id'] == 0:
@@ -587,11 +603,27 @@ def showlist():
             # check id element belongs to session's user
             if img_id[0]['user_id'] != session['user_id']:
                 apologymsg = "Id does not match user id"
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, sorttypes= sorttypes, listelements=listelements, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+
 
             img = db.execute("SELECT * FROM imgs WHERE id=?", int(img_id[0]['img_id']))
             return send_file(BytesIO(img[0]['img']), attachment_filename='download.jpg',as_attachment=True)
+
+        # edit element
+        elif actiononelement == 'editelement':
+            # take the id and check it belongs to session's user
+            ideditelement = request.form.get('ideditelement')
+            if not ideditelement:
+                apologymsg = "Id element required"
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+            rows = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(ideditelement))
+            if session['user_id'] != rows[0]['user_id']:
+                apologymsg = "Id does not match user id"
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+            apologymsg = "hello"
+            return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
             
+
         else:
             # check lists_id user matches session's user_id
             # prevent from showing other users' lists by manipulating html code
@@ -600,7 +632,8 @@ def showlist():
                 for image in images:
                     image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
             apologymsg = "Type of Request not recognized"
-            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements, listelements=listelements, sorttypes= sorttypes, lists_id=lists_id,images=images, apologymsg=apologymsg.capitalize())
+            return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+
 
         #return redirect("/list?lists_id=" + lists_id)
 
@@ -701,3 +734,7 @@ def elements():
             return render_template("elements.html", elements=elements, style=style)
     except:
         return render_template("elements.html", apologymsg="Something went wrong")
+
+
+
+

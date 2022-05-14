@@ -137,6 +137,7 @@ def insert_token_in_db(user_id, token, tokentype):
 def expire_token_status_in_db(user_id, token):
     status = 'expired'
     rows = db.execute("SELECT * FROM tokens WHERE user_id=? AND token=?", user_id, token)
+    print(rows)
     db.execute("UPDATE tokens SET status=? WHERE user_id=? AND token=?", status, user_id, token)
     return
 
