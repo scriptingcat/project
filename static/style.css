@@ -216,3 +216,9 @@ ul.none-display{
 .padding-left-4{
     padding-left: 4.5%!important;
 }
+.display-none{
+    display: none!important;
+}
+.count{
+    /*for the js loop*/
+}

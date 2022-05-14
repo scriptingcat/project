@@ -220,54 +220,72 @@
                 </div>
                 {% endif %}
                 {% endfor %}
-                <div class="mb-3 inline width60">
+                <!--element items -->
+                <div id="elementstoshow{{loop.index0}}" class="mb-3 inline width60">
                     <div class="d-flex flex-row flex-wrap">
                         {% for key,value in element.items() %}
                         {% if key != 'cover' %}
                         {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' %}
                         <div class="mb-3 margin-left-8 text-align-left width12">
-                            <label class="knewavefont" for="edit{{key}}">{{key}}</label>
-                            <input name="edit{{value}}" class="border form-control mx-auto bkground-color-box-white knewavefont primary-font" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                            <h3 class="border form-control mx-auto bkground-color-box-white knewavefont primary-font">
+                                {{key}}: {{value}}
+                            </h3>
                         </div>
                         {% endif %}
                         {% endif %}
                         {% endfor %}
+                        </form>
                     </div>
                 </div>
-                <div class="mb-3 inline">
-                    <!--Edit element-->
-                    <div class="mb-3">
-                        <div class="margin-left-70">
+                <!--edit toggle elements-->
+                <div id="editinfo{{loop.index0}}" class="collapse mb-3 inline width60">
+                    <div class="d-flex flex-row flex-wrap">
+                        {% for key,value in element.items() %}
+                        {% if key != 'cover' %}
+                        {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' %}
+                        <div class="mb-3 margin-left-8 text-align-left width12">
                             <form action="/list?lists_id={{lists_id}}" method="post">
-                                <input name="actiononelement" type="hidden" value="editelement">
-                                <input name="ideditelement" type="hidden" value="{{element['id']}}">
-                                <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow"
-                                    type="submit" value="Edit">
-                            </form>
+                                <label class="knewavefont" for="edit{{key}}">{{key}}</label>
+                                <input name="edit{{value}}"
+                                    class="border form-control mx-auto bkground-color-box-white knewavefont primary-font"
+                                    placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
                         </div>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        <input name="actiononelement" type="hidden" value="editelement">
+                        <input name="ideditelement" type="hidden" value="{{element['id']}}">
+                        <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow"
+                            type="submit" value="Edit">
+                        </form>
+                    </div>
+                </div>
+                <div class="mb-3 inline margin-left-3" align="left">
+                    <!--Edit Toggle-->
+                    <div class="mb-3">
+                            <button id="edittoggle{{loop.index0}}"
+                                class="btn btn-primary knewavefont border mx-auto primary-font primary-colors text-align-left " onclick="changeClass('elementstoshow{{loop.index0}}');"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#editinfo{{loop.index0}}"
+                                aria-expanded="false" aria-controls="editinfo{{loop.index0}}">Edit +</button>
                     </div>
                     <!--Download element-->
                     <div class="mb-3">
-                        <div class="margin-left-70">
                             <form action="/list?lists_id={{lists_id}}" method="post">
                                 <input name="actiononelement" type="hidden" value="downloadelement">
                                 <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
                                 <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow"
                                     type="submit" value="Download">
                             </form>
-                        </div>
                     </div>
                     <!--Delete element-->
                     <div class="mb-3">
-                        <div class="margin-left-70">
                             <form action="/list?lists_id={{lists_id}}" method="post">
                                 <input name="actiononelement" type="hidden" value="deleteelement">
                                 <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
                                 <input
-                                    class="bkground-color-box-delete block btn knewavefont mx-auto primary-colors shadow"
+                                    class="bkground-color-box-delete btn knewavefont mx-auto primary-colors shadow"
                                     type="submit" value="Delete">
                             </form>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -308,54 +326,67 @@
                 {% endfor %}
             </ul>
 
-            <script>
-                let listsid = document.getElementById('listsid')
-                let sortselect = document.getElementById('sortselect')
-                let elementsdefault = document.getElementById('elementsdafault')
-                let viewstyletable = document.getElementById('viewstyletable')
-                let viewstylegrid = document.getElementById('viewstylegrid')
-                
-                let currentstyleview ='grid'
-                let currentsortby = sortselect.input
-
-                sortselect.addEventListener('change', async function () {
-                    let response = await fetch('/elements?lists_id=' + listsid.value + '&sortby=' + sortselect.value + '&styleview=' + currentstyleview);
-                    let elements = await response.text();
-                    document.getElementById('elementsdefault').innerHTML = null;
-                    if (currentstyleview == 'table') {
-                        document.getElementById('table').innerHTML = elements;
-                        document.getElementById('elementsul').innerHTML = null;
-                    }
-                    else {
-                        document.getElementById('table').innerHTML = null;
-                        document.getElementById('elementsul').innerHTML = elements;
-                    }
-                    currentsortby = sortselect.value
-                }
-                );
-
-                viewstyletable.addEventListener('click', async function () {
-                    let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'table' + '&sortby=' + currentsortby);
-                    let elements = await response.text();
-                    document.getElementById('table').innerHTML = elements;
-                    document.getElementById('elementsdefault').innerHTML = null;
-                    document.getElementById('elementsul').innerHTML = null;
-                    currentstyleview = 'table'
-                })
-                viewstylegrid.addEventListener('click', async function () {
-                    let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'grid'+ '&sortby=' + currentsortby);
-                    let elements = await response.text();
-                    document.getElementById('table').innerHTML = null;
-                    document.getElementById('elementsdefault').innerHTML = elements;
-                    document.getElementById('elementsul').innerHTML = null;
-                    currentstyleview = 'grid'
-                })
-
-            </script>
+            
         </div>
     </div>
-
-
-
 </div>
+<script>
+    // change class to show input
+    function changeClass(elementstoshow){
+        let shown = document.getElementById(String(elementstoshow));
+        if (shown.classList.contains('display-none')){
+            shown.classList.remove('display-none')
+        }
+        else{
+            shown.classList.add('display-none')
+        }
+        return
+    }
+
+
+    // manage sort by select and grid-list buttons
+    let listsid = document.getElementById('listsid')
+    let sortselect = document.getElementById('sortselect')
+    let elementsdefault = document.getElementById('elementsdafault')
+    let viewstyletable = document.getElementById('viewstyletable')
+    let viewstylegrid = document.getElementById('viewstylegrid')
+
+    let currentstyleview = 'grid'
+    let currentsortby = sortselect.input
+
+    sortselect.addEventListener('change', async function () {
+        let response = await fetch('/elements?lists_id=' + listsid.value + '&sortby=' + sortselect.value + '&styleview=' + currentstyleview);
+        let elements = await response.text();
+        document.getElementById('elementsdefault').innerHTML = null;
+        if (currentstyleview == 'table') {
+            document.getElementById('table').innerHTML = elements;
+            document.getElementById('elementsul').innerHTML = null;
+        }
+        else {
+            document.getElementById('table').innerHTML = null;
+            document.getElementById('elementsul').innerHTML = elements;
+        }
+        currentsortby = sortselect.value
+    }
+    );
+
+    viewstyletable.addEventListener('click', async function () {
+        let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'table' + '&sortby=' + currentsortby);
+        let elements = await response.text();
+        document.getElementById('table').innerHTML = elements;
+        document.getElementById('elementsdefault').innerHTML = null;
+        document.getElementById('elementsul').innerHTML = null;
+        currentstyleview = 'table'
+    })
+    viewstylegrid.addEventListener('click', async function () {
+        let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'grid' + '&sortby=' + currentsortby);
+        let elements = await response.text();
+        document.getElementById('table').innerHTML = null;
+        document.getElementById('elementsdefault').innerHTML = elements;
+        document.getElementById('elementsul').innerHTML = null;
+        currentstyleview = 'grid'
+    })
+
+</script>
+
 {% endblock %}
