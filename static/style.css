@@ -219,6 +219,6 @@ ul.none-display{
 .display-none{
     display: none!important;
 }
-.count{
-    /*for the js loop*/
+.margin3{
+    margin: 3%;
 }

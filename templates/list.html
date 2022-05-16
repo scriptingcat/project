@@ -239,14 +239,15 @@
                 </div>
                 <!--edit toggle elements-->
                 <div id="editinfo{{loop.index0}}" class="collapse mb-3 inline width60">
+                    <form action="/list?lists_id={{lists_id}}" method="post">
+                    <div class="mb-3" align="center">
                     <div class="d-flex flex-row flex-wrap">
                         {% for key,value in element.items() %}
                         {% if key != 'cover' %}
-                        {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' %}
+                        {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key != 'namelist' %}
                         <div class="mb-3 margin-left-8 text-align-left width12">
-                            <form action="/list?lists_id={{lists_id}}" method="post">
                                 <label class="knewavefont" for="edit{{key}}">{{key}}</label>
-                                <input name="edit{{value}}"
+                                <input name="edit{{key}}"
                                     class="border form-control mx-auto bkground-color-box-white knewavefont primary-font"
                                     placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
                         </div>
@@ -255,37 +256,41 @@
                         {% endfor %}
                         <input name="actiononelement" type="hidden" value="editelement">
                         <input name="ideditelement" type="hidden" value="{{element['id']}}">
-                        <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow"
-                            type="submit" value="Edit">
-                        </form>
                     </div>
+                    <div class="mb-3 margin3">
+                        <input class="bkground-color-box-create btn knewavefont mx-auto primary-colors shadow"
+                            type="submit" value="Update">
+                    </div>
+                    </div>
+                </form>
+
                 </div>
                 <div class="mb-3 inline margin-left-3" align="left">
                     <!--Edit Toggle-->
                     <div class="mb-3">
-                            <button id="edittoggle{{loop.index0}}"
-                                class="btn btn-primary knewavefont border mx-auto primary-font primary-colors text-align-left " onclick="changeClass('elementstoshow{{loop.index0}}');"
-                                type="button" data-bs-toggle="collapse" data-bs-target="#editinfo{{loop.index0}}"
-                                aria-expanded="false" aria-controls="editinfo{{loop.index0}}">Edit +</button>
+                        <button id="edittoggle{{loop.index0}}"
+                            class="btn btn-primary knewavefont border mx-auto primary-font primary-colors text-align-left "
+                            onclick="changeClass('elementstoshow{{loop.index0}}');" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#editinfo{{loop.index0}}" aria-expanded="false"
+                            aria-controls="editinfo{{loop.index0}}">Edit +</button>
                     </div>
                     <!--Download element-->
                     <div class="mb-3">
-                            <form action="/list?lists_id={{lists_id}}" method="post">
-                                <input name="actiononelement" type="hidden" value="downloadelement">
-                                <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
-                                <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow"
-                                    type="submit" value="Download">
-                            </form>
+                        <form action="/list?lists_id={{lists_id}}" method="post">
+                            <input name="actiononelement" type="hidden" value="downloadelement">
+                            <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
+                            <input class="bkground-color-box block btn knewavefont mx-auto primary-colors shadow"
+                                type="submit" value="Download">
+                        </form>
                     </div>
                     <!--Delete element-->
                     <div class="mb-3">
-                            <form action="/list?lists_id={{lists_id}}" method="post">
-                                <input name="actiononelement" type="hidden" value="deleteelement">
-                                <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
-                                <input
-                                    class="bkground-color-box-delete btn knewavefont mx-auto primary-colors shadow"
-                                    type="submit" value="Delete">
-                            </form>
+                        <form action="/list?lists_id={{lists_id}}" method="post">
+                            <input name="actiononelement" type="hidden" value="deleteelement">
+                            <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
+                            <input class="bkground-color-box-delete btn knewavefont mx-auto primary-colors shadow"
+                                type="submit" value="Delete">
+                        </form>
                     </div>
                 </div>
             </div>
@@ -326,18 +331,18 @@
                 {% endfor %}
             </ul>
 
-            
+
         </div>
     </div>
 </div>
 <script>
     // change class to show input
-    function changeClass(elementstoshow){
+    function changeClass(elementstoshow) {
         let shown = document.getElementById(String(elementstoshow));
-        if (shown.classList.contains('display-none')){
+        if (shown.classList.contains('display-none')) {
             shown.classList.remove('display-none')
         }
-        else{
+        else {
             shown.classList.add('display-none')
         }
         return
