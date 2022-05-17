@@ -107,20 +107,29 @@
                     </div>
                     {% for key,value in element.items() %}
                     {% if key != "type" %}
-                    {% if key == "cover" or key == 'image' %}
-                    <div class="mb-3 p-2">
-                        <input
-                            class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                            name="inputimage" title="{{value}}" type="file">
-                    </div>
-                    {% else %}
-                    <div class="mb-3 p-2">
-                        <input
-                            class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                            autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
-                            title="{{value}}" type="text">
-                    </div>
-                    {% endif %}
+                        {% if key == "cover" or key == 'image' %}
+                        <div class="mb-3 p-2">
+                            <input
+                                class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
+                                name="inputimage" title="{{value}}" type="file">
+                        </div>
+                        {% else %}
+                            {% if key =='year'%}
+                            <div class="mb-3 p-2">
+                                <input
+                                    class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
+                                    autocomplete="off" autofocus name="{{key}}" maxlength="4"
+                                    placeholder="Enter a {{key.capitalize()}}" title="{{value}}" type="text">
+                            </div>
+                            {% else %}
+                            <div class="mb-3 p-2">
+                                <input
+                                    class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
+                                    autocomplete="off" autofocus name="{{key}}" placeholder="Enter a {{key.capitalize()}}"
+                                    title="{{value}}" type="text">
+                            </div>
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
                     {% endfor %}
                     {% endif %}
@@ -240,29 +249,38 @@
                 <!--edit toggle elements-->
                 <div id="editinfo{{loop.index0}}" class="collapse mb-3 inline width60">
                     <form action="/list?lists_id={{lists_id}}" method="post">
-                    <div class="mb-3" align="center">
-                    <div class="d-flex flex-row flex-wrap">
-                        {% for key,value in element.items() %}
-                        {% if key != 'cover' %}
-                        {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key != 'namelist' %}
-                        <div class="mb-3 margin-left-8 text-align-left width12">
-                                <label class="knewavefont" for="edit{{key}}">{{key}}</label>
-                                <input name="edit{{key}}"
-                                    class="border form-control mx-auto bkground-color-box-white knewavefont primary-font"
-                                    placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                        <div class="mb-3" align="center">
+                            <div class="d-flex flex-row flex-wrap">
+                                {% for key,value in element.items() %}
+                                {% if key != 'cover' %}
+                                {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key
+                                != 'namelist' and key!= 'year' %}
+                                <div class="mb-3 margin-left-8 text-align-left width12">
+                                    <label class="knewavefont" for="edit{{key}}">{{key}}</label>
+                                    <input name="edit{{key}}"
+                                        class="border form-control mx-auto bkground-color-box-white knewavefont primary-font"
+                                        placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                </div>
+                                {% endif %}
+                                {% if key == 'year' %}
+                                <div class="mb-3 margin-left-8 text-align-left width12">
+                                    <label class="knewavefont" for="edit{{key}}">{{key}}</label>
+                                    <input name="edit{{key}}"
+                                        class="border form-control mx-auto bkground-color-box-white knewavefont primary-font"
+                                        maxlength="4" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+                                <input name="actiononelement" type="hidden" value="editelement">
+                                <input name="ideditelement" type="hidden" value="{{element['id']}}">
+                            </div>
+                            <div class="mb-3 margin3">
+                                <input class="bkground-color-box-create btn knewavefont mx-auto primary-colors shadow"
+                                    type="submit" value="Update">
+                            </div>
                         </div>
-                        {% endif %}
-                        {% endif %}
-                        {% endfor %}
-                        <input name="actiononelement" type="hidden" value="editelement">
-                        <input name="ideditelement" type="hidden" value="{{element['id']}}">
-                    </div>
-                    <div class="mb-3 margin3">
-                        <input class="bkground-color-box-create btn knewavefont mx-auto primary-colors shadow"
-                            type="submit" value="Update">
-                    </div>
-                    </div>
-                </form>
+                    </form>
 
                 </div>
                 <div class="mb-3 inline margin-left-3" align="left">

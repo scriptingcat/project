@@ -614,7 +614,7 @@ def showlist():
             # store the requests in a dict
             requeststoedit = {}
             # create strings for colomns to pass new values in order to update db
-            coltoset = ''
+            coltoset = ""
             # nametags in html inputs is edit{{key}}
             nametag = 'edit'
             # loop through the colomn that can be edited for each corrisponding type of nametable
@@ -626,15 +626,12 @@ def showlist():
                             if len(coltoset) == 0:
                                 coltoset = coltoset
                             else:
-                                coltoset = coltoset + ','
+                                coltoset = coltoset + ", "
                             # take the requests
                             requeststoedit[key] = request.form.get(nametag + str(key))
                             # update strings
-                            coltoset = coltoset + str(key) + '=?'
+                            coltoset = coltoset + str(key) + " = ?"
                     break
-            coltoset = f'({coltoset})'
-            print(coltoset)
-
 
             # take the id and check it belongs to session's user
             ideditelement = request.form.get('ideditelement')
@@ -649,9 +646,13 @@ def showlist():
             if not requeststoedit['title']:
                 apologymsg = "title is requires".capitalize()
                 return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-            db.execute("UPDATE ? SET" + coltoset + " WHERE id=?", nametable,  int(ideditelement))
-            print([x for k,v in requeststoedit])
-            apologymsg = 'hello'
+            # update
+            if nametable == 'movies_tvseries':
+                print("UPDATE ? SET " + coltoset + " WHERE id=?")
+                db.execute("UPDATE ? SET " + coltoset + " WHERE id=?", nametable, requeststoedit['title'], requeststoedit['year'], requeststoedit['director'],  requeststoedit['description'],  requeststoedit['link'],  requeststoedit['note'],int(ideditelement))
+                apologymsg = 'Updated'
+            else:
+                apologymsg = 'Something went wrong. Updating failed.'
             return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
             
 
@@ -665,8 +666,6 @@ def showlist():
             apologymsg = "Type of Request not recognized"
             return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
 
-
-        #return redirect("/list?lists_id=" + lists_id)
 
     else:
         # check lists_id user matches session's user_id
