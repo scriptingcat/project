@@ -15,6 +15,7 @@ from helpers import login_required, validCharPass, validLenPass, generate_token,
 from email_validator import validate_email
 
 from io import BytesIO
+import sqlite3
 
 
 # library to create jwt token 
@@ -611,50 +612,59 @@ def showlist():
 
         # edit element
         elif actiononelement == 'editelement':
-            # store the requests in a dict
-            requeststoedit = {}
-            # create strings for colomns to pass new values in order to update db
-            coltoset = ""
-            # nametags in html inputs is edit{{key}}
-            nametag = 'edit'
-            # loop through the colomn that can be edited for each corrisponding type of nametable
-            for dictionary in listelementstoedit:
-                if dictionary['type'] == nametable:
-                    for key,value in dictionary.items():
-                        if key != 'type':
-                            # handle commas in strings
-                            if len(coltoset) == 0:
-                                coltoset = coltoset
-                            else:
-                                coltoset = coltoset + ", "
-                            # take the requests
-                            requeststoedit[key] = request.form.get(nametag + str(key))
-                            # update strings
-                            coltoset = coltoset + str(key) + " = ?"
-                    break
+            try:
+                # store the requests in a list
+                listreqstoedit = []
+                # create strings for colomns to pass new values in order to update db
+                coltoset = ""
+                # nametags in html inputs is edit{{key}}
+                nametag = 'edit'
+                # loop through the colomn that can be edited for each corrisponding type of nametable
+                for dictionary in listelementstoedit:
+                    if dictionary['type'] == nametable:
+                        for key,value in dictionary.items():
+                            if key != 'type':
+                                # handle commas in strings
+                                if len(coltoset) == 0:
+                                    coltoset = coltoset
+                                else:
+                                    coltoset = coltoset + ", "
+                                # take the requests and save them in a list                            
+                                listreqstoedit.append(request.form.get(nametag + str(key)))
+                                # update strings
+                                coltoset = coltoset + str(key) + " = ?"
+                        break
 
-            # take the id and check it belongs to session's user
-            ideditelement = request.form.get('ideditelement')
-            if not ideditelement:
-                apologymsg = "Id element required"
-                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-            rows = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(ideditelement))
-            if session['user_id'] != rows[0]['user_id']:
-                apologymsg = "Id does not match user id"
-                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-            # handle the requests
-            if not requeststoedit['title']:
-                apologymsg = "title is requires".capitalize()
-                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-            # update
-            if nametable == 'movies_tvseries':
-                print("UPDATE ? SET " + coltoset + " WHERE id=?")
-                db.execute("UPDATE ? SET " + coltoset + " WHERE id=?", nametable, requeststoedit['title'], requeststoedit['year'], requeststoedit['director'],  requeststoedit['description'],  requeststoedit['link'],  requeststoedit['note'],int(ideditelement))
+                # take the id and check it belongs to session's user
+                ideditelement = request.form.get('ideditelement')
+                if not ideditelement:
+                    apologymsg = "Id element required"
+                    return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+                rows = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(ideditelement))
+                # executemany takes 1 seq of param, so requests list must containd the id too, which is also the last param for update sql query (where id = ?), so id needs to be appended as last index of list
+                listreqstoedit.append(int(ideditelement))
+                if session['user_id'] != rows[0]['user_id']:
+                    apologymsg = "Id does not match user id"
+                    return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+                # handle the requests, title / name is always the first so at index 0
+                if len(listreqstoedit[0]) <=0:
+                    apologymsg = "title is required".capitalize()
+                    return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+                
+                # update
+                # using sqlite3 library because cs50 sql library doesn't allow to pass a list of param since there's no executemany 
+                sqltoupdate = "UPDATE " + nametable + " SET " + coltoset + " WHERE id=?"
+                connection = sqlite3.connect('keeptrack.db')
+                cursor = connection.cursor()
+                # list of params has to be followed by a comma because it need to be treated as tuples
+                cursor.executemany(sqltoupdate,(listreqstoedit,))
+                connection.commit()
+                connection.close()
                 apologymsg = 'Updated'
-            else:
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+            except:
                 apologymsg = 'Something went wrong. Updating failed.'
-            return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-            
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
 
         else:
             # check lists_id user matches session's user_id
@@ -668,6 +678,7 @@ def showlist():
 
 
     else:
+        # GET METHOD
         # check lists_id user matches session's user_id
         # prevent from showing other users' lists by manipulating html code
         user_id = lists[0]['user_id']
@@ -681,6 +692,7 @@ def showlist():
         else:
             apologymsg = "Something went wrong. Access to list Denied"
             return redirect("/?message=" + apologymsg)
+
 
 @app.route('/image')
 @login_required
