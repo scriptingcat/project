@@ -11,7 +11,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element
 from email_validator import validate_email
 
 from io import BytesIO
@@ -52,6 +52,16 @@ db = SQL("sqlite:///keeptrack.db")
 
 listelements = [ 
         {
+            "type": "books",
+            "title": "a title for the element",
+            "year": "year of release",
+            "author": "the author of the book",
+            "description" : "a brief text describing the element",
+            "cover": "an image to associate with the element",
+            "link": "a link to assciate with the element",
+            "note": "a brief text to assciate with the element"
+        },
+        {
             "type": "movies_tvseries",
             "title": "a title for the element",
             "year": "year of release",
@@ -73,10 +83,20 @@ listelementstoedit= [
             "link": "a link to assciate with the element",
             "note": "a brief text to assciate with the element"
         },
+        {
+            "type": "books",
+            "title": "a title for the element",
+            "year": "year of release",
+            "author": "the author of the book",
+            "description" : "a brief text describing the element",
+            "link": "a link to assciate with the element",
+            "note": "a brief text to assciate with the element"
+        },
 ]
 
 sorttypes = { 
-    'movies_tvseries': ['title','most recent', 'least recent', 'author']
+    'movies_tvseries': ['title','most recent', 'least recent', 'director'],
+    'books': ['title','most recent', 'least recent', 'author']
     }
 
 '''
@@ -494,37 +514,41 @@ def showlist():
                             elementinput = request.form.get(key)
                             dictofrequests[key] = elementinput
                     break
+            
+            # check title-name request is provided
+            for k,v in dictofrequests.items():
+                if k == 'title':
+                    if not dictofrequests['title'] or dictofrequests['title'] == None:
+                        apologymsg = "Element Title Is Required"
+                        return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+                    else:
+                        break
+                if k == 'name':
+                    if not dictofrequests['name'] or dictofrequests['name'] == None:
+                        apologymsg = "Element Name Is Required"
+                        return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+                    else:
+                        break
 
-            # call function according to type of table
-            if nametable == "movies_tvseries":
-                # check the title input to handle void request
-                if not dictofrequests['title'] or dictofrequests['title'] == None:
-                    apologymsg = "Element Title Is Required"
-                    return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+            # check whether there's an img to save in db:
+            if not dictofrequests['cover'] or dictofrequests['cover'] == 0:
+                add_element(nametable, dictofrequests, namelist, lists_id, session['user_id'])
+            else:
+                db.execute("BEGIN TRANSACTION")
+                # take all the info from filestorage obj
+                #data
+                img = dictofrequests['cover'].read()
+                #filename - how suggested by the guidelines
+                filename = secure_filename(dictofrequests['cover'].filename)
+                #mimetype
+                mimetype = dictofrequests['cover'].mimetype
+                # add the element to the nametable type table and take nametable_id to pass to addimage
+                nametable_id_info = add_element(nametable, dictofrequests, namelist, lists_id, session['user_id'])
+                # add the image to image db
+                addimage(img, filename, mimetype, nametable_id_info['nametable'], nametable_id_info['nametable_id'], nametable_id_info['lists_id'])
+                db.execute("COMMIT")
+            return redirect("/list?lists_id=" + lists_id)
 
-                # check whether there's an img to save in db:
-                if not dictofrequests['cover'] or dictofrequests['cover'] == 0:
-                    add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],0,dictofrequests['link'], dictofrequests['note'])
-                else:
-                    db.execute("BEGIN TRANSACTION")
-                    # take all the info from filestorage obj
-                    #data
-                    img = dictofrequests['cover'].read()
-                    #filename - how suggested by the guidelines
-                    filename = secure_filename(dictofrequests['cover'].filename)
-                    #mimetype
-                    mimetype = dictofrequests['cover'].mimetype
-                    # add the element to the nametable type table and take nametable_id to pass to addimage
-                    nametable_id_info = add_element_movies_tvseries(dictionary['type'], namelist,lists_id, session['user_id'], dictofrequests['title'], dictofrequests['year'], dictofrequests['director'], dictofrequests['description'],'null',dictofrequests['link'], dictofrequests['note'])
-                    # add the image to image db
-                    addimage(img, filename, mimetype, nametable_id_info['nametable'], nametable_id_info['nametable_id'], nametable_id_info['lists_id'])
-                    img_id = db.execute("SELECT * FROM imgs WHERE img=? AND name=? AND mimetype=?", img, filename, mimetype)
-                    img_id = img_id[0]['id']
-                    # update img_id in nametbale db
-                    db.execute("UPDATE movies_tvseries SET img_id=? WHERE id=?",img_id, nametable_id_info['nametable_id'])
-                    db.execute("COMMIT")
-                return redirect("/list?lists_id=" + lists_id)
-        
         # change list name
         elif actiononelement == "changenamelist":
             newnamelist = request.form.get('newnamelist')
@@ -651,7 +675,7 @@ def showlist():
                     apologymsg = "title is required".capitalize()
                     return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
                 
-                # update
+                # update the table
                 # using sqlite3 library because cs50 sql library doesn't allow to pass a list of param since there's no executemany 
                 sqltoupdate = "UPDATE " + nametable + " SET " + coltoset + " WHERE id=?"
                 connection = sqlite3.connect('keeptrack.db')

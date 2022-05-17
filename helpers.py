@@ -193,14 +193,44 @@ def add_element_movies_tvseries(nametable,namelist,lists_id,user_id,title,year,d
 
 # func to add an img in imgs db
 def addimage(img, name, mimetype, nametable, nametable_id, lists_id):
+    # insert the img in imgs db 
     db.execute("INSERT INTO imgs (img, name, mimetype, nametable, nametable_id, lists_id) VALUES (?,?,?, ?,?, ?)", img, name, mimetype, nametable, nametable_id, lists_id)
+    # update img_id in the nametable
+    img_id = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=? AND lists_id=?", nametable_id, nametable, lists_id)
+    img_id = img_id[0]['id']
+    db.execute("UPDATE ? SET img_id=? WHERE id=?",nametable, img_id, nametable_id)
     return
 
+# func to add a new element to list in db
+def add_element(nametable,dictofelements, namelist, lists_id, user_id):
+    if nametable == 'books':
+        db.execute("BEGIN TRANSACTION")
+        # insert the element data
+        # 0 value is value for null since db column only takes integers
+        # img_id is always 0, it is updated after the image has been stored in imgs db
+        db.execute("INSERT INTO books (namelist,lists_id,user_id,title,year,author,description,img_id,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['title'],dictofelements['year'],dictofelements['author'],dictofelements['description'],0,dictofelements['link'],dictofelements['note'])
+        rows = db.execute("SELECT * FROM books WHERE namelist=? AND lists_id=? AND user_id=? AND title=?", namelist, lists_id, user_id, dictofelements['title'])
+        nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
+        db.execute("COMMIT")
+        return nametable_id
+    elif nametable == 'movies_tvseries':
+        db.execute("BEGIN TRANSACTION")
+        # insert the element data
+        # 0 value is value for null since db column only takes integers
+        # img_id is always 0, it is updated after the image has been stored in imgs db
+        db.execute("INSERT INTO movies_tvseries (namelist,lists_id,user_id,title,year,director,description,img_id,link,note) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['title'],dictofelements['year'],dictofelements['director'],dictofelements['description'],0,dictofelements['link'],dictofelements['note'])
+        rows = db.execute("SELECT * FROM movies_tvseries WHERE namelist=? AND lists_id=? AND user_id=? AND title=?", namelist, lists_id, user_id, dictofelements['title'])
+        nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
+        db.execute("COMMIT")
+        return nametable_id
+    else:
+        return
 
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 
 #CREATE TABLE movies_tvseries (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), director TEXT, description TEXT, cover TEXT, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
-#CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), author TEXT, description TEXT, cover TEXT, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
+#CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), author TEXT, description TEXT, img_id INTEGER, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+
 #CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, place TEXT NOT NULL, address TEXT, coordinates TEXT, description TEXT, image TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 #CREATE TABLE shopping (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, item TEXT NOT NULL, brand TEXT, collection TEXT, quantity INTEGER, price FLOAT, description TEXT, image TEXT, wheretobuy TEXT, note TEXT, status CHECK(status in ('to buy', 'bought')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));

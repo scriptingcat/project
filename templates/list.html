@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block span %}
-{{namelist.capitalize()}}
+{{namelist.capitalize()}} 
 {% endblock %}
 
 {% block main %}
@@ -255,7 +255,7 @@
                                 {% if key != 'cover' %}
                                 {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key
                                 != 'namelist' and key!= 'year' %}
-                                <div class="mb-3 margin-left-8 text-align-left width12">
+                                <div class="mb-3 margin-left-8 p-2 text-align-left width12">
                                     <label class="knewavefont" for="edit{{key}}">{{key}}</label>
                                     <input name="edit{{key}}"
                                         class="border form-control mx-auto bkground-color-box-white knewavefont primary-font"
@@ -263,7 +263,7 @@
                                 </div>
                                 {% endif %}
                                 {% if key == 'year' %}
-                                <div class="mb-3 margin-left-8 text-align-left width12">
+                                <div class="mb-3 margin-left-8 p-2 text-align-left width12">
                                     <label class="knewavefont" for="edit{{key}}">{{key}}</label>
                                     <input name="edit{{key}}"
                                         class="border form-control mx-auto bkground-color-box-white knewavefont primary-font"
@@ -275,7 +275,7 @@
                                 <input name="actiononelement" type="hidden" value="editelement">
                                 <input name="ideditelement" type="hidden" value="{{element['id']}}">
                             </div>
-                            <div class="mb-3 margin3">
+                            <div class="mb-3 p-2">
                                 <input class="bkground-color-box-create btn knewavefont mx-auto primary-colors shadow"
                                     type="submit" value="Update">
                             </div>
