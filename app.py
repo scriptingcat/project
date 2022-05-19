@@ -1,7 +1,7 @@
 #app
 
 import os
-from flask import Flask,redirect, request, render_template, session, Response, send_file
+from flask import Flask,redirect, request, render_template, session, Response, send_file, url_for
 from flask_session import Session
 from tempfile import mkdtemp
 from flask_mail import Mail, Message
@@ -95,7 +95,7 @@ listelementstoedit= [
 ]
 
 sorttypes = { 
-    'movies_tvseries': ['title','most recent', 'least recent', 'director'],
+    'movies_tvseries': ['title','most recent', 'least recent', 'director', 'year'],
     'books': ['title','most recent', 'least recent', 'author']
     }
 
@@ -126,8 +126,15 @@ def after_request(response):
     return response
 
 @app.route("/", methods=["GET", "POST"])
-@login_required
 def index():
+    if request.method == "POST":
+        return render_template("index.html")
+    else:
+        return render_template("index.html")
+
+@app.route("/myaccount", methods=["GET", "POST"])
+@login_required
+def myaccount():
     # select list of types can be chosen
     listtypes = db.execute("SELECT nametable FROM list_types")
 
@@ -140,10 +147,10 @@ def index():
         # check values for creating new list
         if not typeoflist and not namelist:
             apologymsg = "All fields required"
-            return render_template("index.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("myaccount.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
         if not typeoflist:
             apologymsg = "Type of list selection required"
-            return render_template("index.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("myaccount.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
         
         # not allowing user to manipulate the selections
         checktype=False
@@ -156,11 +163,11 @@ def index():
                 break
         if checktype == False:
             apologymsg = "Type of list selected not recognized"
-            return render_template("index.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("myaccount.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
 
         if not namelist:
             apologymsg = "Name list required"
-            return render_template("index.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("myaccount.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
 
         addlist(typeoflist, namelist, session['user_id'])
         return redirect("/")
@@ -168,9 +175,9 @@ def index():
     else:
         showmessage = request.args.get('message')
         if showmessage is None or len(showmessage) == 0:
-            return render_template("index.html", listtypes=listtypes, userslists=userslists)
+            return render_template("myaccount.html", listtypes=listtypes, userslists=userslists)
         else:
-            return render_template("index.html", listtypes=listtypes, userslists=userslists, showmessage=showmessage)
+            return render_template("myaccount.html", listtypes=listtypes, userslists=userslists, showmessage=showmessage)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -205,7 +212,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
-        return redirect("/")
+        return redirect("/myaccount")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -277,7 +284,8 @@ def signup():
         rows = db.execute("SELECT * FROM users WHERE username = ?", username)
         # remember which user has logged in
         session["user_id"] = rows[0]["id"]
-        return redirect("/")
+        apologymsg = "Account created!"
+        return redirect("/myaccount" + "?message=" + apologymsg)
 
     else:
         return render_template("signup.html")
@@ -602,7 +610,7 @@ def showlist():
                 responsedeletelist = request.form.get('responsedeletelist')
                 if responsedeletelist == 'Yes':
                     deletelist(lists_id, nametable)
-                    return redirect("/")
+                    return redirect("/myaccount")
                 else:
                     apologymsg="This list has not been deleted"
                     return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
@@ -730,13 +738,13 @@ def image():
         # hande input
         if not nametable_id or not nametable:
             apologymsg = "Something went wrong. Access to element Denied"
-            return redirect("/?message=" + apologymsg)
+            return redirect("/myaccount" + "?message=" + apologymsg)
         
         rows = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(nametable_id))
         # check user requesting is owner of the element
         if rows[0]['user_id'] != session['user_id']:
             apologymsg = "Something went wrong. Access to element Denied"
-            return redirect("/?message=" + apologymsg)
+            return redirect("/myaccount" + "?message=" + apologymsg)
 
         img = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=?", int(nametable_id), nametable)
         image = base64.b64encode(img[0]['img']).decode('ascii')
@@ -745,7 +753,7 @@ def image():
     # for any other type of exception
     except:
         apologymsg = "Something went wrong"
-        return redirect("/?message=" + apologymsg)
+        return redirect("/myaccount" + "?message=" + apologymsg)
 
 @app.route('/search')
 @login_required
@@ -780,6 +788,8 @@ def elements():
     nametable = list_types[0]['nametable']
     # select all the element contained in that list
     elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
+    images = db.execute("SELECT * FROM imgs WHERE lists_id=?", int(lists_id))
+
     try:
         if sortby and styleview:
             if sortby == 'title':
@@ -790,6 +800,8 @@ def elements():
                 elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id DESC", nametable, int(lists_id), session['user_id'])
             elif sortby == 'least recent':
                 elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id ASC", nametable, int(lists_id), session['user_id'])
+            elif sortby == 'year':
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY year ASC", nametable, int(lists_id), session['user_id'])
             else:
                 elementssorted = elements
             elements = elementssorted
@@ -797,7 +809,11 @@ def elements():
                 style = 'table'
             else:
                 style ='grid'
-            return render_template("elements.html", elements=elements, style=style)
+            user_id = lists[0]['user_id']
+            if session['user_id'] == user_id:
+                for image in images:
+                    image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
+            return render_template("elements.html", elements=elements, style=style, images=images)
     except:
         return render_template("elements.html", apologymsg="Something went wrong")
 

@@ -232,5 +232,6 @@ def add_element(nametable,dictofelements, namelist, lists_id, user_id):
 
 #CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), author TEXT, description TEXT, img_id INTEGER, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
-#CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, place TEXT NOT NULL, address TEXT, coordinates TEXT, description TEXT, image TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
+#CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, place TEXT NOT NULL, address TEXT, coordinates TEXT, description TEXT, img_id TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+
 #CREATE TABLE shopping (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, item TEXT NOT NULL, brand TEXT, collection TEXT, quantity INTEGER, price FLOAT, description TEXT, image TEXT, wheretobuy TEXT, note TEXT, status CHECK(status in ('to buy', 'bought')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));

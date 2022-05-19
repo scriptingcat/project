@@ -1,7 +1,16 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Log In or Sign Up
+    Log In
+{% endblock %}
+{% block nav %} 
+<a class="navbar-brand" href="/">
+    <span><img src="/static/favicon.ico"></span>
+    <span class="abrilfatface-font primary-font">keep track: log in</span>
+</a>
+<button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler btnfocus" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+    <span class="navbar-toggler-icon"></span>
+</button>
 {% endblock %}
 
 {% block main %}
@@ -21,7 +30,7 @@
                    
                 </div>
                 <div class="mb-3">
-                    <button class="block btn knewavefont mx-auto primary-colors shadow" type="submit">Log In</button>
+                    <button class="block btn abrilfatface-font mx-auto primary-colors shadow" type="submit">Log In</button>
                 </div>
             </form>
             <form action="/forgotpassword" method="get">
@@ -32,7 +41,7 @@
             <hr class="mx-auto width10 primary-font">
             <form action="/signup" method="get">
                 <div class="mb-3">
-                   <button class="btn knewavefont primary-colors shadow" type="submit">Sign Up</button>
+                   <button class="btn abrilfatface-font primary-colors shadow" type="submit">Sign Up</button>
                 </div>
             </form>
         </div>

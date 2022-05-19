@@ -1,20 +1,21 @@
 body{
     max-width: 100vw;
 }
-
-nav .navbar-brand
-{
-    font-size: x-large;
+nav{
+    border-bottom: #8fd694 1px solid;
 }
+
 .primary-colors {
-    color: #48B!important;
-    background-color: #D8D!important;
+    color: #161b21!important;
+    background-color: #77AD78!important;
 }
 .primary-font{
-    color: #48B!important;
+    color: #161b21!important;
 }
-.main{
+main{
     display: block!important;
+    margin: 0%!important;
+    padding: 0%!important;
 }
 .block {
     display: block!important;
@@ -23,7 +24,7 @@ nav .navbar-brand
     background-color: #fff;
     border: none!important;
     font-size: 10px;
-    color: #48B;
+    color: #161b21;
     outline: none!important;
     text-decoration: none;
 }
@@ -34,19 +35,19 @@ nav .navbar-brand
     width: 15%
 }
 .logoshadow {
-    -webkit-filter: drop-shadow(10px 0px 15px #48B);
+    -webkit-filter: drop-shadow(10px 0px 15px #6f8f72);
     filter: drop-shadow();
 }
 .shadow {
-    box-shadow: 2px 2px 15px 1px #48B!important;
+    box-shadow: 2px 2px 15px 1px #8fd694!important;
 }
 .knewavefont {
     font-family: 'Knewave', cursive;
     font-weight: 200;
 }
 button.shadow:hover{
-    background-color: rgb(243, 160, 243)!important;
-    box-shadow: 2px 2px 15px 1px rgb(83, 169, 235)!important;
+    background-color: #8fd694!important;
+    box-shadow: 2px 2px 15px 1px #8fd694!important;
 
 }
 .noborder{
@@ -57,9 +58,9 @@ button.shadow:hover{
     width: 100%!important;
 }
 .btnfocus:focus{
-    background-color: rgb(243, 160, 243)!important;
+    background-color: #8fd694!important;
     /*box-shadow: 2px 2px 15px 1px rgb(83, 169, 235)!important;*/
-    box-shadow: 0 0 0 0.25rem rgb(83 169 235 / 50%)!important;
+    box-shadow: 0 0 0 0.25rem (#8fd694/ 50%)!important;
 }
 .fontw100 {
     font-weight: 100;
@@ -71,13 +72,13 @@ button.shadow:hover{
     background-color: #f8f9fA!important;
 }
 .shadow-item:hover{
-    background-color: rgb(243, 160, 243)!important;
+    background-color: #8fd694!important;
 }
 .fontsize10vw{
     font-size: 10vw;
 }
 .border{
-    outline:solid 2px #D8D;
+    outline:solid 2px #8fd694;
 }
 .bkground-color-box{
     background-color: #f8f9fA;
@@ -86,7 +87,7 @@ button.shadow:hover{
     background-color: #f8f9fA;
 }
 .bkground-color-box:hover{
-    background-color: rgb(243, 160, 243)!important;
+    background-color: #8fd694!important;
 }
 .bkground-color-box-delete:hover{
     background-color: rgb(233, 71, 93)!important;
@@ -132,12 +133,12 @@ button.bkground-color-box-create:hover{
     margin-top: 2%;
 }
 .primary-colors-checkbox{
-    color: #48B!important;
+    color: #161b21!important;
     background-color: #f8f9fA!important;
 }
 .primary-colors-checkbox:checked{
-    color: #48B!important;
-    background-color: #D8D!important;
+    color: #161b21!important;
+    background-color: #8fd694!important;
 }
 .margin-left-85{
     margin-left: -85%;
@@ -184,7 +185,7 @@ button.bkground-color-box-create:hover{
 .style-li{
     list-style-type: none;
     list-style-position: outside;
-    color: #48B;
+    color: #161b21;
     padding: 0%;
     margin:0%;
     text-align: left;
@@ -208,7 +209,7 @@ ul.none-display{
     padding: 2%;
 }
 .border-top-tbody{
-    border-top: #D8D 5px solid!important;
+    border-top: #8fd694 5px solid!important;
 }
 .padding-left-5{
     padding-left: 5%!important;
@@ -221,4 +222,35 @@ ul.none-display{
 }
 .margin3{
     margin: 3%;
+}
+.no-underline{
+    text-decoration: none;
+}
+
+.abrilfatface-font{
+    font-family: 'Abril Fatface', cursive!important;
+}
+.bkground-color{
+    background-color: #8fd694;
+}
+.font-size7{
+    font-size: 7vw;
+}
+.poppins-font{
+    font-family: 'Poppins', sans-serif;
+}
+.font-size3{
+    font-size: 3vw;
+}
+.border-top{
+    border-top: #8fd694 1px solid!important;
+}
+.width25{
+    width: 25%;
+}
+.width30{
+    width: 30%;
+}
+.width50{
+    width: 50%;
 }

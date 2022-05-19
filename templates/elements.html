@@ -1,6 +1,6 @@
     {% if style and elements %}
     {% if style == 'table' %}
-    <table class=" knewavefont padding2 primary-font table table-hover table-sm text-align-left width60 ">
+    <table class=" poppins-font padding2 primary-font table table-hover table-sm text-align-left width60 ">
     <thead class="fontw100 margin-left-15 padding2">
         <tr class="w-auto">
             <th class="padding-left-5" scope="col"> title</th>
@@ -18,7 +18,7 @@
             <td class="padding-left-5" >{{element['director']}}</td>
             <td class="padding-left-5" >{{element['description']}}</td>
             <td class="padding-left-5" ><button
-                class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
+                class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
                 type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
                 aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value=""></button></td>
         </tr>
@@ -28,27 +28,29 @@
     {% else %}
 
     {% for element in elements %}
-    <li class="p-2 style-li-notype">
-    <div class="mb-3">
+    <li class="p-2 style-li-notype width25">
+    <div class="mb-3  ">
     <button
-        class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
+        class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto"
         type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
         aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
-        <div class="mb-3 fontsize10pc">
-            <div class="width10">
-                <img src="" alt="">
-            </div>
-            <div class="width10">
-                <h4>
+        <div class="d-flex align-items-start flex-wrap mb-3 fontsize10pc">
+            <div align="left" class="fontsize10pc width25">
+                <h5>
                     Title: {{element['title']}}
-                </h4>
-                <h5>
+                </h5>
+                <h6>
                     Year: {{element['year']}}
-                </h5>
-                <h5>
+                </h6>
+                <h6>
                     Director: {{element['director']}}
-                </h5>
+                </h6>
             </div>
+            {% for image in images%}
+            {% if image['nametable_id'] == element['id'] %}
+                <img class="margin-left-3 width25" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
+            {% endif %}
+            {% endfor %}
         </div>
     </button>
     </div>

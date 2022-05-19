@@ -1,92 +1,43 @@
 {% extends "layout.html" %}
 
+{% block nav %} 
+<a class="navbar-brand" href="/">
+    <span><img src="/static/favicon.ico"></span>
+    <span class="abrilfatface-font primary-font">keep track{% block span %}{% endblock %}</span>
+</a>
+<button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler btnfocus" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+    <span class="navbar-toggler-icon"></span>
+</button>
+
+<!--right part-->
+<div>
+    <a class="abrilfatface-font bkground-color-box no-underline primary-colors primary-font" href="{{url_for('login')}}"><button class="bkground-color-box btn btnfocus btn-secondary fontw100 noborder primary-colors w-auto" type="button" >  Log In </button></a>
+    <a class="bkground-color-box no-underline primary-colors primary-font" href="{{url_for('signup')}}"><button class=" abrilfatface-font bkground-color-box btn btnfocus btn-secondary fontw100 noborder primary-colors w-auto" type="button"> Sign Up</button></a>
+</div>
+
+{% endblock %}
 
 {% block title %}
-Your Lists
+Home
 {% endblock %}
 
-{% block span %}
-your lists
-{% endblock %}
+
 
 {% block main %}
 <div>
     {% if showmessage %}
         <div class="mb-3">
-            <p id="apologymsg" class="primary-font mx-auto width15" type="text" name="showmessage"> {{showmessage}} </p>
+            <p id="apologymsg" class="abrilfatface-font mx-auto primary-font width15" type="text" name="showmessage"> {{showmessage}} </p>
         </div>
         {% endif %}
-    <div class="">
-        <form action="/" method="post">
-            <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
-                <div class="mb-3">
-                    <button
-                        class="btn btn-primary knewavefont border primary-font primary-colors text-align-left w-auto"
-                        type="button" data-bs-toggle="collapse" data-bs-target="#selecttypelist" aria-expanded="false"
-                        aria-controls="selecttypelist">
-                        Add New List +
-                    </button>
+        <div class="d-flex flex-row align-content-strech justify-content-center flex-wrap">
+                <div><img class="w-auto" src="/static/android-chrome-192x192.png">
                 </div>
-                <div class="collapse" id="selecttypelist">
-                    <div class="d-flex flex-row">
-                        <div class="mb-3 margin-left-15">
-                            <select
-                                class="bkground-color-box-white border form-select mx-auto w-auto knewavefont primary-font"
-                                name="typeoflist">
-                                <option disable selected>Type of List</option>
-                                {% for element in listtypes %}
-                                {% for key,value in element.items() %}
-                                <option value="{{value}}">
-                                    {{value}}
-                                </option>
-                                {% endfor %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3 margin-left-15">
-                            <input
-                                class="border form-control mx-auto w-auto bkground-color-box-white knewavefont primary-font"
-                                autocomplete="off" autofocus name="namelist" placeholder="Enter a list name"
-                                type="text">
-                        </div>
-                        <div class="mb-3 margin-left-10">
-                            <button class="bkground-color-box-create block btn knewavefont mx-auto primary-colors shadow"
-                                type="submit">Create</button>
-                        </div>
-                    </div>
+                <div>
+                <h1 class="abrilfatface-font font-size7 mt-5 primary-font">keep track</h1>
                 </div>
-            </div>
-        </form>
-        {% if apologymsg %}
-        <div class="mb-3">
-            <p id="apologymsg" class="primary-font mx-auto width15" type="submit" name="apologymsg"> {{apologymsg}} </p>
         </div>
-        {% endif %}
-
-    </div>
-    {% if userslists %}
-    <div class="bkground-color-box-white mt-5">
-        <div class="mb-3 margin-left-88 ">
-            <h2 class="knewavefont primary-font">your lists</h2>
-        </div>
-        <div class="d-flex flex-row">
-            {% for element in userslists %}
-            <div class="mb-3 margin-left-1 margin-right-3">
-               
-                <form action="/list?{{element['id']}}" method="get">
-                    <input name="lists_id" type="hidden" value="{{element['id']}}">
-                    <button
-                        class="border bkground-color-box btn btnfocus btn-primary knewavefont primary-font w-auto h-auto"
-                        type="submit" value="{{element['namelist']}}">
-                        {{element['namelist'].capitalize()}}
-                    </button>
-                </form>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    {% endif %}
-
+        <div><h3 class="poppins-font font-size3 mt-5 primary-font">your customized to do lists stored online</h3></div>
+        <div><h3 class="poppins-font font-size3 primary-font">with images</h3></div>
 </div>
 {% endblock %}

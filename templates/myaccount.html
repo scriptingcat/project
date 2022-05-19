@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+
+{% block title %}
+Your Lists
+{% endblock %}
+
+{% block span %}: your lists
+{% endblock %}
+
+{% block main %}
+<div>
+    {% if showmessage %}
+        <div class="mb-3">
+            <p id="apologymsg" class="primary-font mx-auto width15" type="text" name="showmessage"> {{showmessage}} </p>
+        </div>
+        {% endif %}
+    <div class="">
+        <form action="/myaccount" method="post">
+            <!--Toggles-->
+            <div class="d-flex flex-row align-content-strech justify-content-start flex-wrap">
+                <!--add a new list button-->
+                <div class="mb-3 margin-left-1">
+                    <button
+                        class="btn btn-primary abrilfatface-font border mx-auto primary-font primary-colors text-align-left w-auto"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#selecttypelist" aria-expanded="false"
+                        aria-controls="selecttypelist">
+                        Add New List +
+                    </button>
+                </div>
+                <!--add a new list elements-->
+                <div class="collapse" id="selecttypelist">
+                    <div class="d-flex flex-row">
+                        <div class="mb-3 margin-left-15">
+                            <select
+                                class="bkground-color-box-white border form-select mx-auto w-auto poppins-font primary-font"
+                                name="typeoflist">
+                                <option disable selected>Type of List</option>
+                                {% for element in listtypes %}
+                                {% for key,value in element.items() %}
+                                <option value="{{value}}">
+                                    {{value}}
+                                </option>
+                                {% endfor %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3 margin-left-15">
+                            <input
+                                class="border form-control mx-auto w-auto bkground-color-box-white poppins-font primary-font"
+                                autocomplete="off" autofocus name="namelist" placeholder="Enter a list name"
+                                type="text">
+                        </div>
+                        <div class="mb-3 margin-left-10">
+                            <button class="bkground-color-box block btn abrilfatface-font mx-auto primary-colors shadow"
+                                type="submit">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        {% if apologymsg %}
+        <div class="mb-3">
+            <p id="apologymsg" class="primary-font mx-auto width15" type="submit" name="apologymsg"> {{apologymsg}} </p>
+        </div>
+        {% endif %}
+
+    </div>
+    {% if userslists %}
+    <!--lists-->
+    <div class="bkground-color-box-white border-top mt-5">
+        <div class="mb-3 margin-left-88 ">
+            <h2 class="abrilfatface-font primary-font">your lists</h2>
+        </div>
+        <div class="d-flex flex-row">
+            {% for element in userslists %}
+            <div class="mb-3 margin-left-1 margin-right-3">
+               
+                <form action="/list?{{element['id']}}" method="get">
+                    <input name="lists_id" type="hidden" value="{{element['id']}}">
+                    <button
+                        class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
+                        type="submit" value="{{element['namelist']}}">
+                        {{element['namelist'].capitalize()}}
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}
