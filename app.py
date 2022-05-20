@@ -11,7 +11,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, listelements, listelementstoedit, sorttypes, gridelements
 from email_validator import validate_email
 
 from io import BytesIO
@@ -49,56 +49,6 @@ mail=Mail(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///keeptrack.db")
 
-
-listelements = [ 
-        {
-            "type": "books",
-            "title": "a title for the element",
-            "year": "year of release",
-            "author": "the author of the book",
-            "description" : "a brief text describing the element",
-            "cover": "an image to associate with the element",
-            "link": "a link to assciate with the element",
-            "note": "a brief text to assciate with the element"
-        },
-        {
-            "type": "movies_tvseries",
-            "title": "a title for the element",
-            "year": "year of release",
-            "director": "the director of the movie/tv serie",
-            "description" : "a brief text describing the element",
-            "cover": "an image to associate with the element",
-            "link": "a link to assciate with the element",
-            "note": "a brief text to assciate with the element"
-        },
-]
-
-listelementstoedit= [ 
-        {
-            "type": "movies_tvseries",
-            "title": "a title for the element",
-            "year": "year of release",
-            "director": "the director of the movie/tv serie",
-            "description" : "a brief text describing the element",
-            "link": "a link to assciate with the element",
-            "note": "a brief text to assciate with the element"
-        },
-        {
-            "type": "books",
-            "title": "a title for the element",
-            "year": "year of release",
-            "author": "the author of the book",
-            "description" : "a brief text describing the element",
-            "link": "a link to assciate with the element",
-            "note": "a brief text to assciate with the element"
-        },
-]
-
-sorttypes = { 
-    'movies_tvseries': ['title','most recent', 'least recent', 'director', 'year'],
-    'books': ['title','most recent', 'least recent', 'author']
-    }
-
 '''
     "Name": "a name for the element",
     "Title": "a title for the element",
@@ -132,9 +82,9 @@ def index():
     else:
         return render_template("index.html")
 
-@app.route("/myaccount", methods=["GET", "POST"])
+@app.route("/mylists", methods=["GET", "POST"])
 @login_required
-def myaccount():
+def mylists():
     # select list of types can be chosen
     listtypes = db.execute("SELECT nametable FROM list_types")
 
@@ -147,10 +97,10 @@ def myaccount():
         # check values for creating new list
         if not typeoflist and not namelist:
             apologymsg = "All fields required"
-            return render_template("myaccount.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
         if not typeoflist:
             apologymsg = "Type of list selection required"
-            return render_template("myaccount.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
         
         # not allowing user to manipulate the selections
         checktype=False
@@ -163,11 +113,11 @@ def myaccount():
                 break
         if checktype == False:
             apologymsg = "Type of list selected not recognized"
-            return render_template("myaccount.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
 
         if not namelist:
             apologymsg = "Name list required"
-            return render_template("myaccount.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
 
         addlist(typeoflist, namelist, session['user_id'])
         return redirect("/")
@@ -175,9 +125,9 @@ def myaccount():
     else:
         showmessage = request.args.get('message')
         if showmessage is None or len(showmessage) == 0:
-            return render_template("myaccount.html", listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", listtypes=listtypes, userslists=userslists)
         else:
-            return render_template("myaccount.html", listtypes=listtypes, userslists=userslists, showmessage=showmessage)
+            return render_template("mylists.html", listtypes=listtypes, userslists=userslists, showmessage=showmessage)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -212,7 +162,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
-        return redirect("/myaccount")
+        return redirect("/mylists")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -285,7 +235,7 @@ def signup():
         # remember which user has logged in
         session["user_id"] = rows[0]["id"]
         apologymsg = "Account created!"
-        return redirect("/myaccount" + "?message=" + apologymsg)
+        return redirect("/mylists" + "?message=" + apologymsg)
 
     else:
         return render_template("signup.html")
@@ -610,7 +560,7 @@ def showlist():
                 responsedeletelist = request.form.get('responsedeletelist')
                 if responsedeletelist == 'Yes':
                     deletelist(lists_id, nametable)
-                    return redirect("/myaccount")
+                    return redirect("/mylists")
                 else:
                     apologymsg="This list has not been deleted"
                     return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
@@ -723,7 +673,7 @@ def showlist():
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images)
         else:
             apologymsg = "Something went wrong. Access to list Denied"
-            return redirect("/?message=" + apologymsg)
+            return redirect("/mylists" + "?message=" + apologymsg)
 
 
 @app.route('/image')
@@ -738,13 +688,13 @@ def image():
         # hande input
         if not nametable_id or not nametable:
             apologymsg = "Something went wrong. Access to element Denied"
-            return redirect("/myaccount" + "?message=" + apologymsg)
+            return redirect("/mylists" + "?message=" + apologymsg)
         
         rows = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(nametable_id))
         # check user requesting is owner of the element
         if rows[0]['user_id'] != session['user_id']:
             apologymsg = "Something went wrong. Access to element Denied"
-            return redirect("/myaccount" + "?message=" + apologymsg)
+            return redirect("/mylists" + "?message=" + apologymsg)
 
         img = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=?", int(nametable_id), nametable)
         image = base64.b64encode(img[0]['img']).decode('ascii')
@@ -753,7 +703,7 @@ def image():
     # for any other type of exception
     except:
         apologymsg = "Something went wrong"
-        return redirect("/myaccount" + "?message=" + apologymsg)
+        return redirect("/mylists" + "?message=" + apologymsg)
 
 @app.route('/search')
 @login_required
@@ -807,13 +757,15 @@ def elements():
             elements = elementssorted
             if styleview == 'table':
                 style = 'table'
+            elif styleview == 'title':
+                style = 'title'
             else:
                 style ='grid'
             user_id = lists[0]['user_id']
             if session['user_id'] == user_id:
                 for image in images:
                     image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
-            return render_template("elements.html", elements=elements, style=style, images=images)
+            return render_template("elements.html", elements=elements, style=style, images=images, listelements=listelements, nametable=nametable, gridelements=gridelements)
     except:
         return render_template("elements.html", apologymsg="Something went wrong")
 

@@ -38,6 +38,71 @@ SECRET = os.environ['SECRET']
 db = SQL("sqlite:///keeptrack.db")
 
 
+listelements = [ 
+        {
+            "type": "books",
+            "title": "a title for the element",
+            "year": "year of release",
+            "author": "the author of the book",
+            "description" : "a brief text describing the element",
+            "cover": "an image to associate with the element",
+            "link": "a link to assciate with the element",
+            "note": "a brief text to assciate with the element"
+        },
+        {
+            "type": "movies_tvseries",
+            "title": "a title for the element",
+            "year": "year of release",
+            "director": "the director of the movie/tv serie",
+            "description" : "a brief text describing the element",
+            "cover": "an image to associate with the element",
+            "link": "a link to assciate with the element",
+            "note": "a brief text to assciate with the element"
+        },
+]
+
+listelementstoedit= [ 
+        {
+            "type": "movies_tvseries",
+            "title": "a title for the element",
+            "year": "year of release",
+            "director": "the director of the movie/tv serie",
+            "description" : "a brief text describing the element",
+            "link": "a link to assciate with the element",
+            "note": "a brief text to assciate with the element"
+        },
+        {
+            "type": "books",
+            "title": "a title for the element",
+            "year": "year of release",
+            "author": "the author of the book",
+            "description" : "a brief text describing the element",
+            "link": "a link to assciate with the element",
+            "note": "a brief text to assciate with the element"
+        },
+]
+
+sorttypes = { 
+    'movies_tvseries': ['title','most recent', 'least recent', 'director', 'year'],
+    'books': ['title','most recent', 'least recent', 'author']
+    }
+
+gridelements = [
+    {
+            "type": "movies_tvseries",
+            "title": "a title for the element",
+            "year": "year of release",
+            "director": "the director of the movie/tv serie",
+        },
+        {
+            "type": "books",
+            "title": "a title for the element",
+            "year": "year of release",
+            "author": "the author of the book",
+        },
+
+]
+
 # from finance pset9
 # ensure user is already logged in
 def login_required(f):

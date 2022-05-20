@@ -170,9 +170,9 @@
         {% endif %}
     </div>
     <!--list elements-->
-    <div class="border-top bkground-color-box-white margin0 mt-5 width100">
+    <div class=" margin0 mt-5 width100">
         <!-- upper elements bar-->
-        <div class=" d-flex justify-content-between ">
+        <div class="border-bottom border-top bkground-color-box-white d-flex justify-content-between mb-4">
             <!--name-->
             <div class="margin2 mb-3 w-auto">
                 <h2 class="abrilfatface-font fontw100 primary-font">{{namelist}}</h2>
@@ -201,7 +201,11 @@
                 <div class="btn-group p-2 inline">
                     <button id="viewstyletable" name="viewstyle"
                         class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
-                        type="button" value="table"><i class=" bi bi-list-ul"></i>
+                        type="button" value="table"><i class="bi bi-list-ul"></i>
+                    </button>
+                    <button id="viewstyletitle" name="viewstyle"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
+                        type="button" value="title"><i class="bi bi-grip-horizontal"></i>
                     </button>
                     <button id="viewstylegrid" name="viewstyle"
                         class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
@@ -214,6 +218,7 @@
         {% for element in elements %}
         <div class="collapse" id="showelementinfo{{element['id']}}">
             <div class="d-flex flex-row flex-wrap margin2">
+                <!--image of showelementinfo-->
                 {% for image in images%}
                 {% if image['nametable_id'] == element['id'] %}
                 <div class="mb-3 width14">
@@ -228,7 +233,7 @@
                 </div>
                 {% endif %}
                 {% endfor %}
-                <!--element items -->
+                <!--other showelementinfo items -->
                 <div id="elementstoshow{{loop.index0}}" class="mb-3 inline width60">
                     <div class="d-flex flex-row flex-wrap">
                         {% for key,value in element.items() %}
@@ -245,8 +250,8 @@
                         </form>
                     </div>
                 </div>
-                <!--edit toggle elements-->
-                <div id="editinfo{{loop.index0}}" class="collapse mb-3 inline width60">
+                <!--edit toggle elements to edit the showelementinfo-->
+                <div id="editinfo{{loop.index0}}" class="mb-3 display-none width60">
                     <form action="/list?lists_id={{lists_id}}" method="post">
                         <div class="mb-3" align="center">
                             <div class="d-flex flex-row flex-wrap">
@@ -263,7 +268,7 @@
                                 {% endif %}
                                 {% if key == 'year' %}
                                 <div class="mb-3 margin-left-8 p-2 text-align-left width12">
-                                    <label class="poppins-font" for="edit{{key}}">{{key}}</label>
+                                    <label class="abrilfatface-font fontw100" for="edit{{key}}">{{key}}</label>
                                     <input name="edit{{key}}"
                                         class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
                                         maxlength="4" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
@@ -274,22 +279,20 @@
                                 <input name="actiononelement" type="hidden" value="editelement">
                                 <input name="ideditelement" type="hidden" value="{{element['id']}}">
                             </div>
+                            <!--update button-->
                             <div class="mb-3 p-2">
                                 <input class="bkground-color-box-create btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
                                     type="submit" value="Update">
                             </div>
                         </div>
                     </form>
-
                 </div>
+                <!--Edit, download, delete item buttons-->
                 <div class="mb-3 inline margin-left-3" align="left">
                     <!--Edit Toggle-->
                     <div class="mb-3">
                         <button id="edittoggle{{loop.index0}}"
-                            class="btn btn-primary abrilfatface-font fontw100 border mx-auto primary-font primary-colors text-align-left "
-                            onclick="changeClass('elementstoshow{{loop.index0}}');" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#editinfo{{loop.index0}}" aria-expanded="false"
-                            aria-controls="editinfo{{loop.index0}}">Edit +</button>
+                            class="abrilfatface-font fontw100 btn btn-primary border mx-auto primary-font primary-colors text-align-left " onclick="changeClass('elementstoshow{{loop.index0}}', 'editinfo{{loop.index0}}');" type="button">Edit +</button>
                     </div>
                     <!--Download element-->
                     <div class="mb-3">
@@ -313,40 +316,35 @@
             </div>
         </div>
         {% endfor %}
-        <div class="justify-content-center max-width100">
-            <ul id="elementsul" class="d-flex align-items-start flex-wrap">
-            </ul>
-            <div id="table" class="d-flex justify-content-center"></div>
-            <ul id="elementsdefault" class="d-flex align-items-start flex-wrap">
+        <div class="">
+            <div id="elementviewstylegrid"  class="container-xxl d-flex align-items-start flex-wrap ">
+            </div>
+            <div id="elementviewstyletitle"  class="container-xxl d-flex align-items-start flex-wrap p-2">
+            </div>
+            <div id="table" align="center" class="mx-auto p-2 width80"></div>
+            <!--default viewstyle-->
+            <div id="elementsdefault" class="d-flex align-items-start flex-wrap mx-auto p-2">
                 {% for element in elements %}
-                <li class="p-2 style-li-notype">
-                    <div class="mb-3">
-                        <button
-                            class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
-                            type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
-                            aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit"
-                            value="">
-                            <div class="mb-3 fontsize10pc">
-                                <div class="width10">
-                                    <img src="" alt="">
-                                </div>
-                                <div class="width10">
-                                    <h5>
-                                        Title: {{element['title']}}
-                                    </h5>
-                                    <h6>
-                                        Year: {{element['year']}}
-                                    </h6>
-                                    <h6>
-                                        Director: {{element['director']}}
-                                    </h6>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-                </li>
+                <div class="mb-3 p-2">
+                    <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}" aria-expanded="false"
+                        aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
+                        <div align="left" class="height-width25">
+                            <h5 class="font-size1">
+                                {{element['title'].capitalize()}}
+                            </h5>
+                            <h6 class="">
+                                {% if element['year'] == '' %}
+                                -
+                                {%else%}
+                                {{element['year']}}
+                                {% endif %}
+                            </h6>
+                        </div>
+                    </button>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
 
 
         </div>
@@ -354,24 +352,33 @@
 </div>
 <script>
     // change class to show input
-    function changeClass(elementstoshow) {
-        let shown = document.getElementById(String(elementstoshow));
+    function changeClass(elem1, elem2) {
+        let shown = document.getElementById(String(elem2));
+        let hidden = document.getElementById(String(elem1));
         if (shown.classList.contains('display-none')) {
             shown.classList.remove('display-none')
+            shown.classList.add('inline')
+            hidden.classList.add('display-none')
+            hidden.classList.remove('inline')
+
         }
         else {
             shown.classList.add('display-none')
+            shown.classList.remove('inline')
+            hidden.classList.remove('display-none')
+            hidden.classList.add('inline')
+
         }
         return
     }
 
 
-    // manage sort by select and grid-list buttons
+    // manage sort by select and grid-list-title buttons
     let listsid = document.getElementById('listsid')
     let sortselect = document.getElementById('sortselect')
-    let elementsdefault = document.getElementById('elementsdafault')
     let viewstyletable = document.getElementById('viewstyletable')
     let viewstylegrid = document.getElementById('viewstylegrid')
+    let viewstyletitle = document.getElementById('viewstyletitle')
 
     let currentstyleview = 'grid'
     let currentsortby = sortselect.input
@@ -382,11 +389,18 @@
         document.getElementById('elementsdefault').innerHTML = null;
         if (currentstyleview == 'table') {
             document.getElementById('table').innerHTML = elements;
-            document.getElementById('elementsul').innerHTML = null;
+            document.getElementById('elementviewstylegrid').innerHTML = null;
+            document.getElementById('elementviewstyletitle').innerHTML = null;
+        }
+        else if (currentstyleview == 'title') {
+            document.getElementById('table').innerHTML = null;
+            document.getElementById('elementviewstylegrid').innerHTML = null;
+            document.getElementById('elementviewstyletitle').innerHTML = elements;
         }
         else {
             document.getElementById('table').innerHTML = null;
-            document.getElementById('elementsul').innerHTML = elements;
+            document.getElementById('elementviewstylegrid').innerHTML = elements;
+            document.getElementById('elementviewstyletitle').innerHTML = null;
         }
         currentsortby = sortselect.value
     }
@@ -397,7 +411,8 @@
         let elements = await response.text();
         document.getElementById('table').innerHTML = elements;
         document.getElementById('elementsdefault').innerHTML = null;
-        document.getElementById('elementsul').innerHTML = null;
+        document.getElementById('elementviewstylegrid').innerHTML = null;
+        document.getElementById('elementviewstyletitle').innerHTML = null;
         currentstyleview = 'table'
     })
     viewstylegrid.addEventListener('click', async function () {
@@ -405,8 +420,18 @@
         let elements = await response.text();
         document.getElementById('table').innerHTML = null;
         document.getElementById('elementsdefault').innerHTML = elements;
-        document.getElementById('elementsul').innerHTML = null;
+        document.getElementById('elementviewstylegrid').innerHTML = null;
+        document.getElementById('elementviewstyletitle').innerHTML = null;
         currentstyleview = 'grid'
+    })
+    viewstyletitle.addEventListener('click', async function () {
+        let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'title' + '&sortby=' + currentsortby);
+        let elements = await response.text();
+        document.getElementById('table').innerHTML = null;
+        document.getElementById('elementsdefault').innerHTML = null;
+        document.getElementById('elementviewstylegrid').innerHTML = null;
+        document.getElementById('elementviewstyletitle').innerHTML = elements;
+        currentstyleview = 'title'
     })
 
 </script>

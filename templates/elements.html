@@ -1,66 +1,97 @@
-    {% if style and elements %}
-    {% if style == 'table' %}
-    <table class=" poppins-font padding2 primary-font table table-hover table-sm text-align-left width60 ">
-    <thead class="fontw100 margin-left-15 padding2">
-        <tr class="w-auto">
-            <th class="padding-left-5" scope="col"> title</th>
-            <th class="padding-left-5" scope="col"> year</th>
-            <th class="padding-left-5" scope="col"> director</th>
-            <th class="padding-left-5" scope="col"> description</th>
-            <th class="padding-left-4" scope="col"> show</th>
+{% if style and elements %}
+{% if style == 'table' %}
+<!--viewstyle table-->
+<table class="poppins-font primary-font table table-hover text-align-left">
+    <thead align="center">
+        <tr class="border-bottom5 fontw100">
+            {% for feature in gridelements %}
+            {% if feature['type'] == nametable %}
+            {% for b,n in feature.items() %}
+            {% if b!='type' %}
+            <th class=""> {{b.capitalize()}}</th>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            <th class="">More Info</th>
         </tr>
     </thead>
-    <tbody class="border-top-tbody padding2">
+    <tbody align="center">
         {% for element in elements %}
         <tr class="">
-            <td class="padding-left-5">{{element['title']}}</td>
-            <td class="padding-left-5" >{{element['year']}}</td>
-            <td class="padding-left-5" >{{element['director']}}</td>
-            <td class="padding-left-5" >{{element['description']}}</td>
-            <td class="padding-left-5" ><button
-                class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
-                type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
-                aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value=""></button></td>
+            {% for k,v in element.items() %}
+
+            {% for feature in gridelements %}
+            {% if feature['type'] == nametable %}
+            {% for b,n in feature.items() %}
+            {% if v == '' and b==k and b != 'type' %}
+            <td class=""> - </td>
+            {% elif v!= '' and b==k and b != 'type' %}
+            <td class="">{{element[k]}}</td>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            <td class="padding-left-5"><button
+                    class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
+                    aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit"
+                    value=""></button></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-    {% else %}
-
-    {% for element in elements %}
-    <li class="p-2 style-li-notype width25">
-    <div class="mb-3  ">
-    <button
-        class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto"
-        type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
-        aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
-        <div class="d-flex align-items-start flex-wrap mb-3 fontsize10pc">
-            <div align="left" class="fontsize10pc width25">
-                <h5>
-                    Title: {{element['title']}}
-                </h5>
-                <h6>
-                    Year: {{element['year']}}
-                </h6>
-                <h6>
-                    Director: {{element['director']}}
-                </h6>
-            </div>
-            {% for image in images%}
-            {% if image['nametable_id'] == element['id'] %}
-                <img class="margin-left-3 width25" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
-            {% endif %}
-            {% endfor %}
+{% elif style == 'title' %}
+{% for element in elements %}
+<!--viewstyle title-->
+<div class="mb-3 p-2">
+    <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
+        data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}" aria-expanded="false"
+        aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
+        <div align="left" class="height-width25">
+            <h5 class="font-size1">
+                {{element['title'].capitalize()}}
+            </h5>
+            <h6 class="">
+                {% if element['year'] == '' %}
+                -
+                {%else%}
+                {{element['year']}}
+                {% endif %}
+            </h6>
         </div>
     </button>
-    </div>
-    </li>
-    {% endfor %}
-    {% endif %}
-    {% endif %}
-    {% if apologymsg %}
-        <li class="p-2 style-li-notype width100"><div class="mb-3 width100">
-            <p id="apologymsg" class="primary-font mx-auto width100" type="text" name="apologymsg"> {{apologymsg}} </p>
-        </div></li>
+</div>
+{% endfor %}
+
+
+{% else %}
+<!--viewstyle grid (image only)-->
+{% for element in elements %}
+<div class="mb-3 p-2">
+    <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto" type="button"
+        data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}" aria-expanded="false"
+        aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
+        {% if element['img_id'] != 0 %}
+        {% for image in images%}
+        {% if image['nametable_id'] == element['id'] %}
+        <img class="objective-fit-cover" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
         {% endif %}
-    
+        {% endfor %}
+        {% else %}
+        <div class="width-image-grid"><i class="objective-fit-cover bi bi-slash-circle"></i>
+            No image for this element</div>
+        {% endif %}
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if apologymsg %}
+<li class="p-2 style-li-notype width100">
+    <div class="mb-3 width100">
+        <p id="apologymsg" class="primary-font mx-auto width100" type="text" name="apologymsg"> {{apologymsg}} </p>
+    </div>
+</li>
+{% endif %}
