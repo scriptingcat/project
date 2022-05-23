@@ -1,11 +1,25 @@
 /*by tag*/
+html{
+    margin: 0%;
+}
 body{
+    margin: 0%;
     max-width: 100vw;
+}
+footer{
+    position:relative;
+    bottom: 10%;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    margin-top: 100px;
 }
 main{
     display: block!important;
     margin: 0%!important;
     padding: 0%!important;
+    min-height: 70vh;
+
 }
 nav{
     border-bottom: #8fd694 1px solid;
@@ -14,6 +28,12 @@ nav{
 /*by class*/
 .bkground-color{
     background-color: #8fd694;
+}
+.bkground-color-secondary{
+    background-color: #6f8f72;
+}
+.bkground-color-black{
+    background-color: #161b21;
 }
 .bkground-color-box{
     background-color: #f8f9fA;
@@ -74,6 +94,9 @@ button.bkground-color-box-create:hover{
 .font-size025{
     font-size: 0.25vw;
 }
+.font-size1-0{
+    font-size: 1vw;
+}
 .font-size1{
     font-size: 1.5vw;
 }
@@ -98,6 +121,9 @@ button.bkground-color-box-create:hover{
 }
 .poppins-font{
     font-family: 'Poppins', sans-serif;
+}
+.height100{
+    height: 100%;
 }
 .height-width25{
     height: 60px;
@@ -166,6 +192,11 @@ button.bkground-color-box-create:hover{
     height: 300px;
     object-fit: cover;
 }
+.objective-fit-cover-25auto{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
 .padding2{
     padding: 2%;
 }
@@ -190,8 +221,15 @@ button.bkground-color-box-create:hover{
 .primary-font{
     color: #161b21!important;
 }
+.resizable{
+    overflow:hidden!important;
+    resize: both!important;
+}
 .round-corner{
     border-radius: 2.25rem;
+}
+.secondary-font{
+    color: #8fd694!important;
 }
 .shadow {
     box-shadow: 2px 2px 15px 1px #8fd694!important;
@@ -267,6 +305,10 @@ ul.none-display{
 }
 .width100{
     width: 100%!important;
+}
+.width-image-footer{
+    width: 100px;
+    height: 160px;
 }
 .width-image-grid{
     width: 180px;

@@ -239,10 +239,17 @@
                         {% for key,value in element.items() %}
                         {% if key != 'cover' %}
                         {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' %}
-                        <div class="mb-3 margin-left-8 text-align-left width12">
+                        <div class="mb-3 margin-left-8 text-align-left w-auto">
+                            <label class="abrilfatface-font fontw100">{{key.capitalize()}}</label>
+                            {% if value != '' %}
                             <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-                                {{key}}: {{value}}
+                            {{value}}
                             </h3>
+                            {% else %}
+                            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+                             -
+                            </h3>
+                            {% endif %}
                         </div>
                         {% endif %}
                         {% endif %}
@@ -257,23 +264,32 @@
                             <div class="d-flex flex-row flex-wrap">
                                 {% for key,value in element.items() %}
                                 {% if key != 'cover' %}
-                                {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key
-                                != 'namelist' and key!= 'year' %}
-                                <div class="mb-3 margin-left-8 p-2 text-align-left width12">
-                                    <label class="abrilfatface-font fontw100" for="edit{{key}}">{{key}}</label>
+                                    {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key != 'namelist' and key!= 'year' and key != 'note' and key!= 'description' %}
+                                    <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                    <label class="abrilfatface-font fontw100" for="edit{{key}}">{{key.capitalize()}}</label>
+                                    {% if value != '' %}
                                     <input name="edit{{key}}"
-                                        class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                                        class="border form-control mx-auto bkground-color-box-white poppins-font primary-font " 
                                         placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
-                                </div>
-                                {% endif %}
-                                {% if key == 'year' %}
-                                <div class="mb-3 margin-left-8 p-2 text-align-left width12">
-                                    <label class="abrilfatface-font fontw100" for="edit{{key}}">{{key}}</label>
+                                    {% else %}
                                     <input name="edit{{key}}"
-                                        class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
-                                        maxlength="4" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
-                                </div>
-                                {% endif %}
+                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                                    placeholder="{{key}}: -" type="text" value="{{value}}">
+                                    {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% if key == 'year' %}
+                                    <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                    <label class="abrilfatface-font fontw100" for="edit{{key}}">{{key.capitalize()}}</label>
+                                    <input name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font" maxlength="4" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                    </div>
+                                    {% endif %}
+                                    {% if key == 'note' or key =='description' %}
+                                    <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                    <label class="abrilfatface-font fontw100" for="edit{{key}}">{{key.capitalize()}}</label>
+                                    <textarea name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font w-auto" placeholder="{{key}}: {{value}}" type="text"> {{value}} </textarea>
+                                    </div>
+                                    {% endif %}
                                 {% endif %}
                                 {% endfor %}
                                 <input name="actiononelement" type="hidden" value="editelement">
