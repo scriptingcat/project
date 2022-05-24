@@ -485,6 +485,10 @@ def showlist():
                     if not dictofrequests['name'] or dictofrequests['name'] == None:
                         apologymsg = "Element Name Is Required"
                         return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+                if k == 'status':
+                    if not dictofrequests['status'] or dictofrequests['status'] == None or  dictofrequests['status'] not in ['to buy', 'bought']:
+                        apologymsg = "Element status Error. Status is required. Values allowed: to buy or bought."
+                        return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
                     else:
                         break
             print(dictofrequests)
@@ -744,35 +748,43 @@ def elements():
 
     try:
         if sortby and styleview:
-            if sortby == 'title':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY title ASC", nametable, int(lists_id), session['user_id'])
-            elif sortby == 'name':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY name ASC", nametable, int(lists_id), session['user_id'])
-            elif sortby == 'author':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY director ASC", nametable, int(lists_id), session['user_id'])
-            elif sortby == 'city':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY city ASC", nametable, int(lists_id), session['user_id'])
-            elif sortby == 'province':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY province ASC", nametable, int(lists_id), session['user_id'])
-            elif sortby == 'country':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY country ASC", nametable, int(lists_id), session['user_id'])
-            elif sortby == 'most recent':
+            if sortby == 'most recent':
                 elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id DESC", nametable, int(lists_id), session['user_id'])
             elif sortby == 'least recent':
                 elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id ASC", nametable, int(lists_id), session['user_id'])
-            elif sortby == 'year':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY year ASC", nametable, int(lists_id), session['user_id'])
             else:
-                elementssorted = elements
+                counter = 0
+                # iterate throughout key in dict of sort types
+                for k,v in sorttypes.items():
+                    # when key = nametable, chack the value which is a list
+                    if k == nametable:
+                        # iterate through the list
+                        for i in v:
+                            # when element in list == sortby request value 
+                            if i == sortby:
+                                # select ordered by that value 
+                                elementssorted= db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY " + sortby +" ASC", nametable, int(lists_id), session['user_id'])
+                                # add +1 to counter so that I know elements has been re-selected and break
+                                counter+=1
+                                break
+                        # counter == 0 means no re-selection, so elementssorted == first selection 
+                        if counter == 0:
+                            elementssorted = elements
+                        # break iteration through dict once nametable is found  
+                        break
+            # elements equals to whatever is in elementssorted
             elements = elementssorted
+            # check requested value for styleview and pass it to style
             if styleview == 'table':
                 style = 'table'
             elif styleview == 'title':
                 style = 'title'
             else:
                 style ='grid'
+            # always check user's requesting is owner of list
             user_id = lists[0]['user_id']
             if session['user_id'] == user_id:
+                # decode dataimage from bytes to ascii to be rendered
                 for image in images:
                     image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
             return render_template("elements.html", elements=elements, style=style, images=images, listelements=listelements, nametable=nametable, gridelements=gridelements)

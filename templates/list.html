@@ -115,10 +115,25 @@
                         {% else %}
                             {% if key =='year'%}
                             <div class="mb-3 p-2">
-                                <input
+                                <input 
                                     class="border form-control mx-auto w-auto bkground-color-box-white poppins-font primary-font"
                                     autocomplete="off" autofocus name="{{key}}" maxlength="4"
                                     placeholder="Enter a {{key.capitalize()}}" title="{{value}}" type="text">
+                            </div>
+                            {% elif key =='status'%}
+                            <div class="btn-group mb-3 p-2 vertical-align-middle">
+                                <label class="form-check-label mx-auto w-auto" for="flexRadioDefault1"> To buy </label>
+                                <input id="flexRadioDefault1"
+                                    class="form-check-input bkground-color-box-white poppins-font primary-font" checked
+                                    name="{{key}}" 
+                                    title="{{value}}" type="radio" value="to buy">
+                            </div>
+                            <div class="btn-group mb-3 p-2 vertical-align-middle">
+                                <label class="form-check-label mx-auto w-auto" for="flexRadioDefault2"> Bought</label>
+                                <input id="flexRadioDefault2"
+                                    class="form-check-input bkground-color-box-white poppins-font primary-font"
+                                    name="{{key}}" 
+                                    title="{{value}}" type="radio" value="bought">
                             </div>
                             {% else %}
                             <div class="mb-3 p-2">

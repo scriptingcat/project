@@ -79,6 +79,9 @@ button.bkground-color-box-create:hover{
     /*box-shadow: 2px 2px 15px 1px rgb(83, 169, 235)!important;*/
     box-shadow: 0 0 0 0.25rem (#8fd694/ 50%)!important;
 }
+.color-white{
+    color: #f8f9fA;
+}
 .display-contents{
     display: contents;
 }
@@ -109,7 +112,7 @@ button.bkground-color-box-create:hover{
 .fontsize10vw{
     font-size: 10vw;
 }
-.fontw100 {
+.fontw100{
     font-weight: 100;
 }
 .abrilfatface-font{
@@ -121,6 +124,17 @@ button.bkground-color-box-create:hover{
 }
 .poppins-font{
     font-family: 'Poppins', sans-serif;
+}
+.footer-links{
+    color:#77AD78;
+}
+.footer-links:hover{
+    color: #8fd694;
+    -webkit-transition: 0.5s;
+    transition: 2s;
+    -webkit-transition-property: all;
+    transition-property: all;
+    letter-spacing: 0.2em;
 }
 .height100{
     height: 100%;
@@ -255,6 +269,9 @@ button.shadow:hover{
 .style-li-notype{
     list-style-type: none;
 }
+.text-align-center{
+    text-align: center;
+}
 .text-align-left{
     text-align: left;
 }
@@ -269,6 +286,9 @@ ul.none-display{
 }
 .no-underline{
     text-decoration: none;
+}
+.vertical-align-middle{
+    vertical-align: middle;
 }
 .width05vw{
     width: 4.3em;

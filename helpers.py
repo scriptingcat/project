@@ -73,6 +73,19 @@ listelements = [
             "description" : "a brief text describing the element",
             "note": "a brief text to assciate with the element",
         },
+        {
+            "type": "shopping",
+            "name": "name of item",
+            "brand": "brand of the item",
+            "collection": "collection the item belongs to",
+            "quantity": "how many items are needed",
+            "price": "price per item",
+            "description" : "a brief text describing the element",
+            "cover": "an image to associate with the element",
+            "wheretobuy": "places or stores where to buy the item",
+            "note": "a brief text to assciate with the element",
+            "status": "to buy or bought"
+        },
 ]
 
 listelementstoedit= [ 
@@ -107,12 +120,25 @@ listelementstoedit= [
             "description" : "a brief text describing the element",
             "note": "a brief text to assciate with the element",
         },
+        {
+            "type": "shopping",
+            "name": "name of item",
+            "brand": "brand of the item",
+            "collection": "collection the item belongs to",
+            "quantity": "how many items are needed",
+            "price": "price per item",
+            "description" : "a brief text describing the element",
+            "wheretobuy": "places or stores where to buy the item",
+            "note": "a brief text to assciate with the element",
+            "status": "to buy or bought"
+        },
 ]
 
 sorttypes = { 
     'movies_tvseries': ['title','most recent', 'least recent', 'director', 'year'],
     'books': ['title','most recent', 'least recent', 'author'],
-    'places': ['name', 'city', 'province', 'country','most recent', 'least recent']
+    'places': ['name', 'city', 'province', 'country','most recent', 'least recent'],
+    'shopping': ['name', 'brand', 'most recent', 'least recent', 'price','status'],
     }
 
 gridelements = [
@@ -133,6 +159,12 @@ gridelements = [
             "name": "name of location",
             "city": "city of location",
             "province": "province of location",
+        },
+        {
+            "type": "shopping",
+            "name": "name of item",
+            "brand": "brand of item",
+            "status": "to buy or bought",
         },
 ]
 
@@ -338,6 +370,16 @@ def add_element(nametable,dictofelements, namelist, lists_id, user_id):
         nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
         db.execute("COMMIT")
         return nametable_id
+    elif nametable == 'shopping':
+        db.execute("BEGIN TRANSACTION")
+        # insert the element data
+        # 0 value is value for null since db column only takes integers
+        # img_id is always 0, it is updated after the image has been stored in imgs db
+        db.execute("INSERT INTO shopping (namelist,lists_id,user_id,name,brand,collection,quantity, price, description, img_id, wheretobuy,note, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['name'],dictofelements['brand'],dictofelements['collection'],dictofelements['quantity'],dictofelements['price'],dictofelements['description'], 0, dictofelements['wheretobuy'], dictofelements['note'], dictofelements['status'] )
+        rows = db.execute("SELECT * FROM shopping WHERE namelist=? AND lists_id=? AND user_id=? AND name=?", namelist, lists_id, user_id, dictofelements['name'])
+        nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
+        db.execute("COMMIT")
+        return nametable_id
     else:
         return
 
@@ -361,4 +403,4 @@ def upadate_address(id):
 
 #CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, street TEXT, city TEXT, postal_code INTEGER, province TEXT, country TEXT, address TEXT, coordinates TEXT,link TEXT, description TEXT, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
-#CREATE TABLE shopping (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, list_type_id INTEGER, user_id INTEGER, item TEXT NOT NULL, brand TEXT, collection TEXT, quantity INTEGER, price FLOAT, description TEXT, image INTEGER, wheretobuy TEXT, note TEXT, status CHECK(status in ('to buy', 'bought')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
+#CREATE TABLE shopping (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, brand TEXT, collection TEXT, quantity INTEGER, price FLOAT, description TEXT, img_id INTEGER, wheretobuy TEXT, note TEXT, status CHECK(status in ('to buy', 'bought')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
