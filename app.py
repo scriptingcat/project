@@ -11,7 +11,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, listelements, listelementstoedit, sorttypes, gridelements
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements
 from email_validator import validate_email
 
 from io import BytesIO
@@ -120,7 +120,7 @@ def mylists():
             return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
 
         addlist(typeoflist, namelist, session['user_id'])
-        return redirect("/")
+        return redirect("/mylists")
 
     else:
         showmessage = request.args.get('message')
@@ -460,7 +460,7 @@ def showlist():
                     # for each key in this dict add value equals to input
                     for key,value in dictionary.items():
                         # first check whether its a text input or image/file
-                        if key in ['cover','key']:
+                        if key in ['cover','image']:
                             # take the object
                             file = request.files['inputimage']
                             elementinput = file
@@ -487,7 +487,7 @@ def showlist():
                         return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
                     else:
                         break
-
+            print(dictofrequests)
             # check whether there's an img to save in db:
             if not dictofrequests['cover'] or dictofrequests['cover'] == 0:
                 add_element(nametable, dictofrequests, namelist, lists_id, session['user_id'])
@@ -642,6 +642,8 @@ def showlist():
                 cursor.executemany(sqltoupdate,(listreqstoedit,))
                 connection.commit()
                 connection.close()
+                if nametable == 'places':
+                    upadate_address(int(ideditelement))
                 apologymsg = 'Updated'
                 return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
             except:
@@ -744,8 +746,16 @@ def elements():
         if sortby and styleview:
             if sortby == 'title':
                 elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY title ASC", nametable, int(lists_id), session['user_id'])
+            elif sortby == 'name':
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY name ASC", nametable, int(lists_id), session['user_id'])
             elif sortby == 'author':
                 elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY director ASC", nametable, int(lists_id), session['user_id'])
+            elif sortby == 'city':
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY city ASC", nametable, int(lists_id), session['user_id'])
+            elif sortby == 'province':
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY province ASC", nametable, int(lists_id), session['user_id'])
+            elif sortby == 'country':
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY country ASC", nametable, int(lists_id), session['user_id'])
             elif sortby == 'most recent':
                 elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id DESC", nametable, int(lists_id), session['user_id'])
             elif sortby == 'least recent':
@@ -769,6 +779,10 @@ def elements():
     except:
         return render_template("elements.html", apologymsg="Something went wrong")
 
+@app.route('/customizedtype')
+@login_required
+def customizedtype():
+    return render_template('customizedtype.html', listelements=listelements)
 
 
 

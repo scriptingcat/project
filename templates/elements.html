@@ -51,14 +51,23 @@
         aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
         <div align="left" class="height-width25">
             <h5 class="font-size1">
+                {% if element['title'] %}
                 {{element['title'].capitalize()}}
+                {% endif %}
+                {% if element['name'] %}
+                {{element['name'].capitalize()}}
+                {% endif %}
             </h5>
             <h6 class="">
-                {% if element['year'] == '' %}
+                {% for key,value in element.items() %}
+                {% if key in ['year', 'city'] %}
+                {% if value == '' or value == 'null' %}
                 -
                 {%else%}
-                {{element['year']}}
+                {{element[key]}}
                 {% endif %}
+                {% endif %}
+                {% endfor %}
             </h6>
         </div>
     </button>

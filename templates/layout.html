@@ -44,7 +44,7 @@
                 <div>
                 <a class="navbar-brand" href="/">
                     <span><img src="/static/favicon.ico"></span>
-                    <span class="abrilfatface-font primary-font">keep track{% block span %}{% endblock %}</span>
+                    <span class="abrilfatface-font primary-font vertical-align-middle">keep track{% block span %}{% endblock %}</span>
                 </a>
                 <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler btnfocus" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
                     <span class="navbar-toggler-icon"></span>
@@ -77,15 +77,27 @@
             {% block main %}{% endblock %}
         </main>
     </body>
-    <footer class="bkground-color-black text-center">
-        <div class="d-flex flex-row flex-wrap  margin0 py-3 width100 ">
-            <div class="width25 ">
+    <footer align="center" class="bkground-color-black ">
+        <div class="d-flex flex-row flex-wrap  margin0 mt-4 py-1 width100 ">
+            <div align="left" class="margin-left-2 py-2 text-align-center width20 ">
                 <img class="" src="/static/favicon.ico" alt="logo keep track">
+                <h6 class=" font-size1 inline abrilfatface-font secondary-font vertical-align-middle">keep track</h6>
             </div>
+            <div align="left" class="margin-left-15 width25">
+                <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('index')}}">HOME</a>
+                <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('index')}}">ABOUT</a>
+                <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('index')}}">CONTACT</a>
+            </div>
+            <div align="left" class="width25">
+                <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('login')}}">LOG IN</a>
+                <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('signup')}}">SIGN UP</a>
+                <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('mylists')}}">MY LISTS</a>
 
+            </div>
         </div>
-        <div class="width25 height100">
-            <h4 class="secondary-font font-size1 poppins-font">Keep Track © 2022</h4>
+        <div class="mt-4 mb-3 width100">
+            <h6 class="color-white font-size1-0 fontw100 poppins-font">Keep Track © 2022</h6>
+            <h6 class="color-white font-size1-0 fontw100 poppins-font">Provided by Antonella Giugliano</h6>
         </div>
     </footer>
 </html>

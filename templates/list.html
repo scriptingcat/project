@@ -241,13 +241,13 @@
                         {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' %}
                         <div class="mb-3 margin-left-8 text-align-left w-auto">
                             <label class="abrilfatface-font fontw100">{{key.capitalize()}}</label>
-                            {% if value != '' %}
+                            {% if value == '' or value == 'null' %}
                             <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-                            {{value}}
+                            -
                             </h3>
                             {% else %}
                             <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-                             -
+                            {{value}}
                             </h3>
                             {% endif %}
                         </div>
@@ -263,18 +263,18 @@
                         <div class="mb-3" align="center">
                             <div class="d-flex flex-row flex-wrap">
                                 {% for key,value in element.items() %}
-                                {% if key != 'cover' %}
+                                {% if key != 'cover' and key != 'address' %}
                                     {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key != 'namelist' and key!= 'year' and key != 'note' and key!= 'description' %}
                                     <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
                                     <label class="abrilfatface-font fontw100" for="edit{{key}}">{{key.capitalize()}}</label>
-                                    {% if value != '' %}
+                                    {% if value == '' or value == 'null' %}
                                     <input name="edit{{key}}"
                                         class="border form-control mx-auto bkground-color-box-white poppins-font primary-font " 
-                                        placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                        placeholder="{{key}}: -" type="text">
                                     {% else %}
                                     <input name="edit{{key}}"
                                     class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
-                                    placeholder="{{key}}: -" type="text" value="{{value}}">
+                                    placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
                                     {% endif %}
                                     </div>
                                     {% endif %}
@@ -285,9 +285,13 @@
                                     </div>
                                     {% endif %}
                                     {% if key == 'note' or key =='description' %}
-                                    <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                    <div class="mb-3 margin-left-8 p-2  text-align-left w-auto">
                                     <label class="abrilfatface-font fontw100" for="edit{{key}}">{{key.capitalize()}}</label>
-                                    <textarea name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font w-auto" placeholder="{{key}}: {{value}}" type="text"> {{value}} </textarea>
+                                    {% if value == '' %}
+                                    <textarea name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font resizable w-auto" placeholder= "{{key}}: -"></textarea>
+                                    {% else %}
+                                    <textarea name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font resizable w-auto" placeholder= "{{key}}: {{value}}">{{value}}</textarea>
+                                    {% endif %}
                                     </div>
                                     {% endif %}
                                 {% endif %}
@@ -333,13 +337,13 @@
         </div>
         {% endfor %}
         <div class="">
-            <div id="elementviewstylegrid"  class="container-xxl d-flex align-items-start flex-wrap ">
+            <div id="elementviewstylegrid"  class="container-xxl d-flex align-items-start flex-wrap mx-auto">
             </div>
-            <div id="elementviewstyletitle"  class="container-xxl d-flex align-items-start flex-wrap p-2">
+            <div id="elementviewstyletitle"  class="container-xxl d-flex align-items-start flex-wrap mx-auto">
             </div>
-            <div id="table" align="center" class="mx-auto p-2 width80"></div>
+            <div id="table" align="center" class= width80"></div>
             <!--default viewstyle-->
-            <div id="elementsdefault" class="d-flex align-items-start flex-wrap mx-auto p-2">
+            <div id="elementsdefault" class="d-flex align-items-start flex-wrap mx-auto p-1">
                 {% for element in elements %}
                 <div class="mb-3 p-2">
                     <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
@@ -347,14 +351,23 @@
                         aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
                         <div align="left" class="height-width25">
                             <h5 class="font-size1">
+                                {% if element['title'] %}
                                 {{element['title'].capitalize()}}
+                                {% endif %}
+                                {% if element['name'] %}
+                                {{element['name'].capitalize()}}
+                                {% endif %}
                             </h5>
                             <h6 class="">
-                                {% if element['year'] == '' %}
+                                {% for key,value in element.items() %}
+                                {% if key in ['year', 'city'] %}
+                                {% if value == '' or value == 'null' %}
                                 -
                                 {%else%}
-                                {{element['year']}}
+                                {{element[key]}}
                                 {% endif %}
+                                {% endif %}
+                                {% endfor %}
                             </h6>
                         </div>
                     </button>
@@ -396,7 +409,7 @@
     let viewstylegrid = document.getElementById('viewstylegrid')
     let viewstyletitle = document.getElementById('viewstyletitle')
 
-    let currentstyleview = 'grid'
+    let currentstyleview = 'title'
     let currentsortby = sortselect.input
 
     sortselect.addEventListener('change', async function () {
