@@ -143,6 +143,9 @@ button.bkground-color-box-create:hover{
 .inline{
     display: inline!important;
 }
+.inline-block{
+    display: inline-block !important;
+}
 .linear-gradient-bottom{
     background: linear-gradient(to bottom, #fff 0%, #77AD78 100%);
 }
@@ -293,6 +296,9 @@ ul.none-display{
 }
 .vertical-align-middle{
     vertical-align: middle;
+}
+.vertical-align-top{
+    vertical-align: top!important;
 }
 .width05vw{
     width: 4.3em;

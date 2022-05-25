@@ -37,7 +37,6 @@
         <title>Keep Track: {% block title %}{% endblock %}</title>
     </head>
     <body>
-        {% if session["user_id"] %}
         <!--navbar-->
         <nav class="bg-light navbar-expand-md navbar navbar-light linear-gradient-top">
             <div class="container-xxl margin0 width100 mb-3">
@@ -51,6 +50,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 </div>
+                {% if session["user_id"] %}
                 <!--right part-->
                         <div align="right" class="dropdown">
                         <a class="abrilfatface-font bkground-color-box no-underline primary-colors primary-font" href="{{url_for('mylists')}}"><button class="bkground-color-box btn btnfocus btn-secondary fontw100 noborder primary-colors" type="button">My Lists</button></a>
@@ -64,10 +64,11 @@
             </div>
         </nav>
         {% else %}
-        <nav class="bg-light navbar navbar-expand-md navbar-light linear-gradient-top">
-            <div class="container-fluid border-top mb-3">
-                <!--left part-->
-                {% block nav %} {% endblock %}
+                <!--right part-->
+                <div>
+                    <a class="abrilfatface-font bkground-color-box no-underline primary-colors primary-font" href="{{url_for('login')}}"><button class="bkground-color-box btn btnfocus btn-secondary fontw100 noborder primary-colors w-auto" type="button" >  Log In </button></a>
+                    <a class="bkground-color-box no-underline primary-colors primary-font" href="{{url_for('signup')}}"><button class=" abrilfatface-font bkground-color-box btn btnfocus btn-secondary fontw100 noborder primary-colors w-auto" type="button"> Sign Up</button></a>
+                </div>
             </div>
         </nav>
         {% endif %}
@@ -85,7 +86,7 @@
             <div align="left" class="margin-left-15 width25">
                 <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('index')}}">HOME</a>
                 <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('index')}}">ABOUT</a>
-                <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('index')}}">CONTACT</a>
+                <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('contact')}}">CONTACT</a>
             </div>
             <div align="left" class="width25">
                 <a class="abrilfatface-font block footer-links no-underline" href="{{url_for('login')}}">LOG IN</a>

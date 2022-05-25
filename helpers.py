@@ -30,6 +30,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ["MAIL_USERNAME"]
 mail=Mail(app)
 
+recipientcontact = os.environ["MAIL_DEFAULT_SENDER"]
 # configure private key
 SECRET = os.environ['SECRET']
 
@@ -422,11 +423,17 @@ def upadate_address(id):
         address = f"{rows[0]['street']}, {rows[0]['city']}, {rows[0]['province']}, {rows[0]['country']}"
     else:
         address = f"{rows[0]['street']}, {rows[0]['city']} {rows[0]['postal_code']}, {rows[0]['province']}, {rows[0]['country']}"
-        
-
     db.execute("UPDATE places SET address=? WHERE id=?", address, id )
     return
 
+def send_contact_request(object, account, email, name, lastname, messagecontact):
+    # create an email object, sender and recipient 
+    msg = Message(object, sender = 'MAIL_DEFAULT_SENDER', recipients=[recipientcontact])
+    # create body of email
+    msg.body = f'Request sent by:\nemail: {email}\naccount: {account} \nLast Name: {lastname}\nName: {name}\nObject: {object}\nMessage: \n{messagecontact}'
+    # send email
+    mail.send(msg)
+    return 
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 
 #CREATE TABLE movies_tvseries (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), director TEXT, description TEXT, cover TEXT, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));

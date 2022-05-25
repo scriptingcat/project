@@ -11,7 +11,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request
 from email_validator import validate_email
 
 from io import BytesIO
@@ -733,6 +733,8 @@ def search():
 @app.route('/elements')
 @login_required
 def elements():
+    # show elements of a list, sort them and return the style of the view
+
     sortby = request.args.get('sortby')
     styleview = request.args.get('styleview')
     lists_id = request.args.get('lists_id')
@@ -809,6 +811,44 @@ def elements():
                 return render_template("elements.html", elements=elements, style=style, images='null', listelements=listelements, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
     except:
         return render_template("elements.html", apologymsg="Something went wrong")
+
+@app.route('/contact', methods = ['GET', 'POST'])
+def contact():
+    # send a message via email to admin
+
+    if request.method == 'POST':
+
+        name=request.form.get('nameofcontact')
+        lastname = request.form.get('lastnameofcontact')
+        email = request.form.get('emailofcontact')
+        account = request.form.get('accountofcontact')
+        object = request.form.get('objectofcontact')
+        message = request.form.get('messageofcontact')
+
+        # check inputs are filled
+        if name == None or len(name) <= 0:
+            apologymsg = "Name is required"
+            return redirect('/contact'+'?showmessage='+apologymsg)
+        if lastname == None or len(lastname) <= 0:
+            apologymsg = "Last name is required"
+            return redirect('/contact'+'?showmessage='+apologymsg)
+        if email == None or len(email) <= 0:
+            apologymsg = "Email is required"
+            return redirect('/contact'+'?showmessage='+apologymsg)
+        if object == None or len(object) <= 0:
+            apologymsg = "Name is required"
+            return redirect('/contact'+'?showmessage='+apologymsg)
+        if message == None or len(message) <= 0:
+            apologymsg = "Message is required"
+            return redirect('/contact'+'?showmessage='+apologymsg)
+        send_contact_request(object, account, email, name, lastname, message)
+        apologymsg = "Request Sent"
+        return redirect('/contact'+'?showmessage='+apologymsg)
+    else:   
+        showmessage = request.args.get('showmessage')
+        if showmessage:
+            return render_template('contact.html', showmessage=showmessage)
+        return render_template('contact.html')
 
 @app.route('/customizedtype')
 @login_required

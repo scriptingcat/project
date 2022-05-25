@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block span %}: Contact {% endblock %}
+
+{% block title %}
+Contact
+{% endblock %}
+
+
+
+{% block main %}
+<div align="center" class="text-align-center mx-auto w-auto">
+        <form action="/contact" method="post">
+        <div align='center' class="mt-5 mx-auto">
+        <div class="w-auto">
+            <div align="left" class="inline-block mb-3 p-2 w-auto">
+                <label class="abrilfatface-font">Name</label>
+                <input
+                    class="bkground-color-box-white border form-control mx-auto w-auto poppins-font primary-font"
+                    name="nameofcontact"  placeholder="Enter your name" type="Text">
+            </div>
+            <div align="left" class="inline-block mb-3 p-2 w-auto">
+                <label class="abrilfatface-font">Last Name</label>
+                <input
+                    class="bkground-color-box-white border form-control mx-auto w-auto poppins-font primary-font"
+                    name="lastnameofcontact"  placeholder="Enter your last name" required type="Text">
+            </div>
+        </div>
+        <div class="w-auto">
+            <div align="left" class="inline-block mb-3 p-2 ">
+                <label class="abrilfatface-font">Account</label>
+                <input
+                    class="bkground-color-box-white border form-control mx-auto w-auto poppins-font primary-font"
+                    name="accountofcontact"  placeholder="Enter your account"  type="Text">
+            </div>
+            <div align="left" class="inline-block mb-3 p-2 ">
+                <label class="abrilfatface-font">Email</label>
+                <input
+                    class="bkground-color-box-white border form-control mx-auto w-auto poppins-font primary-font"
+                    name="emailofcontact" placeholder="Enter your email" required type="email">
+            </div>
+        </div>
+        <div class="w-auto">
+        <div align="left" class="inline-block mb-3 p-2 ">
+            <label class="abrilfatface-font">Object</label>
+            <input
+                class="bkground-color-box-white border form-control mx-auto w-auto poppins-font primary-font"
+                name="objectofcontact" placeholder="Enter reason of contact" required type="text">
+        </div>
+        </div>
+        <div class="w-auto">
+        <div align="left" class="inline-block mb-3 p-2">
+            <label class="abrilfatface-font">Message</label>
+            <textarea
+                class="bkground-color-box-white border form-control mx-auto w-auto poppins-font primary-font" 
+                name="messageofcontact" placeholder="Enter your message" required type="text"></textarea>
+        </div>
+        </div>
+        <div class="w-auto">
+            <input class="bkground-color-box-create block btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
+                type="submit" value="Create">
+        </div>
+        </div>
+        </form>
+        {% if showmessage %}
+        <div class="mt-5 mb-3">
+            <p id="apologymsg" class="abrilfatface-font mx-auto primary-font" type="text" name="showmessage"> {{showmessage}} </p>
+        </div>
+        {% endif %}
+</div>
+{% endblock %}
