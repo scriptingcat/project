@@ -11,7 +11,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements
 from email_validator import validate_email
 
 from io import BytesIO
@@ -97,10 +97,10 @@ def mylists():
         # check values for creating new list
         if not typeoflist and not namelist:
             apologymsg = "All fields required"
-            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes,sorttypes=sorttypes, userslists=userslists)
         if not typeoflist:
             apologymsg = "Type of list selection required"
-            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, sorttypes=sorttypes, userslists=userslists)
         
         # not allowing user to manipulate the selections
         checktype=False
@@ -113,11 +113,11 @@ def mylists():
                 break
         if checktype == False:
             apologymsg = "Type of list selected not recognized"
-            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, sorttypes=sorttypes, userslists=userslists)
 
         if not namelist:
             apologymsg = "Name list required"
-            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", apologymsg=apologymsg.capitalize(), listtypes=listtypes, sorttypes=sorttypes, userslists=userslists)
 
         addlist(typeoflist, namelist, session['user_id'])
         return redirect("/mylists")
@@ -125,9 +125,9 @@ def mylists():
     else:
         showmessage = request.args.get('message')
         if showmessage is None or len(showmessage) == 0:
-            return render_template("mylists.html", listtypes=listtypes, userslists=userslists)
+            return render_template("mylists.html", listtypes=listtypes, nametable='lists',sorttypes=sorttypes,userslists=userslists)
         else:
-            return render_template("mylists.html", listtypes=listtypes, userslists=userslists, showmessage=showmessage)
+            return render_template("mylists.html", nametable='lists',listtypes=listtypes,sorttypes=sorttypes, userslists=userslists, showmessage=showmessage)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -735,23 +735,33 @@ def search():
 def elements():
     sortby = request.args.get('sortby')
     styleview = request.args.get('styleview')
-
     lists_id = request.args.get('lists_id')
-    lists = db.execute("SELECT * FROM lists WHERE id=?", int(lists_id))
-    namelist = lists[0]['namelist']
-    # select the list from list_types
-    list_types = db.execute("SELECT * FROM list_types WHERE id=?", lists[0]['list_type_id'])
-    nametable = list_types[0]['nametable']
-    # select all the element contained in that list
-    elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
-    images = db.execute("SELECT * FROM imgs WHERE lists_id=?", int(lists_id))
+    if lists_id != 'lists':
+        lists = db.execute("SELECT * FROM lists WHERE id=?", int(lists_id))
+        namelist = lists[0]['namelist']
+        # select the list from list_types
+        list_types = db.execute("SELECT * FROM list_types WHERE id=?", lists[0]['list_type_id'])
+        nametable = list_types[0]['nametable']
+        # select all the element contained in that list
+        elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
+        images = db.execute("SELECT * FROM imgs WHERE lists_id=?", int(lists_id))
+    else:
+        lists = db.execute("SELECT * FROM lists WHERE user_id=?", session['user_id'])
+        nametable = 'lists'
+        elements = lists
 
     try:
         if sortby and styleview:
             if sortby == 'most recent':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id DESC", nametable, int(lists_id), session['user_id'])
+                if nametable == 'lists':
+                    elementssorted = db.execute("SELECT * FROM lists WHERE user_id=? ORDER BY id DESC", session['user_id'])
+                else:
+                    elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id DESC", nametable, int(lists_id), session['user_id'])
             elif sortby == 'least recent':
-                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id ASC", nametable, int(lists_id), session['user_id'])
+                if nametable == 'lists':
+                    elementssorted = db.execute("SELECT * FROM lists WHERE user_id=? ORDER BY id ASC", session['user_id'])
+                else:
+                    elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id ASC", nametable, int(lists_id), session['user_id'])
             else:
                 counter = 0
                 # iterate throughout key in dict of sort types
@@ -763,7 +773,13 @@ def elements():
                             # when element in list == sortby request value 
                             if i == sortby:
                                 # select ordered by that value 
-                                elementssorted= db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY " + sortby +" ASC", nametable, int(lists_id), session['user_id'])
+                                if k == 'lists':
+                                    if sortby == 'type of list':
+                                         elementssorted= db.execute("SELECT * FROM ? WHERE user_id=? ORDER BY list_type_id ASC", nametable, session['user_id'])
+                                    else: 
+                                        elementssorted= db.execute("SELECT * FROM ? WHERE user_id=? ORDER BY " + sortby +" ASC", nametable, session['user_id'])
+                                else:
+                                    elementssorted= db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY " + sortby +" ASC", nametable, int(lists_id), session['user_id'])
                                 # add +1 to counter so that I know elements has been re-selected and break
                                 counter+=1
                                 break
@@ -782,12 +798,15 @@ def elements():
             else:
                 style ='grid'
             # always check user's requesting is owner of list
-            user_id = lists[0]['user_id']
-            if session['user_id'] == user_id:
-                # decode dataimage from bytes to ascii to be rendered
-                for image in images:
-                    image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
-            return render_template("elements.html", elements=elements, style=style, images=images, listelements=listelements, nametable=nametable, gridelements=gridelements)
+            if nametable != 'lists':
+                user_id = lists[0]['user_id']
+                if session['user_id'] == user_id:
+                    # decode dataimage from bytes to ascii to be rendered
+                    for image in images:
+                        image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
+                return render_template("elements.html", elements=elements, style=style, images=images, listelements=listelements, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+            else:
+                return render_template("elements.html", elements=elements, style=style, images='null', listelements=listelements, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
     except:
         return render_template("elements.html", apologymsg="Something went wrong")
 

@@ -21,9 +21,7 @@ main{
     min-height: 70vh;
 
 }
-nav{
-    border-bottom: #8fd694 1px solid;
-}
+
 
 /*by class*/
 .bkground-color{
@@ -144,6 +142,12 @@ button.bkground-color-box-create:hover{
 }
 .inline{
     display: inline!important;
+}
+.linear-gradient-bottom{
+    background: linear-gradient(to bottom, #fff 0%, #77AD78 100%);
+}
+.linear-gradient-top{
+    background: linear-gradient(to top, #fff 0%, #77AD78 100%);
 }
 .line-height{
     line-height: 140%;

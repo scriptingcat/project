@@ -3,7 +3,7 @@
 <!--viewstyle table-->
 <table class="poppins-font primary-font table table-hover text-align-left">
     <thead align="center">
-        <tr class="border-bottom5 fontw100">
+        <tr class="border-bottom5">
             {% for feature in gridelements %}
             {% if feature['type'] == nametable %}
             {% for b,n in feature.items() %}
@@ -46,31 +46,60 @@
 {% for element in elements %}
 <!--viewstyle title-->
 <div class="mb-3 p-2">
+    {% if nametable != 'lists'%}
     <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
         data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}" aria-expanded="false"
         aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
         <div align="left" class="height-width25">
-            <h5 class="font-size1">
-                {% if element['title'] %}
-                {{element['title'].capitalize()}}
-                {% endif %}
-                {% if element['name'] %}
-                {{element['name'].capitalize()}}
-                {% endif %}
-            </h5>
-            <h6 class="">
-                {% for key,value in element.items() %}
-                {% if key in ['year', 'city'] %}
-                {% if value == '' or value == 'null' %}
-                -
-                {%else%}
-                {{element[key]}}
-                {% endif %}
-                {% endif %}
+    {% else %}
+    <form action="/list?{{element['id']}}" method="get">
+        <input name="lists_id" type="hidden" value="{{element['id']}}">
+        <button
+            class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
+            type="submit" value="{{element['namelist']}}">
+    {% endif %}
+              
+                {% for k,v in element.items() %}
+                    {% for feature in titleelements %}
+                        {% for b,n in feature.items() %}
+                            {% if feature['type'] == nametable %}
+                                {% if b != 'type' %} 
+                                    {% if b == 'name' or b=='title' or b == 'namelist' %}
+                                    {% if v == '' and b==k %}
+                                        <p>-</p>
+                                        {% elif v != '' and b==k %}
+                                        <p>{{element[b]}}</p>
+                                        {% endif%}
+                                    {% endif%}
+                                {% endif%}
+                            {% endif%}
+                        {% endfor%}
+                    {% endfor%}
+                {% endfor%}
+                {% for k,v in element.items() %}
+                    {% for feature in titleelements %}
+                        {% if feature['type'] == nametable %}
+                            {% for b,n in feature.items() %}
+                                {% if b != 'type' %} 
+                                    {% if b != 'name' and b!='title' and b != 'namelist' %}
+                                    {% if v == '' and b==k %}
+                                    <p>-</p>
+                                    {% elif v != '' and b==k %}
+                                    <p>{{element[b]}}</p>
+                                    {% endif%}
+                                    {% endif%}
+                                {% endif%}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
                 {% endfor %}
-            </h6>
-        </div>
+    {% if nametable != 'lists'%}
+    </div>
     </button>
+    {% else %}
+    </button>
+    </form> 
+    {% endif %}
 </div>
 {% endfor %}
 

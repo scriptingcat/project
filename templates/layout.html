@@ -16,6 +16,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Amaranth&display=swap" rel="stylesheet">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,8 +39,8 @@
     <body>
         {% if session["user_id"] %}
         <!--navbar-->
-        <nav class="bg-light navbar-expand-md navbar navbar-light">
-            <div class="container-xxl margin0 width100">
+        <nav class="bg-light navbar-expand-md navbar navbar-light linear-gradient-top">
+            <div class="container-xxl margin0 width100 mb-3">
                 <!--left part-->
                 <div>
                 <a class="navbar-brand" href="/">
@@ -60,20 +61,18 @@
                             <li><form action="/logout" method="get"><button class="dropdown-item fontw100 shadow-item" type="submit">Log out</button></form></li>
                         </ul>
                         </div>
-                    
-                
             </div>
         </nav>
         {% else %}
-        <nav class="bg-light navbar navbar-expand-md navbar-light">
-            <div class="container-fluid">
+        <nav class="bg-light navbar navbar-expand-md navbar-light linear-gradient-top">
+            <div class="container-fluid border-top mb-3">
                 <!--left part-->
                 {% block nav %} {% endblock %}
             </div>
         </nav>
         {% endif %}
 
-        <main class="container-fluid margin0 py-5 text-center">
+        <main class="container-fluid margin0 text-center">
             {% block main %}{% endblock %}
         </main>
     </body>

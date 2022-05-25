@@ -135,6 +135,7 @@ listelementstoedit= [
 ]
 
 sorttypes = { 
+    'lists': ['namelist', 'most recent', 'least recent', "type of list"],
     'movies_tvseries': ['title','most recent', 'least recent', 'director', 'year'],
     'books': ['title','most recent', 'least recent', 'author'],
     'places': ['name', 'city', 'province', 'country','most recent', 'least recent'],
@@ -142,6 +143,10 @@ sorttypes = {
     }
 
 gridelements = [
+    {
+        "type": "lists",
+        "namelist" : "name of a list",
+    },
     {
             "type": "movies_tvseries",
             "title": "a title for the element",
@@ -164,6 +169,33 @@ gridelements = [
             "type": "shopping",
             "name": "name of item",
             "brand": "brand of item",
+            "status": "to buy or bought",
+        },
+]
+titleelements = [
+    {
+        "type": "lists",
+        "namelist" : "name of a list",
+        "type of list": "type of list"
+    },
+    {
+            "type": "movies_tvseries",
+            "title": "a title for the element",
+            "year": "year of release",
+        },
+        {
+            "type": "books",
+            "title": "a title for the element",
+            "author": "the author of the book",
+        },
+        {
+            "type": "places",
+            "name": "name of location",
+            "city": "city of location",
+        },
+        {
+            "type": "shopping",
+            "name": "name of item",
             "status": "to buy or bought",
         },
 ]
