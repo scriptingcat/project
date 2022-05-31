@@ -485,6 +485,7 @@ def showlist():
                     if not dictofrequests['name'] or dictofrequests['name'] == None:
                         apologymsg = "Element Name Is Required"
                         return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+                # check status in shopping table
                 if k == 'status':
                     if not dictofrequests['status'] or dictofrequests['status'] == None or  dictofrequests['status'] not in ['to buy', 'bought']:
                         apologymsg = "Element status Error. Status is required. Values allowed: to buy or bought."
@@ -841,6 +842,7 @@ def contact():
         if message == None or len(message) <= 0:
             apologymsg = "Message is required"
             return redirect('/contact'+'?showmessage='+apologymsg)
+        # send request
         send_contact_request(object, account, email, name, lastname, message)
         apologymsg = "Request Sent"
         return redirect('/contact'+'?showmessage='+apologymsg)

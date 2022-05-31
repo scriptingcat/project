@@ -87,6 +87,29 @@ listelements = [
             "note": "a brief text to assciate with the element",
             "status": "to buy or bought"
         },
+        {
+            "type": "closet",
+            "name": "name of item",
+            "brand": "brand of the item",
+            "tag": "a particular tag you want to label the item as",
+            "type_of_item": "type of item",
+            "price": "item's cost at time of buying",
+            "cover": "an image to associate with the element",
+            "store": "store where the item has been bought",
+            "datetime_of_buying": "when the item has been bought",
+            "note": "a brief text to assciate with the element",
+        },
+        {
+            "type": "storage",
+            "name": "name of item",
+            "brand": "brand of the item",
+            "tag": "a particular tag you want to label the item as",
+            "type_of_item": "type of item",
+            "quantity": "number of pieces per item in your storage",
+            "cover": "an image to associate with the element",
+            "note": "a brief text to assciate with the element",
+        }, 
+
 ]
 
 listelementstoedit= [ 
@@ -133,6 +156,26 @@ listelementstoedit= [
             "note": "a brief text to assciate with the element",
             "status": "to buy or bought"
         },
+        {
+            "type": "closet",
+            "name": "name of item",
+            "brand": "brand of the item",
+            "tag": "a particular tag you want to label the item as",
+            "type_of_item": "type of item",
+            "price": "item's cost at time of buying",
+            "store": "store where the item has been bought",
+            "datetime_of_buying": "when the item has been bought",
+            "note": "a brief text to assciate with the element",
+        },
+        {
+            "type": "storage",
+            "name": "name of item",
+            "brand": "brand of the item",
+            "tag": "a particular tag you want to label the item as",
+            "type_of_item": "type of item",
+            "quantity": "number of pieces per item in your storage",
+            "note": "a brief text to assciate with the element",
+        },
 ]
 
 sorttypes = { 
@@ -141,6 +184,8 @@ sorttypes = {
     'books': ['title','most recent', 'least recent', 'author'],
     'places': ['name', 'city', 'province', 'country','most recent', 'least recent'],
     'shopping': ['name', 'brand', 'most recent', 'least recent', 'price','status'],
+    'closet' : ['name', 'brand', 'most recent', 'least recent', 'price', 'tag', 'type_of_item','datetime_of_buying'],
+    'storage' : ['name', 'brand', 'most recent', 'least recent', 'tag', 'type_of_item','quantity'],
     }
 
 gridelements = [
@@ -172,6 +217,20 @@ gridelements = [
             "brand": "brand of item",
             "status": "to buy or bought",
         },
+        {
+            "type": "closet",
+            "name": "name of item",
+            "brand": "brand of the item",
+            "tag": "a particular tag you want to label the item as",
+
+        },
+        {
+            "type": "storage",
+            "name": "name of item",
+            "quantity": "number of pieces per item in your storage",
+            "tag": "a particular tag you want to label the item as",
+
+        },
 ]
 titleelements = [
     {
@@ -199,6 +258,17 @@ titleelements = [
             "name": "name of item",
             "status": "to buy or bought",
         },
+        {
+            "type": "closet",
+            "name": "name of item",
+            "brand": "brand of the item",
+        },
+        {
+            "type": "storage",
+            "name": "name of item",
+            "quantity": "number of pieces per item in your storage",
+        },
+
 ]
 
 # from finance pset9
@@ -413,6 +483,26 @@ def add_element(nametable,dictofelements, namelist, lists_id, user_id):
         nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
         db.execute("COMMIT")
         return nametable_id
+    elif nametable == 'closet':
+        db.execute("BEGIN TRANSACTION")
+        # insert the element data
+        # 0 value is value for null since db column only takes integers
+        # img_id is always 0, it is updated after the image has been stored in imgs db
+        db.execute("INSERT INTO closet (namelist,lists_id,user_id,name,brand,tag,type_of_item, price, img_id, store,datetime_of_buying,note) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['name'],dictofelements['brand'],dictofelements['tag'],dictofelements['type_of_item'], dictofelements['price'], 0, dictofelements['store'],dictofelements['datetime_of_buying'], dictofelements['note'] )
+        rows = db.execute("SELECT * FROM closet WHERE namelist=? AND lists_id=? AND user_id=? AND name=?", namelist, lists_id, user_id, dictofelements['name'])
+        nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
+        db.execute("COMMIT")
+        return nametable_id
+    elif nametable == 'storage':
+        db.execute("BEGIN TRANSACTION")
+        # insert the element data
+        # 0 value is value for null since db column only takes integers
+        # img_id is always 0, it is updated after the image has been stored in imgs db
+        db.execute("INSERT INTO storage (namelist,lists_id,user_id,name,brand,tag,type_of_item,quantity, img_id,note) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['name'],dictofelements['brand'],dictofelements['tag'],dictofelements['type_of_item'], dictofelements['quantity'], 0, dictofelements['note'])
+        rows = db.execute("SELECT * FROM storage WHERE namelist=? AND lists_id=? AND user_id=? AND name=?", namelist, lists_id, user_id, dictofelements['name'])
+        nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
+        db.execute("COMMIT")
+        return nametable_id
     else:
         return
 
@@ -443,3 +533,7 @@ def send_contact_request(object, account, email, name, lastname, messagecontact)
 #CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, street TEXT, city TEXT, postal_code INTEGER, province TEXT, country TEXT, address TEXT, coordinates TEXT,link TEXT, description TEXT, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
 #CREATE TABLE shopping (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, brand TEXT, collection TEXT, quantity INTEGER, price FLOAT, description TEXT, img_id INTEGER, wheretobuy TEXT, note TEXT, status CHECK(status in ('to buy', 'bought')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+
+#CREATE TABLE closet (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, brand TEXT, tag TEXT, type_of_item TEXT, price FLOAT, img_id INTEGER, store TEXT, datetime_of_buying DATETIME, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+
+#CREATE TABLE storage (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, brand TEXT, tag TEXT, type_of_item TEXT, quantity INTEGER, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
