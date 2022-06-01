@@ -11,7 +11,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage
 from email_validator import validate_email
 
 from io import BytesIO
@@ -460,7 +460,7 @@ def showlist():
                     # for each key in this dict add value equals to input
                     for key,value in dictionary.items():
                         # first check whether its a text input or image/file
-                        if key in ['cover','image']:
+                        if key in ['cover','image'] and key != 'cover_paid':
                             # take the object
                             file = request.files['inputimage']
                             elementinput = file
@@ -468,7 +468,7 @@ def showlist():
                             if len(file.filename)<=0:
                                 elementinput = 0
                             dictofrequests[key] = elementinput
-                        if key not in ['image', 'cover']:
+                        if key not in ['image', 'cover'] and key != 'cover_paid':
                             elementinput = request.form.get(key)
                             dictofrequests[key] = elementinput
                     break
@@ -487,8 +487,12 @@ def showlist():
                         return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
                 # check status in shopping table
                 if k == 'status':
-                    if not dictofrequests['status'] or dictofrequests['status'] == None or  dictofrequests['status'] not in ['to buy', 'bought']:
-                        apologymsg = "Element status Error. Status is required. Values allowed: to buy or bought."
+                    if not dictofrequests['status'] or dictofrequests['status'] == None or  dictofrequests['status'] not in ['to buy', 'bought', 'to pay', 'paid']:
+                        if nametable == 'shopping':
+                            apologymsg = "Element status Error. Status is required. Values allowed: to buy or bought."
+                        elif nametable == 'bills':
+                            apologymsg = "Element status Error. Status is required. Values allowed: to pay or paid."
+
                         return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
                     else:
                         break
@@ -575,10 +579,14 @@ def showlist():
 
         # download element
         elif actiononelement == 'downloadelement':
+            imgname =request.form.get('imgname')
             iddownloadelement = request.form.get('iddownloadelement')
             # handle id request
             if not iddownloadelement:
                 apologymsg = "Id element required"
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+            if not imgname:
+                apologymsg = "imgname element required"
                 return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
 
             img_id = db.execute("SELECT * FROM ? WHERE id=?", nametable, int(iddownloadelement))
@@ -593,8 +601,10 @@ def showlist():
                 apologymsg = "Id does not match user id"
                 return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
 
-
-            img = db.execute("SELECT * FROM imgs WHERE id=?", int(img_id[0]['img_id']))
+            if imgname != 'img_paid':
+                img = db.execute("SELECT * FROM imgs WHERE id=?", int(img_id[0]['img_id']))
+                return send_file(BytesIO(img[0]['img']), attachment_filename='download.jpg',as_attachment=True)
+            img = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND name=?", int(iddownloadelement), 'img_paid')
             return send_file(BytesIO(img[0]['img']), attachment_filename='download.jpg',as_attachment=True)
 
         # edit element
@@ -655,6 +665,44 @@ def showlist():
                 apologymsg = 'Something went wrong. Updating failed.'
                 return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
 
+        # update paid cover in bills table
+        elif actiononelement == 'updatepaidelement':
+            print('updatepaidelement')
+            id = request.form.get('idupdatepaidelement')
+            print(id)
+            # namefile = 'updatepaidcover' + str(id)
+            imagepaid = request.files['inputimage']
+            print(imagepaid)
+            if nametable != 'bills':
+                apologymsg = 'Action not allowed on this list'
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+            print('ok nametable')
+            if len(id) <= 0:
+                apologymsg = 'Id required'
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+            print('ok id')
+
+            if len(imagepaid.filename) <= 0:
+                apologymsg = 'A new image must be provided'
+                return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+
+            print('ok imgpaid')
+
+            db.execute("BEGIN TRANSACTION")
+            # take all the info from filestorage obj
+            #data
+            img = imagepaid.read()
+            #filename - how suggested by the guidelines
+            filename = secure_filename(imagepaid.filename)
+            #mimetype
+            mimetype = imagepaid.mimetype
+            # add the image to image db
+            addpaidimage(img, mimetype, 'bills', id, lists_id)
+            db.execute("COMMIT")
+
+            apologymsg = 'Image Updated'
+            return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
+
         else:
             # check lists_id user matches session's user_id
             # prevent from showing other users' lists by manipulating html code
@@ -690,10 +738,10 @@ def image():
     # open image
     nametable_id = request.args.get('nametable_id')
     nametable = request.args.get('nametable')
-    
+    name = request.args.get('imgname')
     try:
         # hande input
-        if not nametable_id or not nametable:
+        if not nametable_id or not nametable or not name:
             apologymsg = "Something went wrong. Access to element Denied"
             return redirect("/mylists" + "?message=" + apologymsg)
         
@@ -702,10 +750,14 @@ def image():
         if rows[0]['user_id'] != session['user_id']:
             apologymsg = "Something went wrong. Access to element Denied"
             return redirect("/mylists" + "?message=" + apologymsg)
+        if name != 'img_paid':
+            imgs = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=?", int(nametable_id), nametable)
+        else:
+            imgs = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=? AND name=?", int(nametable_id), nametable, name)
 
-        img = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=?", int(nametable_id), nametable)
-        image = base64.b64encode(img[0]['img']).decode('ascii')
-        return render_template('image.html',data=img[0]['mimetype'], image=image)
+        for i in range(len(imgs)):
+            img = base64.b64encode(imgs[i]['img']).decode('ascii')
+            return render_template('image.html',data=imgs[i]['mimetype'], image=img)
 
     # for any other type of exception
     except:

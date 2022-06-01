@@ -8,7 +8,7 @@ import datetime
 import urllib.parse
 from urllib.parse import urljoin
 
-from flask import Flask, redirect, render_template, request, session
+from flask import Flask, redirect, render_template, request, session, send_file
 from flask_mail import Mail, Message
 from functools import wraps
 
@@ -17,6 +17,9 @@ import jwt
 
 # library to conver img into a string
 import base64
+# library to conver str img into bytes
+from io import BytesIO
+
 
 
 # configure application
@@ -85,7 +88,7 @@ listelements = [
             "cover": "an image to associate with the element",
             "wheretobuy": "places or stores where to buy the item",
             "note": "a brief text to assciate with the element",
-            "status": "to buy or bought"
+            "status": ["to buy","bought"]
         },
         {
             "type": "closet",
@@ -109,7 +112,17 @@ listelements = [
             "cover": "an image to associate with the element",
             "note": "a brief text to assciate with the element",
         }, 
-
+        {
+            "type": "bills",
+            "name": "name of bill",
+            "description" : "a brief text describing the element",
+            "expiration_date": "expiring date of the bill",
+            "cost": "cost of the bill",
+            "cover": "an image to associate with the bill",
+            "status": ["to pay", "paid"],
+            "cover_paid": "an image to associate with the paid bill",
+            "note": "a brief text to assciate with the element",
+        }, 
 ]
 
 listelementstoedit= [ 
@@ -176,6 +189,15 @@ listelementstoedit= [
             "quantity": "number of pieces per item in your storage",
             "note": "a brief text to assciate with the element",
         },
+        {
+            "type": "bills",
+            "name": "name of bill",
+            "description" : "a brief text describing the element",
+            "expiration_date": "expiring date of the bill",
+            "cost": "cost of the bill",
+            "status": ["to pay", "paid"],
+            "note": "a brief text to assciate with the element",
+        },
 ]
 
 sorttypes = { 
@@ -186,6 +208,7 @@ sorttypes = {
     'shopping': ['name', 'brand', 'most recent', 'least recent', 'price','status'],
     'closet' : ['name', 'brand', 'most recent', 'least recent', 'price', 'tag', 'type_of_item','datetime_of_buying'],
     'storage' : ['name', 'brand', 'most recent', 'least recent', 'tag', 'type_of_item','quantity'],
+    'bills' : ['name', 'most recent', 'least recent', 'cost','expiration_date', 'status']
     }
 
 gridelements = [
@@ -222,15 +245,20 @@ gridelements = [
             "name": "name of item",
             "brand": "brand of the item",
             "tag": "a particular tag you want to label the item as",
-
         },
         {
             "type": "storage",
             "name": "name of item",
             "quantity": "number of pieces per item in your storage",
             "tag": "a particular tag you want to label the item as",
-
         },
+        {
+            "type": "bills",
+            "name": "name of bill",
+            "expiration_date": "expiring date of the bill",
+            "status": "to pay or paid",
+        },
+        
 ]
 titleelements = [
     {
@@ -267,6 +295,11 @@ titleelements = [
             "type": "storage",
             "name": "name of item",
             "quantity": "number of pieces per item in your storage",
+        },
+        {
+            "type": "bills",
+            "name": "name of bill",
+            "expiration_date": "expiring date of the bill",
         },
 
 ]
@@ -503,6 +536,16 @@ def add_element(nametable,dictofelements, namelist, lists_id, user_id):
         nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
         db.execute("COMMIT")
         return nametable_id
+    elif nametable == 'bills':
+        db.execute("BEGIN TRANSACTION")
+        # insert the element data
+        # 0 value is value for null since db column only takes integers
+        # img_id is always 0, it is updated after the image has been stored in imgs db
+        db.execute("INSERT INTO bills (namelist,lists_id,user_id,name,description,expiration_date,cost,img_id,status, img_paid_id, note) VALUES (?,?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['name'],dictofelements['description'],dictofelements['expiration_date'],dictofelements['cost'], 0, dictofelements['status'], 0, dictofelements['note'])
+        rows = db.execute("SELECT * FROM bills WHERE namelist=? AND lists_id=? AND user_id=? AND name=?", namelist, lists_id, user_id, dictofelements['name'])
+        nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
+        db.execute("COMMIT")
+        return nametable_id
     else:
         return
 
@@ -524,6 +567,18 @@ def send_contact_request(object, account, email, name, lastname, messagecontact)
     # send email
     mail.send(msg)
     return 
+
+# func to add an img in imgs db
+def addpaidimage(img, mimetype, nametable, nametable_id, lists_id):
+    # insert the img in imgs db 
+    db.execute("INSERT INTO imgs (img, name, mimetype, nametable, nametable_id, lists_id) VALUES (?,?,?,?, ?,?)", img, 'img_paid', mimetype, nametable, nametable_id, lists_id)
+    # update img_id in the nametable
+    img_id = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=? AND lists_id=? and name=?", nametable_id, 'bills', lists_id, 'img_paid')
+    img_paid_id = img_id[0]['id']
+    db.execute("UPDATE bills SET img_paid_id=? WHERE id=?",img_paid_id, nametable_id)
+    return
+
+
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 
 #CREATE TABLE movies_tvseries (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), director TEXT, description TEXT, cover TEXT, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
@@ -537,3 +592,5 @@ def send_contact_request(object, account, email, name, lastname, messagecontact)
 #CREATE TABLE closet (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, brand TEXT, tag TEXT, type_of_item TEXT, price FLOAT, img_id INTEGER, store TEXT, datetime_of_buying DATETIME, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
 #CREATE TABLE storage (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, brand TEXT, tag TEXT, type_of_item TEXT, quantity INTEGER, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+
+#CREATE TABLE bills (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, description TEXT, expiration_date datetime, cost FLOAT, img_id INTEGER, status CHECK(status in ('to pay', 'paid')), img_paid_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));

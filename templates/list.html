@@ -105,7 +105,7 @@
                             name="nametable" disabled type="Text" value={{nametable}}>
                     </div>
                     {% for key,value in element.items() %}
-                    {% if key != "type" %}
+                    {% if key != "type" and key != 'cover_paid'%}
                         {% if key == "cover" or key == 'image' %}
                         <div class="mb-3 p-2">
                             <input
@@ -122,19 +122,24 @@
                             </div>
                             {% elif key =='status'%}
                             <div class="btn-group mb-3 p-2 vertical-align-middle">
-                                <label class="form-check-label mx-auto w-auto" for="flexRadioDefault1"> To buy </label>
+                                <label class="form-check-label mx-auto w-auto" for="flexRadioDefault1"> {{value[0]}} </label>
                                 <input id="flexRadioDefault1"
                                     class="form-check-input bkground-color-box-white poppins-font primary-font" checked
                                     name="{{key}}" 
-                                    title="{{value}}" type="radio" value="to buy">
+                                    title="{{value}}" type="radio" value="{{value[0]}}">
                             </div>
                             <div class="btn-group mb-3 p-2 vertical-align-middle">
-                                <label class="form-check-label mx-auto w-auto" for="flexRadioDefault2"> Bought</label>
+                                <label class="form-check-label mx-auto w-auto" for="flexRadioDefault2"> {{value[1]}}</label>
                                 <input id="flexRadioDefault2"
                                     class="form-check-input bkground-color-box-white poppins-font primary-font"
                                     name="{{key}}" 
-                                    title="{{value}}" type="radio" value="bought">
+                                    title="{{value}}" type="radio" value="{{value[1]}}">
                             </div>
+                            {% elif key == 'expiration_date' or key == 'datetime_of_buying' %}
+                                    <div class="mb-3 p-2 text-align-left w-auto">
+                                    <input autocomplete="off" autofocus name="{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font" placeholder="Enter a {{key.capitalize()}}" type="datetime" title="{{value}}">
+                                    </div>
+                                    
                             {% else %}
                             <div class="mb-3 p-2">
                                 <input
@@ -234,26 +239,55 @@
         <div class="collapse" id="showelementinfo{{element['id']}}">
             <div class="d-flex flex-row flex-wrap margin2">
                 <!--image of showelementinfo-->
+                <div class="mb-3 width14">
                 {% for image in images%}
                 {% if image['nametable_id'] == element['id'] %}
-                <div class="mb-3 width14">
+                <div class="mb-3 ">
+                    <div class="mb-3">
                     <form action="/image?{{image['nametable']}}&{{image['nametable_id']}} " method="get">
                         <input name="nametable_id" type="hidden" value="{{image['nametable_id']}}">
                         <input name="nametable" type="hidden" value="{{image['nametable']}}">
+                        {% if image['name' == 'img_paid']%}
+                        <input name="imgname" type="hidden" value="{{image['img_paid']}}">
+                        {% else %}
+                        <input name="imgname" type="hidden" value="{{image['name']}}">
+                        {% endif %}
+            
                         <button class="noborder" type="submit">
                             <img class="border form-control bkground-color-box-white poppins-font primary-font"
                                 src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
                         </button>
                     </form>
+                    </div>
+                    <!--Download element-->
+                    <div class="">
+                        <form action="/list?lists_id={{lists_id}}" method="post">
+                            {% if image['name' == 'img_paid']%}
+                            <input name="imgname" type="hidden" value="{{image['img_paid']}}">
+                            {% else %}
+                            <input name="imgname" type="hidden" value="{{image['name']}}">
+                            {% endif %}
+                            <input name="actiononelement" type="hidden" value="downloadelement">
+                            <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
+
+                            <button
+                            class="btn btn-primary noborder primary-font primary-colors-whitebkg text-align-left w-auto"
+                            type="submit">
+                            <i class="i-hover bi bi-arrow-down-circle"></i>
+                            </button>
+                            
+                        </form>
+                    </div>
                 </div>
                 {% endif %}
                 {% endfor %}
+                </div>
                 <!--other showelementinfo items -->
                 <div id="elementstoshow{{loop.index0}}" class="mb-3 inline width60">
                     <div class="d-flex flex-row flex-wrap">
                         {% for key,value in element.items() %}
-                        {% if key != 'cover' %}
-                        {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' %}
+                        {% if key != 'cover' and key != 'cover_paid' %}
+                        {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key != 'img_paid_id' %}
                         <div class="mb-3 margin-left-8 text-align-left w-auto">
                             <label class="abrilfatface-font">{{key.capitalize()}}</label>
                             {% if value == '' or value == 'null' %}
@@ -273,44 +307,119 @@
                     </div>
                 </div>
                 <!--edit toggle elements to edit the showelementinfo-->
-                <div id="editinfo{{loop.index0}}" class="mb-3 display-none width60">
+                <div id="editinfo{{loop.index0}}" class="mb-3 display-none width60"> 
                     <form action="/list?lists_id={{lists_id}}" method="post">
                         <div class="mb-3" align="center">
                             <div class="d-flex flex-row flex-wrap">
                                 {% for key,value in element.items() %}
-                                {% if key != 'cover' and key != 'address' %}
-                                    {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key != 'namelist' and key!= 'year' and key != 'note' and key!= 'description' %}
-                                    <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
-                                    <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
-                                    {% if value == '' or value == 'null' %}
-                                    <input name="edit{{key}}"
-                                        class="border form-control mx-auto bkground-color-box-white poppins-font primary-font " 
-                                        placeholder="{{key}}: -" type="text">
-                                    {% else %}
-                                    <input name="edit{{key}}"
-                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
-                                    placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                    {% if key != 'cover' and key != 'address' %}
+                                        {% if key not in ['id', 'img_id','lists_id', 'user_id', 'namelist', 'year', 'note','description', 'img_paid_id','expiration_date','datetime_of_buying', 'status'] %}
+                                            <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                            <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                            {% if value == '' or value == 'null' %}
+                                                <input name="edit{{key}}"
+                                                class="border form-control mx-auto bkground-color-box-white poppins-font primary-font " 
+                                                placeholder="{{key}}: -" type="text">
+                                            {% else %}
+                                                <input name="edit{{key}}"
+                                                class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                                                placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                            {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        {% if key == 'year' %}
+                                            <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                            <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                            <input name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font" maxlength="4" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                            </div>
+                                        {% endif %}
+                                        {% if key == 'expiration_date' or key == 'datetime_of_buying' %}
+                                            <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                            <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                            <input name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font" placeholder="{{key}}: {{value}}" type="datetime" value="{{value}}">
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if key == 'note' or key =='description' %}
+                                            <div class="mb-3 margin-left-8 p-2  text-align-left w-auto">
+                                            <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                            {% if value == '' %}
+                                                <textarea name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font resizable w-auto" placeholder= "{{key}}: -"></textarea>
+                                            {% else %}
+                                                <textarea name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font resizable w-auto" placeholder= "{{key}}: {{value}}">{{value}}</textarea>
+                                            {% endif %}
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
-                                    </div>
-                                    {% endif %}
-                                    {% if key == 'year' %}
-                                    <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
-                                    <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
-                                    <input name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font" maxlength="4" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
-                                    </div>
-                                    {% endif %}
-                                    {% if key == 'note' or key =='description' %}
-                                    <div class="mb-3 margin-left-8 p-2  text-align-left w-auto">
-                                    <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
-                                    {% if value == '' %}
-                                    <textarea name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font resizable w-auto" placeholder= "{{key}}: -"></textarea>
-                                    {% else %}
-                                    <textarea name="edit{{key}}" class="border form-control mx-auto bkground-color-box-white poppins-font primary-font resizable w-auto" placeholder= "{{key}}: {{value}}">{{value}}</textarea>
-                                    {% endif %}
-                                    </div>
-                                    {% endif %}
-                                {% endif %}
                                 {% endfor %}
+                                {% for key,value in element.items() %}
+                                {% if key == 'status' %}
+                                            {% for el in listelements%}
+                                            {% if el['type']==nametable %}
+                                            {% for k,v in el.items() %}
+                                            {% if k=='status' %}
+                                                <div class="mb-3 margin-left-8 p-2 text-align-left">
+                                                <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+
+                                                {% if element['status'] == v[0] %}
+                                                    <div class="block border form-control w-auto mx-auto">
+
+                                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+                                                        <div class="w-auto">
+                                                        <input id="val0" class="form-check-input bkground-color-box-white poppins-font primary-font primary-colors-checkbox" checked
+                                                            name="edit{{key}}" 
+                                                            title="{{v[0]}}" type="radio" value="{{v[0]}}">
+                                                        </div>
+                                                        <div  class=" w-auto">
+                                                            <label class="form-check-label mx-auto " for="val0">{{v[0]}}</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+                                                        <div class="w-auto">
+                                                        <input id="val0" class="form-check-input bkground-color-box-white  poppins-font primary-font primary-colors-checkbox"
+                                                        name="edit{{key}}" 
+                                                        title="{{v[1]}}" type="radio" value="{{v[1]}}">
+                                                        </div>
+                                                        <div class=" w-auto">
+                                                        <label class="form-check-label mx-auto w-auto" for="val1">{{v[1]}}</label>
+                                                    </div>
+                                                    </div>
+                                                    </div>
+                                                {% else %}
+                                                <div class="block border form-control w-auto mx-auto">
+
+                                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+                                                        <div class="w-auto">
+                                                        <input id="val0" class="form-check-input bkground-color-box-white poppins-font primary-font primary-colors-checkbox" 
+                                                            name="edit{{key}}" 
+                                                            title="{{v[0]}}" type="radio" value="{{v[0]}}">
+                                                        </div>
+                                                        <div class=" w-auto">
+                                                            <label class="form-check-label mx-auto " for="val0">{{v[0]}}</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+                                                        <div class=" w-auto">
+                                                        <input id="val0" class="form-check-input bkground-color-box-white  poppins-font primary-font primary-colors-checkbox"
+                                                        name="edit{{key}}" checked
+                                                        title="{{v[1]}}" type="radio" value="{{v[1]}}">
+                                                        </div>
+                                                        <div class="w-auto">
+                                                        <label class="form-check-label mx-auto w-auto" for="val1">{{v[1]}}</label>
+                                                    </div>
+                                                    </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                            {% endif %}
+                                            {% endfor %}
+                                            
+                                        {% endif %}
+                                        {% endfor %}
                                 <input name="actiononelement" type="hidden" value="editelement">
                                 <input name="ideditelement" type="hidden" value="{{element['id']}}">
                             </div>
@@ -321,23 +430,46 @@
                             </div>
                         </div>
                     </form>
+                    <!-- update paid cover toggle elements-->
+                    <div id="updatepaidinfo{{loop.index0}}" class="mb-3 width60 display-none">
+                        <form action="/list?lists_id={{lists_id}}" method="post" enctype="multipart/form-data">
+                                    {% for key,value in element.items() %}
+                                    {% if key == 'img_paid_id' %}
+                                    <div class="mb-3 p-2">
+                                        <label class="abrilfatface-font " for="updatepaidcover">Paid Bill</label>
+                                        <input
+                                            class="border form-control mx-auto w-auto bkground-color-box-white poppins-font primary-font"
+                                            name="inputimage" title="{{value}}" type="file">
+                                        </div>
+                                            <input name="actiononelement" type="hidden" value="updatepaidelement">
+                                            <input name="idupdatepaidelement" type="hidden" value="{{element['id']}}">
+                                        <!--update button-->
+                                        <div class="mb-3 p-2">
+                                        <input class="bkground-color-box-create btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
+                                        type="submit" value="Update">
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}     
+                                    
+                        </form>
+                    </div>
                 </div>
+                
                 <!--Edit, download, delete item buttons-->
                 <div class="mb-3 inline margin-left-3" align="left">
                     <!--Edit Toggle-->
                     <div class="mb-3">
                         <button id="edittoggle{{loop.index0}}"
-                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left " onclick="changeClass('elementstoshow{{loop.index0}}', 'editinfo{{loop.index0}}');" type="button">Edit +</button>
+                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left " onclick="changeClass('elementstoshow{{loop.index0}}', 'editinfo{{loop.index0}}'); changeClass('updatepaidbtn{{loop.index0}}', 'updatepaidbtn{{loop.index0}}');" type="button">Edit +</button>
                     </div>
-                    <!--Download element-->
+                    <!--Upload Cover_Paid toggle-->
+                    {% if nametable == 'bills' %}
+                    {% if element['img_paid_id'] == 0 %}
                     <div class="mb-3">
-                        <form action="/list?lists_id={{lists_id}}" method="post">
-                            <input name="actiononelement" type="hidden" value="downloadelement">
-                            <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
-                            <input class="bkground-color-box block btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
-                                type="submit" value="Download">
-                        </form>
+                        <button id="updatepaidbtn{{loop.index0}}" class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left display-none" onclick="changeClass('updatepaidinfo{{loop.index0}}', 'updatepaidinfo{{loop.index0}}');" type="button">Upload Paid Bill +</button>
                     </div>
+                    {% endif %}
+                    {% endif %}
                     <!--Delete element-->
                     <div class="mb-3">
                         <form action="/list?lists_id={{lists_id}}" method="post">
@@ -396,25 +528,39 @@
 <script>
     // change class to show input
     function changeClass(elem1, elem2) {
-        let shown = document.getElementById(String(elem2));
-        let hidden = document.getElementById(String(elem1));
-        if (shown.classList.contains('display-none')) {
-            shown.classList.remove('display-none')
-            shown.classList.add('inline')
-            hidden.classList.add('display-none')
-            hidden.classList.remove('inline')
+        if (elem1 != elem2){
+            let shown = document.getElementById(String(elem2));
+            let hidden = document.getElementById(String(elem1));
+            if (shown.classList.contains('display-none')) {
+                shown.classList.remove('display-none')
+                shown.classList.add('inline')
+                hidden.classList.add('display-none')
+                hidden.classList.remove('inline')
 
+            }
+            else {
+                shown.classList.add('display-none')
+                shown.classList.remove('inline')
+                hidden.classList.remove('display-none')
+                hidden.classList.add('inline')
+
+            }
         }
-        else {
-            shown.classList.add('display-none')
-            shown.classList.remove('inline')
-            hidden.classList.remove('display-none')
-            hidden.classList.add('inline')
+        else{
+            let shown = document.getElementById(String(elem1));
+            if (shown.classList.contains('display-none')) {
+                shown.classList.remove('display-none')
+                shown.classList.add('inline')
 
+            }
+            else {
+                shown.classList.add('display-none')
+                shown.classList.remove('inline')
+
+            }
         }
         return
     }
-
 
     // manage sort by select and grid-list-title buttons
     let listsid = document.getElementById('listsid')

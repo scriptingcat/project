@@ -143,6 +143,9 @@ button.bkground-color-box-create:hover{
 .height-width25{
     height: 60px;
 }
+.i-hover:hover{
+    color: #8fd694!important;
+}
 .inline{
     display: inline!important;
 }
@@ -233,6 +236,10 @@ button.bkground-color-box-create:hover{
 .primary-colors {
     color: #161b21!important;
     background-color: #77AD78!important;
+}
+.primary-colors-whitebkg{
+    color: #161b21!important;
+    background-color: #fff!important;
 }
 .primary-colors-checkbox{
     color: #161b21!important;
