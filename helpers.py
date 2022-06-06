@@ -113,6 +113,14 @@ listelements = [
             "note": "a brief text to assciate with the element",
         }, 
         {
+            "type": "shoppinglist",
+            "name": "name of product",
+            "quantity": "number of pieces per item needed",
+            "price": "price of the product",
+            "cover": "an image to associate with the bill",
+            "note": "a brief text to assciate with the element",
+        }, 
+        {
             "type": "bills",
             "name": "name of bill",
             "description" : "a brief text describing the element",
@@ -190,6 +198,13 @@ listelementstoedit= [
             "note": "a brief text to assciate with the element",
         },
         {
+            "type": "shoppinglist",
+            "name": "name of product",
+            "quantity": "number of pieces per item needed",
+            "price": "price of the product",
+            "note": "a brief text to assciate with the element",
+        }, 
+        {
             "type": "bills",
             "name": "name of bill",
             "description" : "a brief text describing the element",
@@ -208,6 +223,7 @@ sorttypes = {
     'shopping': ['name', 'brand', 'most recent', 'least recent', 'price','status'],
     'closet' : ['name', 'brand', 'most recent', 'least recent', 'price', 'tag', 'type_of_item','datetime_of_buying'],
     'storage' : ['name', 'brand', 'most recent', 'least recent', 'tag', 'type_of_item','quantity'],
+    'shoppinglist': ['name', 'quantity', 'most recent', 'least recent', 'price'],
     'bills' : ['name', 'most recent', 'least recent', 'cost','expiration_date', 'status']
     }
 
@@ -253,6 +269,12 @@ gridelements = [
             "tag": "a particular tag you want to label the item as",
         },
         {
+            "type": "shoppinglist",
+            "name": "name of item",
+            "quantity": "number of pieces per item needed",
+            "price": "price of the product",
+        },
+        {
             "type": "bills",
             "name": "name of bill",
             "expiration_date": "expiring date of the bill",
@@ -295,6 +317,11 @@ titleelements = [
             "type": "storage",
             "name": "name of item",
             "quantity": "number of pieces per item in your storage",
+        },
+        {
+            "type": "shoppinglist",
+            "name": "name of item",
+            "quantity": "number of pieces per item needed",
         },
         {
             "type": "bills",
@@ -546,6 +573,16 @@ def add_element(nametable,dictofelements, namelist, lists_id, user_id):
         nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
         db.execute("COMMIT")
         return nametable_id
+    elif nametable == 'shoppinglist':
+        db.execute("BEGIN TRANSACTION")
+        # insert the element data
+        # 0 value is value for null since db column only takes integers
+        # img_id is always 0, it is updated after the image has been stored in imgs db
+        db.execute("INSERT INTO shoppinglist (namelist,lists_id,user_id,name,quantity, price,img_id,note) VALUES (?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['name'],dictofelements['quantity'],dictofelements['price'], 0, dictofelements['note'])
+        rows = db.execute("SELECT * FROM shoppinglist WHERE namelist=? AND lists_id=? AND user_id=? AND name=?", namelist, lists_id, user_id, dictofelements['name'])
+        nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
+        db.execute("COMMIT")
+        return nametable_id
     else:
         return
 
@@ -573,8 +610,11 @@ def addpaidimage(img, mimetype, nametable, nametable_id, lists_id):
     # insert the img in imgs db 
     db.execute("INSERT INTO imgs (img, name, mimetype, nametable, nametable_id, lists_id) VALUES (?,?,?,?, ?,?)", img, 'img_paid', mimetype, nametable, nametable_id, lists_id)
     # update img_id in the nametable
+    # paid img in bills always have 'img_paid' as img['name']
     img_id = db.execute("SELECT * FROM imgs WHERE nametable_id=? AND nametable=? AND lists_id=? and name=?", nametable_id, 'bills', lists_id, 'img_paid')
     img_paid_id = img_id[0]['id']
+    # update paid img id in bills table 
+
     db.execute("UPDATE bills SET img_paid_id=? WHERE id=?",img_paid_id, nametable_id)
     return
 
@@ -594,3 +634,5 @@ def addpaidimage(img, mimetype, nametable, nametable_id, lists_id):
 #CREATE TABLE storage (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, brand TEXT, tag TEXT, type_of_item TEXT, quantity INTEGER, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
 #CREATE TABLE bills (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, description TEXT, expiration_date datetime, cost FLOAT, img_id INTEGER, status CHECK(status in ('to pay', 'paid')), img_paid_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+
+#CREATE TABLE shoppinglist (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, quantity INTEGER, price FLOAT, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));

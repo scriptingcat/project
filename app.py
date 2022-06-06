@@ -670,23 +670,17 @@ def showlist():
             print('updatepaidelement')
             id = request.form.get('idupdatepaidelement')
             print(id)
-            # namefile = 'updatepaidcover' + str(id)
             imagepaid = request.files['inputimage']
-            print(imagepaid)
             if nametable != 'bills':
                 apologymsg = 'Action not allowed on this list'
                 return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-            print('ok nametable')
             if len(id) <= 0:
                 apologymsg = 'Id required'
                 return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-            print('ok id')
 
             if len(imagepaid.filename) <= 0:
                 apologymsg = 'A new image must be provided'
                 return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-
-            print('ok imgpaid')
 
             db.execute("BEGIN TRANSACTION")
             # take all the info from filestorage obj
@@ -740,7 +734,7 @@ def image():
     nametable = request.args.get('nametable')
     name = request.args.get('imgname')
     try:
-        # hande input
+        # handle input
         if not nametable_id or not nametable or not name:
             apologymsg = "Something went wrong. Access to element Denied"
             return redirect("/mylists" + "?message=" + apologymsg)
@@ -800,7 +794,9 @@ def elements():
         # select all the element contained in that list
         elements = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=?", nametable, int(lists_id), session['user_id'])
         images = db.execute("SELECT * FROM imgs WHERE lists_id=?", int(lists_id))
+        
     else:
+        # show the lists of session['user_id'] in mylists when sortby
         lists = db.execute("SELECT * FROM lists WHERE user_id=?", session['user_id'])
         nametable = 'lists'
         elements = lists
@@ -850,6 +846,11 @@ def elements():
                 style = 'table'
             elif styleview == 'title':
                 style = 'title'
+            elif styleview == 'shopping list':
+                if nametable != 'shoppinglist':
+                    apologymsg = "This view is not allowed on this kind of list"
+                    return render_template("elements.html", apologymsg=apologymsg)
+                style = 'shopping list'
             else:
                 style ='grid'
             # always check user's requesting is owner of list

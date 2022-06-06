@@ -232,6 +232,14 @@
                         type="button" value="grid"><i class=" bi bi-grid"></i>
                     </button>
                 </div>
+                {% if nametable == 'shoppinglist' %}
+                <div class="btn-group p-2 inline">
+                    <button id="viewstyleshoppinglist" name="viewstyle"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
+                        type="button" value="shopping list"><i class="bi bi-basket-fill"></i>
+                    </button>
+                </div>
+                {% endif %}
             </div>
         </div>
         <!-- showelementinfo elements-->
@@ -486,6 +494,8 @@
         <div class="">
             <div id="elementviewstylegrid"  class="container-xxl d-flex align-items-start flex-wrap mx-auto">
             </div>
+            <div id="elementviewstyleshoppinglist"  class="container-xxl align-items-start mx-auto">
+            </div>
             <div id="elementviewstyletitle"  class="container-xxl d-flex align-items-start flex-wrap mx-auto">
             </div>
             <div id="table" align="center" class= width80"></div>
@@ -568,6 +578,7 @@
     let viewstyletable = document.getElementById('viewstyletable')
     let viewstylegrid = document.getElementById('viewstylegrid')
     let viewstyletitle = document.getElementById('viewstyletitle')
+    let viewstyleshoppinglist = document.getElementById('viewstyleshoppinglist')
 
     let currentstyleview = 'title'
     let currentsortby = sortselect.input
@@ -580,16 +591,25 @@
             document.getElementById('table').innerHTML = elements;
             document.getElementById('elementviewstylegrid').innerHTML = null;
             document.getElementById('elementviewstyletitle').innerHTML = null;
+            document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         }
         else if (currentstyleview == 'title') {
             document.getElementById('table').innerHTML = null;
             document.getElementById('elementviewstylegrid').innerHTML = null;
             document.getElementById('elementviewstyletitle').innerHTML = elements;
+            document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+        }
+        else if (currentstyleview == 'shopping list') {
+            document.getElementById('table').innerHTML = null;
+            document.getElementById('elementviewstylegrid').innerHTML = null;
+            document.getElementById('elementviewstyletitle').innerHTML = null;
+            document.getElementById('elementviewstyleshoppinglist').innerHTML = elements;
         }
         else {
             document.getElementById('table').innerHTML = null;
             document.getElementById('elementviewstylegrid').innerHTML = elements;
             document.getElementById('elementviewstyletitle').innerHTML = null;
+            document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         }
         currentsortby = sortselect.value
     }
@@ -602,6 +622,7 @@
         document.getElementById('elementsdefault').innerHTML = null;
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = null;
+        document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         currentstyleview = 'table'
     })
     viewstylegrid.addEventListener('click', async function () {
@@ -611,6 +632,7 @@
         document.getElementById('elementsdefault').innerHTML = elements;
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = null;
+        document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         currentstyleview = 'grid'
     })
     viewstyletitle.addEventListener('click', async function () {
@@ -620,7 +642,18 @@
         document.getElementById('elementsdefault').innerHTML = null;
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = elements;
+        document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         currentstyleview = 'title'
+    })
+    viewstyleshoppinglist.addEventListener('click', async function () {
+        let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'shopping list' + '&sortby=' + currentsortby);
+        let elements = await response.text();
+        document.getElementById('table').innerHTML = null;
+        document.getElementById('elementsdefault').innerHTML = null;
+        document.getElementById('elementviewstylegrid').innerHTML = null;
+        document.getElementById('elementviewstyletitle').innerHTML = null;
+        document.getElementById('elementviewstyleshoppinglist').innerHTML = elements;
+        currentstyleview = 'shopping list'
     })
 
 </script>

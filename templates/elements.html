@@ -13,7 +13,11 @@
             {% endfor %}
             {% endif %}
             {% endfor %}
+            {% if nametable == 'lists' %}
+            {% else %}
             <th class="">More Info</th>
+            {% endif %}
+
         </tr>
     </thead>
     <tbody align="center">
@@ -33,11 +37,25 @@
             {% endif %}
             {% endfor %}
             {% endfor %}
+            {% if nametable == 'lists' %}
+            <td class="padding-left-5">
+                <form action="/list?{{element['id']}}" method="get">
+                    <input name="lists_id" type="hidden" value="{{element['id']}}">
+                    <input name="lists_id" type="hidden" value="{{element['namelist']}}">
+                    <button
+                    class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
+                    value="{{element['namelist']}}"" type="submit"
+                    >Go</button>
+                </form>
+            </td>
+            {% else %}
+
             <td class="padding-left-5"><button
                     class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
                     type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}"
                     aria-expanded="false" aria-controls="showelementinfo{{element['id']}}" type="submit"
                     value=""></button></td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>
@@ -103,6 +121,93 @@
 </div>
 {% endfor %}
 
+{% elif style == 'shopping list' %}
+{% if nametable != 'lists'%}
+<!--viewstyle shoppinglist-->
+<div class="mb-3 p-2 poppins-font primary-font">
+    Shopping List
+</div>
+{% for element in elements %}
+<div class="mb-3 p-2 d-flex flex-row flex-wrap">
+    <!-- checkbox-->
+    <div><input type="checkbox"></div>
+    <!--image-->
+    {% if element['img_id'] != 0 %}
+        {% for image in images%}
+            {% if element['img_id'] == image['id'] %}
+            <div>
+                <img class="objective-fit-cover" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <div class="width-image-grid"><i class="objective-fit-cover bi bi-slash-circle"></i>No image for this element</div>
+    {% endif %}
+    <!-- name + note-->
+    <div>
+        <div class="mb-3 margin-left-8 text-align-left w-auto">
+            <label class="abrilfatface-font">Name</label>
+            {% if element['name'] == '' or element['name'] == 'null' %}
+            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+            -
+            </h3>
+            {% else %}
+            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+            {{element['name']}}
+            </h3>
+            {% endif %}
+        </div>
+        <div class="mb-3 margin-left-8 text-align-left w-auto">
+            <label class="abrilfatface-font">Note</label>
+            {% if element['note'] == '' or element['note'] == 'null' %}
+            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+            -
+            </h3>
+            {% else %}
+            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+            {{element['note']}}
+            </h3>
+            {% endif %}
+        </div>
+    </div>
+    <!-- quantity + price -->
+    <div>
+        <div class="mb-3 margin-left-8 text-align-left w-auto d-flex flex-row">
+            <div>
+            <label class="abrilfatface-font">Qnty</label>
+            {% if element['quantity'] == '' or element['quantity'] == 'null' %}
+            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+            -
+            </h3>
+            {% else %}
+            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+            {{element['quantity']}}
+            </h3>
+            {% endif %}
+            </div>
+            <div>
+                <div><i class="bi bi-plus-square"></i></div>
+                <div><i class="bi bi-dash-square"></i></div>
+            </div>
+        </div>
+        <div class="mb-3 margin-left-8 text-align-left w-auto">
+            <label class="abrilfatface-font">Price</label>
+            {% if element['price'] == '' or element['price'] == 'null' %}
+            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+            -
+            </h3>
+            {% else %}
+            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+            {{element['price']}}
+            </h3>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endfor %}
+{% endif %}
+
 
 {% else %}
 <!--viewstyle grid (image only)-->
@@ -111,16 +216,39 @@
     <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto" type="button"
         data-bs-toggle="collapse" data-bs-target="#showelementinfo{{element['id']}}" aria-expanded="false"
         aria-controls="showelementinfo{{element['id']}}" type="submit" value="">
-        {% if element['img_id'] != 0 %}
-        {% for image in images%}
-        {% if image['nametable_id'] == element['id'] %}
-        <img class="objective-fit-cover" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
+        <div class="d-flex flex-wrap">
+        {% if nametable != 'bills' %}
+            {% if element['img_id'] != 0 %}
+                {% for image in images%}
+                    {% if element['img_id'] == image['id'] %}
+                    <img class="objective-fit-cover" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                   <div class="width-image-grid"><i class="objective-fit-cover bi bi-slash-circle"></i>No image for this element</div>
+            {% endif %}
         {% endif %}
-        {% endfor %}
-        {% else %}
-        <div class="width-image-grid"><i class="objective-fit-cover bi bi-slash-circle"></i>
-            No image for this element</div>
+
+        {% if nametable == 'bills' %}
+            {% if element['img_id'] != 0 %}
+                {% for image in images%}
+                    {% if element['img_id'] == image['id'] %}
+                         <img class="objective-fit-cover" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if element['img_paid_id'] != 0 %}
+                {% for image in images%}
+                    {% if element['img_paid_id'] == image['id'] %}
+                    <img class="objective-fit-cover" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if element['img_id'] == 0 and element['img_paid_id'] == 0 %}
+                <div class="width-image-grid"><i class="objective-fit-cover bi bi-slash-circle"></i>No image for this element</div>
+            {% endif %}
         {% endif %}
+        </div>
     </button>
 </div>
 {% endfor %}
