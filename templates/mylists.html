@@ -105,10 +105,7 @@ My Lists
                         class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
                         type="button" value="title"><i class="bi bi-grip-horizontal"></i>
                     </button>
-                    <button id="viewstylegrid" name="viewstyle"
-                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" disabled
-                        type="button" value="grid"><i class=" bi bi-grid"></i>
-                    </button>
+                    
                 </div>
             </div>
         </div>
@@ -139,7 +136,6 @@ My Lists
         let listsid = document.getElementById('listsid')
         let sortselect = document.getElementById('sortselect')
         let viewstyletable = document.getElementById('viewstyletable')
-        let viewstylegrid = document.getElementById('viewstylegrid')
         let viewstyletitle = document.getElementById('viewstyletitle')
     
         let currentstyleview = 'title'
@@ -151,18 +147,11 @@ My Lists
             document.getElementById('elementsdefault').innerHTML = null;
             if (currentstyleview == 'table') {
                 document.getElementById('table').innerHTML = elements;
-                document.getElementById('elementviewstylegrid').innerHTML = null;
                 document.getElementById('elementviewstyletitle').innerHTML = null;
             }
             else if (currentstyleview == 'title') {
                 document.getElementById('table').innerHTML = null;
-                document.getElementById('elementviewstylegrid').innerHTML = null;
                 document.getElementById('elementviewstyletitle').innerHTML = elements;
-            }
-            else {
-                document.getElementById('table').innerHTML = null;
-                document.getElementById('elementviewstylegrid').innerHTML = elements;
-                document.getElementById('elementviewstyletitle').innerHTML = null;
             }
             currentsortby = sortselect.value
         }
@@ -173,25 +162,15 @@ My Lists
             let elements = await response.text();
             document.getElementById('table').innerHTML = elements;
             document.getElementById('elementsdefault').innerHTML = null;
-            document.getElementById('elementviewstylegrid').innerHTML = null;
             document.getElementById('elementviewstyletitle').innerHTML = null;
             currentstyleview = 'table'
         })
-        viewstylegrid.addEventListener('click', async function () {
-            let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'grid' + '&sortby=' + currentsortby);
-            let elements = await response.text();
-            document.getElementById('table').innerHTML = null;
-            document.getElementById('elementsdefault').innerHTML = elements;
-            document.getElementById('elementviewstylegrid').innerHTML = null;
-            document.getElementById('elementviewstyletitle').innerHTML = null;
-            currentstyleview = 'grid'
-        })
+        
         viewstyletitle.addEventListener('click', async function () {
             let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'title' + '&sortby=' + currentsortby);
             let elements = await response.text();
             document.getElementById('table').innerHTML = null;
             document.getElementById('elementsdefault').innerHTML = null;
-            document.getElementById('elementviewstylegrid').innerHTML = null;
             document.getElementById('elementviewstyletitle').innerHTML = elements;
             currentstyleview = 'title'
         })

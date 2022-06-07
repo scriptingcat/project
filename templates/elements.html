@@ -124,83 +124,97 @@
 {% elif style == 'shopping list' %}
 {% if nametable != 'lists'%}
 <!--viewstyle shoppinglist-->
-<div class="mb-3 p-2 poppins-font primary-font">
-    Shopping List
+<div class=" p-2 poppins-font primary-font primary-colors border width60">
+    This is your shopping list: {{namelist}}
 </div>
 {% for element in elements %}
-<div class="mb-3 p-2 d-flex flex-row flex-wrap">
-    <!-- checkbox-->
-    <div><input type="checkbox"></div>
-    <!--image-->
-    {% if element['img_id'] != 0 %}
-        {% for image in images%}
-            {% if element['img_id'] == image['id'] %}
-            <div>
-                <img class="objective-fit-cover" src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
-            </div>
-            {% endif %}
-        {% endfor %}
-    {% else %}
-        <div class="width-image-grid"><i class="objective-fit-cover bi bi-slash-circle"></i>No image for this element</div>
-    {% endif %}
-    <!-- name + note-->
-    <div>
-        <div class="mb-3 margin-left-8 text-align-left w-auto">
-            <label class="abrilfatface-font">Name</label>
-            {% if element['name'] == '' or element['name'] == 'null' %}
-            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-            -
-            </h3>
-            {% else %}
-            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-            {{element['name']}}
-            </h3>
-            {% endif %}
-        </div>
-        <div class="mb-3 margin-left-8 text-align-left w-auto">
-            <label class="abrilfatface-font">Note</label>
-            {% if element['note'] == '' or element['note'] == 'null' %}
-            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-            -
-            </h3>
-            {% else %}
-            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-            {{element['note']}}
-            </h3>
-            {% endif %}
-        </div>
+<div class="border d-flex flex-row flex-wrap mb-2 mt-2 py-2 width60 ">
+    <!-- actions buttons-->
+    <div class="w-auto margin-left-3 align-self-center">
+        <div class="w-auto "><i class="primary-font-hover font-size1 bi bi-trash3"></i></div>
+        <div class="w-auto "><i class="primary-font-hover font-size1 bi bi-bag-check-fill"></i></div>
     </div>
-    <!-- quantity + price -->
-    <div>
-        <div class="mb-3 margin-left-8 text-align-left w-auto d-flex flex-row">
-            <div>
-            <label class="abrilfatface-font">Qnty</label>
-            {% if element['quantity'] == '' or element['quantity'] == 'null' %}
-            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-            -
-            </h3>
-            {% else %}
-            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-            {{element['quantity']}}
-            </h3>
-            {% endif %}
+    <!--image-->
+    <div class="border objective-fit-cover-sl margin-left-3 align-self-center">
+        {% if element['img_id'] != 0 %}
+            {% for image in images%}
+                {% if element['img_id'] == image['id'] %}
+                <img class="objective-fit-cover-sl " src="data:{{image['mimetype']}};base64,{{image['imagedata']}}" alt="">
+                {% endif %}
+            {% endfor %}
+        {% else %}
+        <i class="objective-fit-cover-sl bi bi-slash-circle"></i>No image for this element
+        {% endif %}
+    </div>
+    <!-- name + quantity + note + price-->
+    <div class="width70 ">
+        <!-- name + quantity-->
+        <div align="left" class="d-flex w-auto align-self-stretch">
+            <!--name-->
+            <div class="w-auto margin-left-8">
+                <div class="w-auto"><label class="abrilfatface-font">Name</label></div>
+                <div class="w-auto">
+                    {% if element['name'] == '' or element['name'] == 'null' %}
+                        <h3 class="w-auto border form-control mx-auto bkground-color-box-white poppins-font primary-font">-</h3>
+                    {% else %}
+                        <h3 class="w-auto border form-control mx-auto bkground-color-box-white poppins-font primary-font">{{element['name']}}</h3>
+                    {% endif %}
+                </div>
             </div>
-            <div>
-                <div><i class="bi bi-plus-square"></i></div>
-                <div><i class="bi bi-dash-square"></i></div>
+            <!--quantity-->
+            <div class="w-auto margin-left-8">
+                <div class="w-auto">
+                    <label class="abrilfatface-font block">Qnty</label>
+                </div>
+                <div class="d-flex flex-row w-auto">
+                    <div class="w-auto">
+                        <h3 class="w-auto border form-control bkground-color-box-white poppins-font primary-font margin0">
+                        {% if element['quantity'] == '' or element['quantity'] == 'null' %}
+                            -
+                        {% else %}
+                        {{element['quantity']}}
+                        {% endif %}
+                        </h3>
+                    </div>
+                    <div class="w-auto fontsize85pc margin-left-15">
+                        <div class="w-auto"><i class="primary-font-hover  bi bi-plus-square"></i></div>
+                        <div class="w-auto"><i class="primary-font-hover  bi bi-dash-square"></i></div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="mb-3 margin-left-8 text-align-left w-auto">
-            <label class="abrilfatface-font">Price</label>
-            {% if element['price'] == '' or element['price'] == 'null' %}
-            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-            -
-            </h3>
-            {% else %}
-            <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
-            {{element['price']}}
-            </h3>
-            {% endif %}
+        <!-- note + price -->
+        <div align="left" class="d-flex w-auto">
+            <!--note-->
+            <div class="w-auto margin-left-8">
+                <div class="w-auto">
+                    <label class="abrilfatface-font block">Note</label>
+                </div>
+                <div class="w-auto">
+                        <h3 class="w-auto border form-control bkground-color-box-white poppins-font primary-font margin0">
+                        {% if element['note'] == '' or element['note'] == 'null' %}
+                            -
+                        {% else %}
+                        {{element['note']}}
+                        {% endif %}
+                        </h3>
+                </div>
+            </div>
+            <!--price-->
+            <div class="w-auto margin-left-8">
+                <div class="w-auto">
+                    <label class="abrilfatface-font block">Price</label>
+                </div>
+                <div class="w-auto">
+                    <h3 class="w-auto border form-control bkground-color-box-white poppins-font primary-font margin0">
+                        {% if element['price'] == '' or element['price'] == 'null' %}
+                            -
+                        {% else %}
+                        {{element['price']}}
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -210,6 +224,7 @@
 
 
 {% else %}
+{% if nametable != 'lists'%}
 <!--viewstyle grid (image only)-->
 {% for element in elements %}
 <div class="mb-3 p-2">
@@ -252,6 +267,7 @@
     </button>
 </div>
 {% endfor %}
+{% endif %}
 {% endif %}
 {% endif %}
 {% if apologymsg %}

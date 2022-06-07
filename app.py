@@ -799,6 +799,7 @@ def elements():
         # show the lists of session['user_id'] in mylists when sortby
         lists = db.execute("SELECT * FROM lists WHERE user_id=?", session['user_id'])
         nametable = 'lists'
+        namelist = 'lists'
         elements = lists
 
     try:
@@ -860,9 +861,9 @@ def elements():
                     # decode dataimage from bytes to ascii to be rendered
                     for image in images:
                         image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
-                return render_template("elements.html", elements=elements, style=style, images=images, listelements=listelements, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+                return render_template("elements.html", elements=elements, style=style, images=images, listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
             else:
-                return render_template("elements.html", elements=elements, style=style, images='null', listelements=listelements, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+                return render_template("elements.html", elements=elements, style=style, images='null', listelements=listelements, namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
     except:
         return render_template("elements.html", apologymsg="Something went wrong")
 
