@@ -180,7 +180,7 @@
                 <div class="d-flex flex-row w-auto">
                     <div class="w-auto">
                         <input id="actiononelement{{loop.index0}}" name="actiononelement" type="hidden" value="updateqnty">
-                        <h3 id="quantity{{loop.index0}}" class="w-auto border form-control bkground-color-box-white poppins-font primary-font margin0" onchange="updatetable('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}' );" > 
+                        <h3 id="quantity{{loop.index0}}" class="w-auto border form-control bkground-color-box-white poppins-font primary-font margin0" > 
                         {%if element['quantity'] == '' or element['quantity'] == 'null' %}
                         -
                         {% else %}
@@ -193,28 +193,13 @@
                         <div class="w-auto position-relativei top--95">
                             <input id="lists_id{{loop.index0}}" type="hidden" value="{{lists_id}}">
                             <input id="id{{loop.index0}}" type="hidden" value="{{element['id']}}">
-                            <button id="increase{{loop.index0}}" class="noborder bkground-color-box-none" onclick="increaseqnty('quantity{{loop.index0}}');" type="button">
+                            <button id="increase{{loop.index0}}" class="noborder bkground-color-box-none" onclick="increaseqnty('quantity{{loop.index0}}'); updatetable('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}', 'add' );" " type="button">
                                 <i class="primary-font-hover  bi bi-plus-square"></i>
                             </button>
 
-                            <button id="decrease{{loop.index0}}" class="noborder bkground-color-box-none " onclick="decreaseqnty('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}' );" type="button">
+                            <button id="decrease{{loop.index0}}" class="noborder bkground-color-box-none " onclick="decreaseqnty('quantity{{loop.index0}}'); updatetable('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}', 'remove' );" type="button">
                                 <i class="primary-font-hover  bi bi-dash-square"></i>
                             </button>
-
-                            <script>
-                                
-                                /*function updatetable(qnty, listsid, id){
-                                    let lists_id = document.getElementById(String(listsid))
-                                    let el_id = document.getElementById(String(id))
-                                    let quantity = document.getElementById(String(qnty))
-                                    quantity.addEventListener('change', async function () {
-                                        let response = await fetch('/list?lists_id=' + lists_id.value + '&id=' + el_id.value + '&quantity=' + quantity.value);
-                                        let entry = await response.text();
-                                        quantity.innerHTML = entry;
-                                        return;
-                                    });
-                                }*/
-                            </script>
                         </div>
                     </div>
                 </div>

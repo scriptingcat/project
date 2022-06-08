@@ -727,7 +727,6 @@ def showlist():
 
             if actiononelement == 'updateqnty':
                 id = request.args.get('id')
-                print(id)
                 quantity = request.args.get('quantity')
                 type = request.args.get('type')
                 updatequantity(quantity, type, id)

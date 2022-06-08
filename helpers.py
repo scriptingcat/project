@@ -620,11 +620,11 @@ def addpaidimage(img, mimetype, nametable, nametable_id, lists_id):
 
 # func to update quantity in shopping list view
 def updatequantity(qnty, type, id):
+    x = db.execute("SELECT quantity FROM shoppinglist WHERE id=?", int(id))
     if type == 'add':
-        quantity = int(qnty)
+        db.execute("UPDATE shoppinglist SET quantity=? WHERE id=?", x[0]['quantity']+1, int(id))
     if type == 'remove':
-        quantity = int(qnty) * (-1)
-    db.execute("UPDATE shoppinglist SET quantity=? WHERE id=?", quantity, int(id))
+        db.execute("UPDATE shoppinglist SET quantity=? WHERE id=?", x[0]['quantity']-1, int(id))
     return
 
    

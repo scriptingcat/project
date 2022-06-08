@@ -668,7 +668,7 @@
     }
 
     // func to decrease value
-    function decreaseqnty(elementtochange,listsid,id){
+    function decreaseqnty(elementtochange){
         // value
         var val = document.getElementById(String(elementtochange)).innerText
         // handle value
@@ -683,40 +683,16 @@
             var newval = val - 1 ;
         }
         document.getElementById(String(elementtochange)).innerText = newval;
-        let lists_id = document.getElementById(String(listsid))
-        console.log(lists_id.value)
-        let el_id = document.getElementById(String(id))
-        console.log(el_id.value)
-
-        let quantity = document.getElementById(String(elementtochange))
-        console.log(quantity)
-        console.log(quantity.innerText)
     }
-    
-        async function updatetable(elementtochange,listsid,id) {
-            let lists_id = document.getElementById(String(listsid))
-        console.log(lists_id.value)
+
+    // func to update async the quantity
+    async function updatetable(elementtochange,listsid,id, type) {
+        let lists_id = document.getElementById(String(listsid))
         let el_id = document.getElementById(String(id))
-        console.log(el_id.value)
-
         let quantity = document.getElementById(String(elementtochange))
-        console.log(quantity)
-        console.log(quantity.innerText)
-
-            let response = await fetch('/list?lists_id=' + lists_id.value + '&id=' + el_id.value + '&quantity=' + quantity.innerText + '&actiononelement=' + 'updateqnty' + '&type=' + 'remove');
-            let ti = '/list?lists_id=' + String(lists_id.value) + '&id=' + String(el_id.value) + '&quantity=' + String(quantity.innerText) + '&actiononelement=updateqnty&type=remove';
-            var tu = 'ciao'
-            console.log(tu)
-            console.log(ti)
-            console.log(quantity)
-
-            let entry = await response.text();
-            console.log(entry)
-
-            quantity.innerText = entry;
-
-            return;
-        };
+        let response = await fetch('/list?lists_id=' + lists_id.value + '&id=' + el_id.value + '&quantity=' + quantity.innerText + '&actiononelement=' + 'updateqnty' + '&type=' + type);
+        return;
+    };
         
     
     // func to increase value
