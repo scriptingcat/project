@@ -1,7 +1,12 @@
-<ul class="bold bkground-color-box primary-font style-li ">
+<ul class="bold primary-font style-li ">
     {% if entry %}
     {% for element in entry %}
-    <li class="margin-left-8">{{element['title']}}</li>
+    {% if element['title'] %}
+        <li class="bkground-color-box margin-left-8">{{element['title']}}</li>
+    {% endif %}
+    {% if element['name'] %}
+        <li class="bkground-color-box margin-left-8">{{element['name']}}</li>
+    {% endif %}
     {% endfor %}
     {% endif %}
     {% if apologymsg %}

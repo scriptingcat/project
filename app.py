@@ -11,7 +11,8 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage, updatequantity
+
 from email_validator import validate_email
 
 from io import BytesIO
@@ -712,6 +713,7 @@ def showlist():
         # GET METHOD
         # check lists_id user matches session's user_id
         # prevent from showing other users' lists by manipulating html code
+        
         user_id = lists[0]['user_id']
         if session['user_id'] == user_id:
             apologymsg = request.args.get('apologymsg')
@@ -719,6 +721,20 @@ def showlist():
                 image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
             if apologymsg:
                 return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, apologymsg=apologymsg)
+            
+            
+            actiononelement = request.args.get('actiononelement')
+
+            if actiononelement == 'updateqnty':
+                id = request.args.get('id')
+                print(id)
+                quantity = request.args.get('quantity')
+                type = request.args.get('type')
+                updatequantity(quantity, type, id)
+                newquantity = db.execute("SELECT quantity FROM shoppinglist WHERE id=?", int(id))
+                entry = newquantity[0]['quantity']
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry)
+                
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images)
         else:
             apologymsg = "Something went wrong. Access to list Denied"
@@ -771,7 +787,18 @@ def search():
     list_types = db.execute("SELECT * FROM list_types WHERE id=?", lists[0]['list_type_id'])
     nametable = list_types[0]['nametable']
 
-    entry = db.execute('SELECT * FROM ? WHERE title LIKE ? AND user_id=?', nametable, '%'+ query + '%', session['user_id'])
+    # select name or title according to type of nametable
+    for elemnt in listelements:
+        if elemnt['type'] == nametable:
+            try:
+                if elemnt['title']:
+                    nameof = 'title'
+            except:
+                nameof = 'name'
+            break
+
+
+    entry = db.execute('SELECT * FROM ? WHERE ' + nameof + ' LIKE ? AND user_id=?', nametable, '%'+ query + '%', session['user_id'])
     if len(entry)>0:
         return render_template("search.html", entry=entry)
     else:
@@ -861,9 +888,9 @@ def elements():
                     # decode dataimage from bytes to ascii to be rendered
                     for image in images:
                         image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
-                return render_template("elements.html", elements=elements, style=style, images=images, listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+                return render_template("elements.html", elements=elements, style=style, images=images, lists_id=int(lists_id),listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
             else:
-                return render_template("elements.html", elements=elements, style=style, images='null', listelements=listelements, namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+                return render_template("elements.html", elements=elements, style=style, images='null', lists_id=int(lists_id), listelements=listelements, namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
     except:
         return render_template("elements.html", apologymsg="Something went wrong")
 

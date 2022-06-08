@@ -44,7 +44,7 @@
                     <input name="lists_id" type="hidden" value="{{element['namelist']}}">
                     <button
                     class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
-                    value="{{element['namelist']}}"" type="submit"
+                    value="{{element['namelist']}}" type="submit"
                     >Go</button>
                 </form>
             </td>
@@ -128,11 +128,22 @@
     This is your shopping list: {{namelist}}
 </div>
 {% for element in elements %}
-<div class="border d-flex flex-row flex-wrap mb-2 mt-2 py-2 width60 ">
+<div class="border d-flex flex-row flex-wrap mb-2 mt-2 py-2 width60 position-relative">
     <!-- actions buttons-->
-    <div class="w-auto margin-left-3 align-self-center">
-        <div class="w-auto "><i class="primary-font-hover font-size1 bi bi-trash3"></i></div>
-        <div class="w-auto "><i class="primary-font-hover font-size1 bi bi-bag-check-fill"></i></div>
+    <div class="w-auto margin-left-3 align-self-center z-i-30">
+        
+        <div class="w-auto ">
+            <form action="/list?lists_id={{lists_id}}" method="post">
+                <input name="actiononelement" type="hidden" value="deleteelement">
+                <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
+                <button class="noborder bkground-color-box-none" type="submit"><i class="primary-font-delete-hover bkground-color-box-none font-size1 bi bi-trash3"></i></button>
+            </form>
+        </div>
+        <div class="w-auto">
+            <button class="noborder bkground-color-box-none" onclick="displaynone('overcolor{{loop.index0}}');" type="button">
+                <i class="primary-font-hover font-size1 bi bi-bag-check-fill"></i>
+            </button>
+        </div>
     </div>
     <!--image-->
     <div class="border objective-fit-cover-sl margin-left-3 align-self-center">
@@ -147,7 +158,7 @@
         {% endif %}
     </div>
     <!-- name + quantity + note + price-->
-    <div class="width70 ">
+    <div class="width65">
         <!-- name + quantity-->
         <div align="left" class="d-flex w-auto align-self-stretch">
             <!--name-->
@@ -168,17 +179,43 @@
                 </div>
                 <div class="d-flex flex-row w-auto">
                     <div class="w-auto">
-                        <h3 class="w-auto border form-control bkground-color-box-white poppins-font primary-font margin0">
-                        {% if element['quantity'] == '' or element['quantity'] == 'null' %}
-                            -
+                        <input id="actiononelement{{loop.index0}}" name="actiononelement" type="hidden" value="updateqnty">
+                        <h3 id="quantity{{loop.index0}}" class="w-auto border form-control bkground-color-box-white poppins-font primary-font margin0" onchange="updatetable('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}' );" > 
+                        {%if element['quantity'] == '' or element['quantity'] == 'null' %}
+                        -
                         {% else %}
                         {{element['quantity']}}
                         {% endif %}
                         </h3>
+                        
                     </div>
-                    <div class="w-auto fontsize85pc margin-left-15">
-                        <div class="w-auto"><i class="primary-font-hover  bi bi-plus-square"></i></div>
-                        <div class="w-auto"><i class="primary-font-hover  bi bi-dash-square"></i></div>
+                    <div class="w-auto fontsize85pc margin-left-8 align-self-top ">
+                        <div class="w-auto position-relativei top--95">
+                            <input id="lists_id{{loop.index0}}" type="hidden" value="{{lists_id}}">
+                            <input id="id{{loop.index0}}" type="hidden" value="{{element['id']}}">
+                            <button id="increase{{loop.index0}}" class="noborder bkground-color-box-none" onclick="increaseqnty('quantity{{loop.index0}}');" type="button">
+                                <i class="primary-font-hover  bi bi-plus-square"></i>
+                            </button>
+
+                            <button id="decrease{{loop.index0}}" class="noborder bkground-color-box-none " onclick="decreaseqnty('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}' );" type="button">
+                                <i class="primary-font-hover  bi bi-dash-square"></i>
+                            </button>
+
+                            <script>
+                                
+                                /*function updatetable(qnty, listsid, id){
+                                    let lists_id = document.getElementById(String(listsid))
+                                    let el_id = document.getElementById(String(id))
+                                    let quantity = document.getElementById(String(qnty))
+                                    quantity.addEventListener('change', async function () {
+                                        let response = await fetch('/list?lists_id=' + lists_id.value + '&id=' + el_id.value + '&quantity=' + quantity.value);
+                                        let entry = await response.text();
+                                        quantity.innerHTML = entry;
+                                        return;
+                                    });
+                                }*/
+                            </script>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -217,9 +254,16 @@
             </div>
         </div>
     </div>
+    <!--overcolor-->
+    <div id="overcolor{{loop.index0}}" class="position-absolute width100 height100 bkground-color-box-grey top--05 display-none">
+
+    </div>
 
 </div>
 {% endfor %}
+<script>
+    
+</script>
 {% endif %}
 
 
@@ -277,3 +321,6 @@
     </div>
 </li>
 {% endif %}
+<script>
+    
+</script>

@@ -618,6 +618,16 @@ def addpaidimage(img, mimetype, nametable, nametable_id, lists_id):
     db.execute("UPDATE bills SET img_paid_id=? WHERE id=?",img_paid_id, nametable_id)
     return
 
+# func to update quantity in shopping list view
+def updatequantity(qnty, type, id):
+    if type == 'add':
+        quantity = int(qnty)
+    if type == 'remove':
+        quantity = int(qnty) * (-1)
+    db.execute("UPDATE shoppinglist SET quantity=? WHERE id=?", quantity, int(id))
+    return
+
+   
 
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
 

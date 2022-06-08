@@ -36,6 +36,13 @@ main{
 .bkground-color-box{
     background-color: #f8f9fA;
 }
+.bkground-color-box-none{
+    background-color:transparent;
+}
+.bkground-color-box-grey{
+    background-color: #161b21;
+    opacity: 0.1;
+}
 .bkground-color-box-white{
     background-color: #f8f9fA;
 }
@@ -238,6 +245,9 @@ button.bkground-color-box-create:hover{
     height: auto;
     object-fit: cover;
 }
+.padding0{
+    padding: 0%!important;
+}
 .padding2{
     padding: 2%;
 }
@@ -246,6 +256,15 @@ button.bkground-color-box-create:hover{
 }
 .padding-left-5{
     padding-left: 5%!important;
+}
+.position-absolute{
+    position: absolute;
+}
+.position-relative{
+    position: relative;
+}
+.position-relativei{
+    position: relative!important;
 }
 .primary-colors {
     color: #161b21!important;
@@ -271,6 +290,12 @@ button.bkground-color-box-create:hover{
 }
 .primary-font-hover:hover{
     color: #8fd694 !important;
+}
+.primary-font-delete-hover{
+    color: #161b21!important
+}
+.primary-font-delete-hover:hover{
+    color: rgb(233, 71, 93)!important;
 }
 .resizable{
     overflow:hidden!important;
@@ -314,6 +339,12 @@ button.shadow:hover{
 }
 .text-align-right{
     text-align: right;
+}
+.top--05{
+    top: -0.5%;
+}
+.top--95{
+    top: -9.5%!important;
 }
 ul.max-width-100{
     max-width: 100vw;
@@ -363,6 +394,9 @@ ul.none-display{
 .width60{
     width: 60%;
 }
+.width65{
+    width: 65%;
+}
 .width70{
     width: 70%;
 }
@@ -380,7 +414,9 @@ ul.none-display{
     width: 180px;
     height: 300px;
 }
-
+.z-i-30{
+    z-index: 30;
+}
 
 /*by id */
 #forgotpassword, #apologymsg {
