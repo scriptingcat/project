@@ -131,6 +131,27 @@ My Lists
             {% endfor %}
         </div>
     </div>
+    {% endif %}
+    {% if not userslists %}
+    <button class="mt-5 border-dashed bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
+            data-bs-toggle="collapse" data-bs-target="#selecttypelist" aria-expanded="false"
+            aria-controls="selecttypelist" type="submit" value="">
+            <div align="left" class="mt-2 container-xxl d-flex align-items-start flex-wrap mx-auto">
+                <div align="left" class="width50">
+                    <h6 class="">Add a new<br> list</h6>
+                </div>
+                <div align="right" class="width50 align-self-center">
+                    <i class="font-size2 position-relative bi bi-plus-circle"></i>
+                </div>
+
+            </div>
+            </button>
+            <div class="mt-5 mb-3 font-size2 poppins-font primary-font">
+                You have not created any list yet.<br>
+                Click on the button to create your new list now!
+            </div>
+    {% endif %}
+
     <script>
         // manage sort by select and grid-list-title buttons
         let listsid = document.getElementById('listsid')
@@ -177,7 +198,6 @@ My Lists
     
     </script>
 
-    {% endif %}
 
 </div>
 {% endblock %}

@@ -10,7 +10,7 @@
 {% block main %}
 
 <div class="width100">
-    <!-- toggles + their elements-->
+    <!--upper bar toggles + their elements-->
     <div class="width100">
         <!--change namelist, add element, delete list-->
         <div class="d-flex justify-content-between">
@@ -242,7 +242,7 @@
                 {% if nametable == 'shoppinglist' %}
                 <div class="btn-group p-2 inline">
                     <button id="viewstyleshoppinglist" name="viewstyle"
-                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" 
                         onclick="closealltoggle('{{elements|length}}','showelementinfo');" type="button"
                         value="shopping list"><i class="bi bi-basket-fill"></i>
                     </button>
@@ -250,6 +250,7 @@
                 {% endif %}
             </div>
         </div>
+        {% if elements|length > 0%}
         <!-- showelementinfo elements-->
         {% for element in elements %}
         <div class="collapse" id="showelementinfo{{loop.index0}}">
@@ -269,7 +270,7 @@
                                 <input name="imgname" type="hidden" value="{{image['name']}}">
                                 {% endif %}
 
-                                <button class="noborder" type="submit">
+                                <button class="noborder bkground-color-box-none width80" type="submit">
                                     <img class="border form-control bkground-color-box-white poppins-font primary-font"
                                         src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
                                 </button>
@@ -580,6 +581,26 @@
 
 
         </div>
+        {% endif %}
+        {% if elements|length == 0 %}
+            <button class="mt-5 border-dashed bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
+            data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false"
+            aria-controls="addelementinfo" type="submit" value="">
+            <div align="left" class="mt-2 container-xxl d-flex align-items-start flex-wrap mx-auto">
+                <div align="left" class="width50">
+                    <h6 class="">Add a new<br> element</h6>
+                </div>
+                <div align="right" class="width50 align-self-center">
+                    <i class="font-size2 position-relative bi bi-plus-circle"></i>
+                </div>
+
+            </div>
+            </button>
+            <div class="mt-5 mb-3 font-size2 poppins-font primary-font">
+                Your list is empty.<br>
+                Click on the button to start adding items to your list!
+            </div>
+        {% endif %}
     </div>
 </div>
 <script>

@@ -67,6 +67,9 @@ button.bkground-color-box-create:hover{
 .border{
     outline:solid 2px #8fd694;
 }
+.border-dashed{
+    outline:double 5px #8fd694;
+}
 .noborder{
     border: none!important;
 }
@@ -113,6 +116,12 @@ button.bkground-color-box-create:hover{
 }
 .font-size1{
     font-size: 1.5vw;
+}
+.font-size2{
+    font-size: 2vw;
+}
+.font-size25{
+    font-size: 2.5vw;
 }
 .font-size3{
     font-size: 3vw;
@@ -161,6 +170,12 @@ button.bkground-color-box-create:hover{
 }
 .inline-block{
     display: inline-block !important;
+}
+.left50{
+    left: 50px;
+}
+.left13pc{
+    left: 13%;
 }
 .linear-gradient-bottom{
     background: linear-gradient(to bottom, #fff 0%, #77AD78 100%);
@@ -223,6 +238,9 @@ button.bkground-color-box-create:hover{
 }
 .margin-right-inline20{
     margin-right: -20%;
+}
+.margin-top-w8{
+    margin-top: 8%;
 }
 .margin-top-w2{
     margin-top: 2%;
@@ -346,6 +364,9 @@ button.shadow:hover{
 .top--95{
     top: -9.5%!important;
 }
+.top-25{
+    top: 25px!important;
+}
 ul.max-width-100{
     max-width: 100vw;
 }
@@ -413,6 +434,9 @@ ul.none-display{
 .width-image-grid{
     width: 180px;
     height: 300px;
+}
+.z-i-10{
+    z-index: 10;
 }
 .z-i-30{
     z-index: 30;

@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block span %}: About {% endblock %}
+
+{% block title %}
+About
+{% endblock %}
+
+
+
+{% block main %}
+<div>
+    {% if showmessage %}
+        <div class="mb-3">
+            <p id="apologymsg" class="abrilfatface-font mx-auto primary-font width15" type="text" name="showmessage"> {{showmessage}} </p>
+        </div>
+        {% endif %}
+        <div class="d-flex flex-row align-content-strech justify-content-center flex-wrap mt-5">
+                <div class="mt-5"><img class="w-auto" src="/static/android-chrome-192x192.png">
+                </div>
+                <div class="mt-5">
+                <h1 class="abrilfatface-font font-size7 mt-5 primary-font">keep track</h1>
+                </div>
+        </div>
+        <div><h3 class="poppins-font font-size3 mt-5 primary-font">your customized lists stored online</h3></div>
+        <div class="mb-5"><h3 class="poppins-font font-size3 primary-font">with images</h3></div>
+        <div align="center" class="width30 margin-top-w8 mb-1 w-auto">
+            <h4 class="poppins-font font-size25 primary-font">How to start:</h4>
+        <div align="center" class="width40 poppins-font font-size2 primary-font text-align-center" >
+                First things first, let's create a list!
+        </div>
+        <div align="center" class="position-relative left13pc width40 poppins-font font-size2 primary-font text-align-left" >
+            <p class="width50 poppins-font font-size1-0 primary-font">
+                1. go to "mylists" page<br>
+                2. click on Add New List button<br>
+                3. choose a list type<br>
+                4. add a name<br>
+                5. click on create button<br>
+            </p>
+        </div>
+        <div align="center" class="width40 poppins-font font-size2 primary-font text-align-center" >
+            Now, let's create items on your list!
+            </div>
+            <div align="center" class="position-relative left13pc width40 poppins-font font-size2 primary-font text-align-left" >
+
+                <p class="width50 poppins-font font-size1-0 primary-font">
+                    1. go to "mylists" page<br>
+                    2. click on your list name button<br>
+                    3. click on Add New Element button<br>
+                    4. enter the fields<br>
+                    5. remember: a title or a name is always required<br>
+                    6. click on create button<br>
+                </p>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
