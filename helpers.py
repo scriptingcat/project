@@ -25,10 +25,13 @@ from io import BytesIO
 # configure application
 app = Flask(__name__)
 
-app.config['MAIL_DEFAULT_SENDER'] = os.environ["MAIL_DEFAULT_SENDER"]
+mail_default_sender = os.environ["MAIL_DEFAULT_SENDER"]
+
+
+app.config['MAIL_DEFAULT_SENDER'] = mail_default_sender
 app.config['MAIL_PASSWORD'] = os.environ["MAIL_PASSWORD"]
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ["MAIL_USERNAME"]
 mail=Mail(app)
@@ -37,6 +40,8 @@ recipientcontact = os.environ["MAIL_DEFAULT_SENDER"]
 # configure private key
 SECRET = os.environ['SECRET']
 
+# configure sending email since gmail blocked less secure app
+unsetMail = True
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///keeptrack.db")
@@ -604,6 +609,7 @@ def send_contact_request(object, account, email, name, lastname, messagecontact)
     # send email
     mail.send(msg)
     return 
+
 
 # func to add an img in imgs db
 def addpaidimage(img, mimetype, nametable, nametable_id, lists_id):

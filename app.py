@@ -11,7 +11,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage, updatequantity
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage, updatequantity, unsetMail
 
 from email_validator import validate_email
 
@@ -331,9 +331,12 @@ def requesttoken():
         # func send_reset_email geneates token and sends via email
         # changes on db have to be commited together with sending email
         db.execute("BEGIN TRANSACTION")
-        token = send_reset_email(id, email)
-        tokentype = "resetpassword"
-        insert_token_in_db(id, token, tokentype)
+        
+        # it's not actually sending an email since gmail blocked less secure app but everything is set to work fine
+        if unsetMail == False:
+            token = send_reset_email(id, email)
+            tokentype = "resetpassword"
+            insert_token_in_db(id, token, tokentype)
         db.execute("COMMIT")
 
         apologymsg = "Reset Password Request Sent"
@@ -366,13 +369,13 @@ def resetpassword():
                     # if it returns an user_id
                     # check token status in db to know whether it has already used or not to reset password
                     if check_token_status(user_id, token, "resetpassword") == "expired":
-                        apologymsg = "Expired Token 4"
+                        apologymsg = "Expired Token"
                         return render_template("forgotpassword.html", apologymsg=apologymsg.capitalize())
                     else:
                         return render_template("resetpassword.html", id=token)
             except:
                 # if it returns an error, return to forgot password
-                apologymsg = "Expired Token 5"
+                apologymsg = "Expired Token"
                 return render_template("forgotpassword.html", apologymsg=apologymsg)
 
     # check request method
@@ -932,7 +935,9 @@ def contact():
             apologymsg = "Message is required"
             return redirect('/contact'+'?showmessage='+apologymsg)
         # send request
-        send_contact_request(object, account, email, name, lastname, message)
+         # it's not actually sending an email since gmail blocked less secure app but everything is set to work fine
+        if unsetMail == False:
+            send_contact_request(object, account, email, name, lastname, message)
         apologymsg = "Request Sent"
         return redirect('/contact'+'?showmessage='+apologymsg)
     else:   
