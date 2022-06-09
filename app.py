@@ -828,70 +828,70 @@ def elements():
         namelist = 'lists'
         elements = lists
 
-    try:
-        if sortby and styleview:
-            if sortby == 'most recent':
-                if nametable == 'lists':
-                    elementssorted = db.execute("SELECT * FROM lists WHERE user_id=? ORDER BY id DESC", session['user_id'])
-                else:
-                    elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id DESC", nametable, int(lists_id), session['user_id'])
-            elif sortby == 'least recent':
-                if nametable == 'lists':
-                    elementssorted = db.execute("SELECT * FROM lists WHERE user_id=? ORDER BY id ASC", session['user_id'])
-                else:
-                    elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id ASC", nametable, int(lists_id), session['user_id'])
+    #try:
+    if sortby and styleview:
+        if sortby == 'most recent':
+            if nametable == 'lists':
+                elementssorted = db.execute("SELECT * FROM lists WHERE user_id=? ORDER BY id DESC", session['user_id'])
             else:
-                counter = 0
-                # iterate throughout key in dict of sort types
-                for k,v in sorttypes.items():
-                    # when key = nametable, chack the value which is a list
-                    if k == nametable:
-                        # iterate through the list
-                        for i in v:
-                            # when element in list == sortby request value 
-                            if i == sortby:
-                                # select ordered by that value 
-                                if k == 'lists':
-                                    if sortby == 'type of list':
-                                         elementssorted= db.execute("SELECT * FROM ? WHERE user_id=? ORDER BY list_type_id ASC", nametable, session['user_id'])
-                                    else: 
-                                        elementssorted= db.execute("SELECT * FROM ? WHERE user_id=? ORDER BY " + sortby +" ASC", nametable, session['user_id'])
-                                else:
-                                    elementssorted= db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY " + sortby +" ASC", nametable, int(lists_id), session['user_id'])
-                                # add +1 to counter so that I know elements has been re-selected and break
-                                counter+=1
-                                break
-                        # counter == 0 means no re-selection, so elementssorted == first selection 
-                        if counter == 0:
-                            elementssorted = elements
-                        # break iteration through dict once nametable is found  
-                        break
-            # elements equals to whatever is in elementssorted
-            elements = elementssorted
-            # check requested value for styleview and pass it to style
-            if styleview == 'table':
-                style = 'table'
-            elif styleview == 'title':
-                style = 'title'
-            elif styleview == 'shopping list':
-                if nametable != 'shoppinglist':
-                    apologymsg = "This view is not allowed on this kind of list"
-                    return render_template("elements.html", apologymsg=apologymsg)
-                style = 'shopping list'
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id DESC", nametable, int(lists_id), session['user_id'])
+        elif sortby == 'least recent':
+            if nametable == 'lists':
+                elementssorted = db.execute("SELECT * FROM lists WHERE user_id=? ORDER BY id ASC", session['user_id'])
             else:
-                style ='grid'
-            # always check user's requesting is owner of list
-            if nametable != 'lists':
-                user_id = lists[0]['user_id']
-                if session['user_id'] == user_id:
-                    # decode dataimage from bytes to ascii to be rendered
-                    for image in images:
-                        image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
-                return render_template("elements.html", elements=elements, style=style, images=images, lists_id=int(lists_id),listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
-            else:
-                return render_template("elements.html", elements=elements, style=style, images='null', lists_id=int(lists_id), listelements=listelements, namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
-    except:
-        return render_template("elements.html", apologymsg="Something went wrong")
+                elementssorted = db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY id ASC", nametable, int(lists_id), session['user_id'])
+        else:
+            counter = 0
+            # iterate throughout key in dict of sort types
+            for k,v in sorttypes.items():
+                # when key = nametable, chack the value which is a list
+                if k == nametable:
+                    # iterate through the list
+                    for i in v:
+                        # when element in list == sortby request value 
+                        if i == sortby:
+                            # select ordered by that value 
+                            if k == 'lists':
+                                if sortby == 'type of list':
+                                        elementssorted= db.execute("SELECT * FROM ? WHERE user_id=? ORDER BY list_type_id ASC", nametable, session['user_id'])
+                                else: 
+                                    elementssorted= db.execute("SELECT * FROM ? WHERE user_id=? ORDER BY " + sortby +" ASC", nametable, session['user_id'])
+                            else:
+                                elementssorted= db.execute("SELECT * FROM ? WHERE lists_id=? AND user_id=? ORDER BY " + sortby +" ASC", nametable, int(lists_id), session['user_id'])
+                            # add +1 to counter so that I know elements has been re-selected and break
+                            counter+=1
+                            break
+                    # counter == 0 means no re-selection, so elementssorted == first selection 
+                    if counter == 0:
+                        elementssorted = elements
+                    # break iteration through dict once nametable is found  
+                    break
+        # elements equals to whatever is in elementssorted
+        elements = elementssorted
+        # check requested value for styleview and pass it to style
+        if styleview == 'table':
+            style = 'table'
+        elif styleview == 'title':
+            style = 'title'
+        elif styleview == 'shopping list':
+            if nametable != 'shoppinglist':
+                apologymsg = "This view is not allowed on this kind of list"
+                return render_template("elements.html", apologymsg=apologymsg)
+            style = 'shopping list'
+        else:
+            style ='grid'
+        # always check user's requesting is owner of list
+        if nametable != 'lists':
+            user_id = lists[0]['user_id']
+            if session['user_id'] == user_id:
+                # decode dataimage from bytes to ascii to be rendered
+                for image in images:
+                    image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
+            return render_template("elements.html", elements=elements, style=style, images=images, lists_id=int(lists_id),listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+        else:
+            return render_template("elements.html", elements=elements, style=style, images='null', listelements=listelements, namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+    #except:
+        #return render_template("elements.html", apologymsg="Something went wrong")
 
 @app.route('/contact', methods = ['GET', 'POST'])
 def contact():

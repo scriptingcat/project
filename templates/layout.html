@@ -34,6 +34,22 @@
 
         <!--Bootstrap icon-->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+        <script>
+            window.onscroll = function() {scrollPage()};
+
+            function scrollPage() {
+                upButton = document.getElementById("go-up-button");
+                if (document.documentElement.scrollTop > 20) {
+                    upButton.style.display = "block";
+                } else {
+                    upButton.style.display = "none";
+                }
+            }
+
+            function goUp() {
+                document.documentElement.scrollTop = 0;
+            }
+        </script>
         <title>Keep Track: {% block title %}{% endblock %}</title>
     </head>
     <body>
@@ -100,4 +116,6 @@
             <h6 class="color-white fontw100 font-size085 poppins-font">Provided by Antonella Giugliano</h6>
         </div>
     </footer>
+    <button onclick="goUp()" id="go-up-button" title="Go To Top"><i class="bi bi-caret-up-fill"></i></button>
+
 </html>

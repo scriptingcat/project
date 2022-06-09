@@ -427,3 +427,23 @@ ul.none-display{
     outline: none!important;
     text-decoration: none;
 }
+
+#go-up-button {
+    display: none;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 199;
+    border: none;
+    color: #161b21;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 20px;
+    font-size: 18px;
+    text-align: center;
+}
+
+
+#go-up-button:hover{
+    color: #8fd694;
+}
