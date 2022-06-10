@@ -898,12 +898,10 @@
         let defaultelem = document.getElementById(String(defaultel))
         let defaulticon = document.getElementById(String(defaulticn))
         let icon = document.getElementById(String(icn))
-        console.log(defaulticon)
 
         // hide default style
         if (defaultelem != null){
             defaultelem.classList.add('display-none')
-            console.log(1)
         }
         if (!(defaulticon.classList.contains('display-none')))
         {
@@ -916,8 +914,6 @@
 
         let xy = document.getElementById(String(element));
 
-        console.log(status)
-        console.log(xy)
         if (status.innerText == 'to do'){
             if (xy.classList.contains('display-none')) {
                 xy.classList.remove('display-none')
@@ -933,11 +929,9 @@
         else if (status.innerText == 'done'){
             if (xy.classList.contains('display-none')) {
                 xy.classList.add('display-none')
-                console.log(4)
             } 
             if (!(xy.classList.contains('display-none'))) {
                 xy.classList.add('display-none')
-                console.log(5)
             } 
             if (icon.classList.contains('bi-check-square')) {
                 icon.classList.remove('bi-check-square')

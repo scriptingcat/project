@@ -498,18 +498,19 @@ def showlist():
                     if not dictofrequests['name'] or dictofrequests['name'] == None:
                         apologymsg = "Element Name Is Required"
                         return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
-                # check status in shopping table
+                # check status in shopping, shoppinglist, todo tables
                 if k == 'status':
                     if not dictofrequests['status'] or dictofrequests['status'] == None or  dictofrequests['status'] not in ['to buy', 'bought', 'to pay', 'paid', 'to do', 'done']:
                         if nametable == 'shopping':
                             apologymsg = "Element status Error. Status is required. Values allowed: to buy or bought."
                         elif nametable == 'bills':
                             apologymsg = "Element status Error. Status is required. Values allowed: to pay or paid."
+                        elif nametable == 'todo':
+                            apologymsg = "Element status Error. Status is required. Values allowed: to do or done."
 
                         return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
                     else:
                         break
-            print(dictofrequests)
             # check whether there's an img to save in db:
             if not dictofrequests['cover'] or dictofrequests['cover'] == 0:
                 add_element(nametable, dictofrequests, namelist, lists_id, session['user_id'])
@@ -680,9 +681,7 @@ def showlist():
 
         # update paid cover in bills table
         elif actiononelement == 'updatepaidelement':
-            print('updatepaidelement')
             id = request.form.get('idupdatepaidelement')
-            print(id)
             imagepaid = request.files['inputimage']
             if nametable != 'bills':
                 apologymsg = 'Action not allowed on this list'
@@ -736,28 +735,57 @@ def showlist():
             
             
             actiononelement = request.args.get('actiononelement')
+            try:
+                if actiononelement == 'updateqnty':
+                    id = request.args.get('id')
+                   
+                    quantity = request.args.get('quantity')
+                    type = request.args.get('type')
+                    if not id or not quantity or not type:
+                        apologymsg = "All fields required to update quantity"
+                        return redirect("/mylists" + "?message=" + apologymsg)
+                    # check id belongs to user's session
+                    checkid = db.execute('SELECT * FROM shoppinglist WHERE id=?', int(id))
+                    if checkid[0]['user_id'] != session['user_id']:
+                        apologymsg = "Id does not match user's session"
+                        return redirect("/mylists" + "?message=" + apologymsg)
+                    if type not in ['add','remove']:
+                        apologymsg = "Type not recognized"
+                        return redirect("/mylists" + "?message=" + apologymsg)
 
-            if actiononelement == 'updateqnty':
-                id = request.args.get('id')
-                quantity = request.args.get('quantity')
-                type = request.args.get('type')
-                updatequantity(quantity, type, id)
-                newquantity = db.execute("SELECT quantity FROM shoppinglist WHERE id=?", int(id))
-                entry = newquantity[0]['quantity']
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry)
-            
-            if actiononelement == 'updatetodostatus':
-                id = request.args.get('id')
-                status = request.args.get('status')
-                updatetodostatus(status, id)
-                newstatus = db.execute("SELECT status FROM todo WHERE id=?", int(id))
-                entry = newstatus[0]['status']
-                print(entry)
+                    updatequantity(quantity, type, id)
+                    newquantity = db.execute("SELECT quantity FROM shoppinglist WHERE id=?", int(id))
+                    entry = newquantity[0]['quantity']
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry)
+                
+                if actiononelement == 'updatetodostatus':
+                    id = request.args.get('id')
+                    status = request.args.get('status')
+                    
+                    if not id or not status:
+                        apologymsg = "All fields required to update status"
+                        return redirect("/mylists" + "?message=" + apologymsg)
+                    if status not in ['to do','done']:
+                        apologymsg = "Status not recognized"
+                        return redirect("/mylists" + "?message=" + apologymsg)
+                    checkid = db.execute('SELECT * FROM shoppinglist WHERE id=?', int(id))
+                    if checkid[0]['user_id'] != session['user_id']:
+                        apologymsg = "Id does not match user's session"
+                        return redirect("/mylists" + "?message=" + apologymsg)
+                    updatetodostatus(status, id)
+                    newstatus = db.execute("SELECT status FROM todo WHERE id=?", int(id))
+                    entry = newstatus[0]['status']
+                    print(entry)
 
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry)    
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry)    
             
                 
-            return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images)
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images)
+            
+            except:
+
+                apologymsg = "Something went wrong. Access to list Denied"
+                return redirect("/mylists" + "?message=" + apologymsg)
 
         else:
             apologymsg = "Something went wrong. Access to list Denied"
