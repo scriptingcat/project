@@ -136,6 +136,16 @@ listelements = [
             "cover_paid": "an image to associate with the paid bill",
             "note": "a brief text to assciate with the element",
         }, 
+        {
+            "type": "todo",
+            "name": "name of to do action",
+            "nolaterthan": "date by which it has to be done",
+            "onthisdatetime": "date on which it has to be done",
+            "cover": "an image to associate with the to do action",
+            "time": "time at which it has to be done",
+            "status": ["to do", "done"],
+            "note": "a brief text to assciate with the element",
+        }, 
 ]
 
 listelementstoedit= [ 
@@ -218,6 +228,15 @@ listelementstoedit= [
             "status": ["to pay", "paid"],
             "note": "a brief text to assciate with the element",
         },
+        {
+            "type": "todo",
+            "name": "name of to do action",
+            "nolaterthan": "date by which it has to be done",
+            "onthisdatetime": "date on which it has to be done",
+            "time": "time at which it has to be done",
+            "status": ["to do", "done"],
+            "note": "a brief text to assciate with the element",
+        },
 ]
 
 sorttypes = { 
@@ -229,7 +248,8 @@ sorttypes = {
     'closet' : ['name', 'brand', 'most recent', 'least recent', 'price', 'tag', 'type_of_item','datetime_of_buying'],
     'storage' : ['name', 'brand', 'most recent', 'least recent', 'tag', 'type_of_item','quantity'],
     'shoppinglist': ['name', 'quantity', 'most recent', 'least recent', 'price'],
-    'bills' : ['name', 'most recent', 'least recent', 'cost','expiration_date', 'status']
+    'bills' : ['name', 'most recent', 'least recent', 'cost','expiration_date', 'status'],
+    'todo': ['name', 'most recent', 'least recent', 'nolaterthan','onthisdatetime', 'status']
     }
 
 gridelements = [
@@ -285,6 +305,12 @@ gridelements = [
             "expiration_date": "expiring date of the bill",
             "status": "to pay or paid",
         },
+        {
+            "type": "todo",
+            "name": "name of to do action",
+            "nolaterthan": "date by which it has to be done",
+            "status": "to do or done",
+        },
         
 ]
 titleelements = [
@@ -332,6 +358,11 @@ titleelements = [
             "type": "bills",
             "name": "name of bill",
             "expiration_date": "expiring date of the bill",
+        },
+        {
+            "type": "todo",
+            "name": "name of to do action",
+            "status": "to do or done",
         },
 
 ]
@@ -588,6 +619,16 @@ def add_element(nametable,dictofelements, namelist, lists_id, user_id):
         nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
         db.execute("COMMIT")
         return nametable_id
+    elif nametable == 'todo':
+        db.execute("BEGIN TRANSACTION")
+        # insert the element data
+        # 0 value is value for null since db column only takes integers
+        # img_id is always 0, it is updated after the image has been stored in imgs db
+        db.execute("INSERT INTO todo (namelist,lists_id,user_id,name,nolaterthan, onthisdatetime,img_id,time,note, status) VALUES (?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['name'],dictofelements['nolaterthan'],dictofelements['onthisdatetime'], 0, dictofelements['time'], dictofelements['note'], dictofelements['status'])
+        rows = db.execute("SELECT * FROM todo WHERE namelist=? AND lists_id=? AND user_id=? AND name=?", namelist, lists_id, user_id, dictofelements['name'])
+        nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
+        db.execute("COMMIT")
+        return nametable_id
     else:
         return
 
@@ -633,6 +674,16 @@ def updatequantity(qnty, type, id):
         db.execute("UPDATE shoppinglist SET quantity=? WHERE id=?", x[0]['quantity']-1, int(id))
     return
 
+# func to update status in to do list view
+def updatetodostatus(status, id):
+    x = db.execute("SELECT status FROM todo WHERE id=?", int(id))
+    if status == 'to do':
+        newstatus = 'done'
+    if status == 'done':
+        newstatus = 'to do'
+    db.execute("UPDATE todo SET status=? WHERE id=?", newstatus, int(id))
+    return
+
    
 
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
@@ -652,3 +703,6 @@ def updatequantity(qnty, type, id):
 #CREATE TABLE bills (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, description TEXT, expiration_date datetime, cost FLOAT, img_id INTEGER, status CHECK(status in ('to pay', 'paid')), img_paid_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
 #CREATE TABLE shoppinglist (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, quantity INTEGER, price FLOAT, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+
+
+#CREATE TABLE todo (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, nolaterthan DATE, onthisdatetime DATE, img_id INTEGER, time TIME, note TEXT, status CHECK(status in ('to do', 'done')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));

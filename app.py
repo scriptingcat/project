@@ -11,7 +11,7 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage, updatequantity, unsetMail
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage, updatequantity, unsetMail, updatetodostatus
 
 from email_validator import validate_email
 
@@ -500,7 +500,7 @@ def showlist():
                         return redirect('/list?lists_id=' + lists_id + '&apologymsg=' + apologymsg)
                 # check status in shopping table
                 if k == 'status':
-                    if not dictofrequests['status'] or dictofrequests['status'] == None or  dictofrequests['status'] not in ['to buy', 'bought', 'to pay', 'paid']:
+                    if not dictofrequests['status'] or dictofrequests['status'] == None or  dictofrequests['status'] not in ['to buy', 'bought', 'to pay', 'paid', 'to do', 'done']:
                         if nametable == 'shopping':
                             apologymsg = "Element status Error. Status is required. Values allowed: to buy or bought."
                         elif nametable == 'bills':
@@ -745,8 +745,20 @@ def showlist():
                 newquantity = db.execute("SELECT quantity FROM shoppinglist WHERE id=?", int(id))
                 entry = newquantity[0]['quantity']
                 return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry)
+            
+            if actiononelement == 'updatetodostatus':
+                id = request.args.get('id')
+                status = request.args.get('status')
+                updatetodostatus(status, id)
+                newstatus = db.execute("SELECT status FROM todo WHERE id=?", int(id))
+                entry = newstatus[0]['status']
+                print(entry)
+
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry)    
+            
                 
             return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images)
+
         else:
             apologymsg = "Something went wrong. Access to list Denied"
             return redirect("/mylists" + "?message=" + apologymsg)
@@ -839,7 +851,6 @@ def elements():
         nametable = 'lists'
         namelist = 'lists'
         elements = lists
-
     try:
         if sortby and styleview:
             if sortby == 'most recent':
@@ -890,6 +901,11 @@ def elements():
                     apologymsg = "This view is not allowed on this kind of list"
                     return render_template("elements.html", apologymsg=apologymsg)
                 style = 'shopping list'
+            elif styleview == 'to do list':
+                if nametable != 'todo':
+                    apologymsg = "This view is not allowed on this kind of list"
+                    return render_template("elements.html", apologymsg=apologymsg)
+                style = 'to do list'
             else:
                 style ='grid'
             # always check user's requesting is owner of list

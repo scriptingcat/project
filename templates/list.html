@@ -135,13 +135,18 @@
                             class="form-check-input bkground-color-box-white poppins-font primary-font" name="{{key}}"
                             title="{{value}}" type="radio" value="{{value[1]}}">
                     </div>
-                    {% elif key == 'expiration_date' or key == 'datetime_of_buying' %}
+                    {% elif key == 'expiration_date' or key == 'datetime_of_buying' or key == 'nolaterthan' or key == 'onthisdatetime' %}
                     <div class="mb-3 p-2 text-align-left w-auto">
                         <input autocomplete="off" autofocus name="{{key}}"
                             class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
-                            placeholder="Enter a {{key.capitalize()}}" type="datetime" title="{{value}}">
+                            placeholder="Enter a {{key.capitalize()}}" type="date" title="{{value}}">
                     </div>
-
+                    {% elif key == 'time' %}
+                    <div class="mb-3 p-2 text-align-left w-auto">
+                        <input autocomplete="off" autofocus name="{{key}}"
+                            class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                            placeholder="Enter a {{key.capitalize()}}" type="time" title="{{value}}">
+                    </div>
                     {% else %}
                     <div class="mb-3 p-2">
                         <input
@@ -227,15 +232,15 @@
                 <!-- viewstyle-->
                 <div class="btn-group p-2 inline">
                     <button id="viewstyletable" name="viewstyle"
-                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" type="button"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" title="table view" type="button"
                         value="table"><i class="bi bi-list-ul"></i>
                     </button>
                     <button id="viewstyletitle" name="viewstyle"
-                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" type="button"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" title="title list view" type="button"
                         value="title"><i class="bi bi-grip-horizontal"></i>
                     </button>
                     <button id="viewstylegrid" name="viewstyle"
-                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" type="button"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" title="image list view" type="button"
                         value="grid"><i class=" bi bi-grid"></i>
                     </button>
                 </div>
@@ -243,8 +248,19 @@
                 <div class="btn-group p-2 inline">
                     <button id="viewstyleshoppinglist" name="viewstyle"
                         class="btn btn-primary border primary-font primary-colors text-align-left w-auto" 
-                        onclick="closealltoggle('{{elements|length}}','showelementinfo');" type="button"
+                        onclick="closealltoggle('{{elements|length}}','showelementinfo');"
+                        title="shopping list view" type="button"
                         value="shopping list"><i class="bi bi-basket-fill"></i>
+                    </button>
+                </div>
+                {% endif %}
+                {% if nametable == 'todo' %}
+                <div class="btn-group p-2 inline">
+                    <button id="viewstyletodolist" name="viewstyle"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" 
+                        onclick="closealltoggle('{{elements|length}}','showelementinfo');" 
+                        title="check list view" type="button"
+                        value="to do list"><i class="bi bi bi-check-square"></i>
                     </button>
                 </div>
                 {% endif %}
@@ -332,7 +348,7 @@
                                 {% for key,value in element.items() %}
                                 {% if key != 'cover' and key != 'address' %}
                                 {% if key not in ['id', 'img_id','lists_id', 'user_id', 'namelist', 'year',
-                                'note','description', 'img_paid_id','expiration_date','datetime_of_buying', 'status'] %}
+                                'note','description', 'img_paid_id','expiration_date', 'nolaterthan', 'onthisdatetime', 'time', 'datetime_of_buying', 'status'] %}
                                 <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
                                     <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
                                     {% if value == '' or value == 'null' %}
@@ -354,12 +370,21 @@
                                         maxlength="4" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
                                 </div>
                                 {% endif %}
-                                {% if key == 'expiration_date' or key == 'datetime_of_buying' %}
+                                {% if key == 'expiration_date' or key == 'datetime_of_buying' or key == 'nolaterthan' or key == 'onthisdatetime' %}
                                 <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
                                     <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
                                     <input name="edit{{key}}"
                                         class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
-                                        placeholder="{{key}}: {{value}}" type="datetime" value="{{value}}">
+                                        placeholder="{{key}}: {{value}}" type="date" value="{{value}}">
+                                </div>
+                                {% endif %}
+    
+                                {% if key == 'time' %}
+                                <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                    <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                    <input name="edit{{key}}"
+                                        class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                                        placeholder="{{key}}: {{value}}" type="time" value="{{value}}">
                                 </div>
                                 {% endif %}
 
@@ -387,31 +412,31 @@
                                 {% if k=='status' %}
                                 <div class="mb-3 margin-left-8 p-2 text-align-left">
                                     <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
-
+                                    <!--status-->
                                     {% if element['status'] == v[0] %}
                                     <div class="block border form-control w-auto mx-auto">
 
                                         <div class="d-flex flex-row flex-wrap justify-content-start">
                                             <div class="w-auto">
-                                                <input id="val0"
+                                                <input id="val0-{{element['id']}}"
                                                     class="form-check-input bkground-color-box-white poppins-font primary-font primary-colors-checkbox"
                                                     checked name="edit{{key}}" title="{{v[0]}}" type="radio"
                                                     value="{{v[0]}}">
                                             </div>
                                             <div class=" w-auto">
-                                                <label class="form-check-label mx-auto " for="val0">{{v[0]}}</label>
+                                                <label class="form-check-label mx-auto " for="val0-{{element['id']}}">{{v[0]}}</label>
                                             </div>
                                         </div>
 
                                         <div class="d-flex flex-row flex-wrap justify-content-start">
                                             <div class="w-auto">
-                                                <input id="val0"
+                                                <input id="val1-{{element['id']}}"
                                                     class="form-check-input bkground-color-box-white  poppins-font primary-font primary-colors-checkbox"
                                                     name="edit{{key}}" title="{{v[1]}}" type="radio" value="{{v[1]}}">
                                             </div>
                                             <div class=" w-auto">
                                                 <label class="form-check-label mx-auto w-auto"
-                                                    for="val1">{{v[1]}}</label>
+                                                    for="val1-{{element['id']}}">{{v[1]}}</label>
                                             </div>
                                         </div>
                                     </div>
@@ -420,25 +445,25 @@
 
                                         <div class="d-flex flex-row flex-wrap justify-content-start">
                                             <div class="w-auto">
-                                                <input id="val0"
+                                                <input id="val0-{{element['id']}}"
                                                     class="form-check-input bkground-color-box-white poppins-font primary-font primary-colors-checkbox"
                                                     name="edit{{key}}" title="{{v[0]}}" type="radio" value="{{v[0]}}">
                                             </div>
                                             <div class=" w-auto">
-                                                <label class="form-check-label mx-auto " for="val0">{{v[0]}}</label>
+                                                <label class="form-check-label mx-auto " for="val0-{{element['id']}}">{{v[0]}}</label>
                                             </div>
                                         </div>
 
                                         <div class="d-flex flex-row flex-wrap justify-content-start">
                                             <div class=" w-auto">
-                                                <input id="val0"
+                                                <input id="val1-{{element['id']}}"
                                                     class="form-check-input bkground-color-box-white  poppins-font primary-font primary-colors-checkbox"
                                                     name="edit{{key}}" checked title="{{v[1]}}" type="radio"
                                                     value="{{v[1]}}">
                                             </div>
                                             <div class="w-auto">
                                                 <label class="form-check-label mx-auto w-auto"
-                                                    for="val1">{{v[1]}}</label>
+                                                    for="val1-{{element['id']}}">{{v[1]}}</label>
                                             </div>
                                         </div>
                                     </div>
@@ -539,10 +564,13 @@
             </div>
         </div>
         {% endfor %}
+        <!--styleview elements-->
         <div class="">
             <div id="elementviewstylegrid" class="container-xxl d-flex align-items-start flex-wrap mx-auto">
             </div>
             <div id="elementviewstyleshoppinglist" align="center" class="width80 mx-auto">
+            </div>
+            <div id="elementviewstyletodolist" align="center" class="width80 mx-auto">
             </div>
             <div id="elementviewstyletitle" class="container-xxl d-flex align-items-start flex-wrap mx-auto">
             </div>
@@ -597,8 +625,8 @@
             </div>
             </button>
             <div class="mt-5 mb-3 font-size2 poppins-font primary-font">
-                Your list is empty.<br>
-                Click on the button to start adding items to your list!
+               {{namelist.capitalize()}} list is empty.<br>
+                Click on the button to start adding items to this list!
             </div>
         {% endif %}
     </div>
@@ -647,6 +675,7 @@
     let viewstylegrid = document.getElementById('viewstylegrid')
     let viewstyletitle = document.getElementById('viewstyletitle')
     let viewstyleshoppinglist = document.getElementById('viewstyleshoppinglist')
+    let viewstyletodolist = document.getElementById('viewstyletodolist')
 
     let currentstyleview = 'title'
     let currentsortby = sortselect.input
@@ -660,24 +689,35 @@
             document.getElementById('elementviewstylegrid').innerHTML = null;
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+            document.getElementById('elementviewstyletodolist').innerHTML = null;
         }
         else if (currentstyleview == 'title') {
             document.getElementById('table').innerHTML = null;
             document.getElementById('elementviewstylegrid').innerHTML = null;
             document.getElementById('elementviewstyletitle').innerHTML = elements;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+            document.getElementById('elementviewstyletodolist').innerHTML = null;
         }
         else if (currentstyleview == 'shopping list') {
             document.getElementById('table').innerHTML = null;
             document.getElementById('elementviewstylegrid').innerHTML = null;
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = elements;
+            document.getElementById('elementviewstyletodolist').innerHTML = null;
+        }
+        else if (currentstyleview == 'to do list') {
+            document.getElementById('table').innerHTML = null;
+            document.getElementById('elementviewstylegrid').innerHTML = null;
+            document.getElementById('elementviewstyletitle').innerHTML = null;
+            document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+            document.getElementById('elementviewstyletodolist').innerHTML = elements;
         }
         else {
             document.getElementById('table').innerHTML = null;
             document.getElementById('elementviewstylegrid').innerHTML = elements;
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+            document.getElementById('elementviewstyletodolist').innerHTML = null;
         }
         currentsortby = sortselect.value
     }
@@ -685,7 +725,7 @@
 
 
     // func to change styleview
-
+    if (viewstyletable != null){
     viewstyletable.addEventListener('click', async function () {
         let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'table' + '&sortby=' + currentsortby);
         let elements = await response.text();
@@ -694,8 +734,12 @@
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+        document.getElementById('elementviewstyletodolist').innerHTML = null;
+
         currentstyleview = 'table'
-    })
+    })}
+
+    if (viewstylegrid != null){
     viewstylegrid.addEventListener('click', async function () {
         let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'grid' + '&sortby=' + currentsortby);
         let elements = await response.text();
@@ -704,8 +748,12 @@
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+        document.getElementById('elementviewstyletodolist').innerHTML = null;
+
         currentstyleview = 'grid'
-    })
+    })}
+
+    if (viewstyletitle != null){
     viewstyletitle.addEventListener('click', async function () {
         let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'title' + '&sortby=' + currentsortby);
         let elements = await response.text();
@@ -714,8 +762,12 @@
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = elements;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+        document.getElementById('elementviewstyletodolist').innerHTML = null;
+
         currentstyleview = 'title'
-    })
+    })}
+
+    if (viewstyleshoppinglist != null){
     viewstyleshoppinglist.addEventListener('click', async function () {
         let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'shopping list' + '&sortby=' + currentsortby);
         let elements = await response.text();
@@ -724,8 +776,24 @@
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = elements;
+        document.getElementById('elementviewstyletodolist').innerHTML = null;
+
         currentstyleview = 'shopping list'
-    })
+    })}
+
+    if (viewstyletodolist != null){
+    viewstyletodolist.addEventListener('click', async function () {
+        let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'to do list' + '&sortby=' + currentsortby);
+        let elements = await response.text();
+        document.getElementById('table').innerHTML = null;
+        document.getElementById('elementsdefault').innerHTML = null;
+        document.getElementById('elementviewstylegrid').innerHTML = null;
+        document.getElementById('elementviewstyletitle').innerHTML = null;
+        document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+        document.getElementById('elementviewstyletodolist').innerHTML = elements;
+
+        currentstyleview = 'to do list'
+    })}
 
     // func to show/hide 1 element
     function displaynone(element) {
@@ -795,14 +863,9 @@
 
     // func to close all collapse toggled
     function closealltoggle(numb, element) {
-        console.log(parseInt(numb))
-        console.log(element)
         for (let i = 0; i < parseInt(numb); i++) {
-            console.log(i)
-            console.log(String(element) + String(i))
             var eltoclose = document.getElementById(String(element) + String(i))
             if (eltoclose != null) {
-                console.log(eltoclose)
                 if (eltoclose.classList.contains('show')) {
                     eltoclose.classList.remove('show')
                 }
@@ -810,6 +873,81 @@
         }
         return
     }
+
+
+     // func to update async the to do status
+    async function updatetodostatus(elementtochange, listsid, id) {
+        let lists_id = document.getElementById(String(listsid))
+        let el_id = document.getElementById(String(id))
+        let status = document.getElementById(String(elementtochange))
+        let response = await fetch('/list?lists_id=' + lists_id.value + '&id=' + el_id.value + '&status=' + status.innerText + '&actiononelement=' + 'updatetodostatus');
+        let entry = await response.text();
+
+       if (status.innerText == 'to do'){
+            document.getElementById(String(elementtochange)).innerText = 'done'
+        }
+        else if (status.innerText == 'done'){
+            document.getElementById(String(elementtochange)).innerText = 'to do'
+        }
+        return;
+    };
+
+    // func to show/hide 1 element
+    function displaynonetodolist(element,defaultel, statusel, defaulticn, icn) {
+        let status = document.getElementById(String(statusel))
+        let defaultelem = document.getElementById(String(defaultel))
+        let defaulticon = document.getElementById(String(defaulticn))
+        let icon = document.getElementById(String(icn))
+        console.log(defaulticon)
+
+        // hide default style
+        if (defaultelem != null){
+            defaultelem.classList.add('display-none')
+            console.log(1)
+        }
+        if (!(defaulticon.classList.contains('display-none')))
+        {
+            defaulticon.classList.add('display-none')
+        }
+        // show new style
+        if (icon.classList.contains('display-none')){
+            icon.classList.remove('display-none')
+        }
+
+        let xy = document.getElementById(String(element));
+
+        console.log(status)
+        console.log(xy)
+        if (status.innerText == 'to do'){
+            if (xy.classList.contains('display-none')) {
+                xy.classList.remove('display-none')
+            }
+            
+
+            if (icon.classList.contains('bi-square')) {
+                icon.classList.remove('bi-square')
+                icon.classList.add('bi-check-square')
+            }
+            return
+        }   
+        else if (status.innerText == 'done'){
+            if (xy.classList.contains('display-none')) {
+                xy.classList.add('display-none')
+                console.log(4)
+            } 
+            if (!(xy.classList.contains('display-none'))) {
+                xy.classList.add('display-none')
+                console.log(5)
+            } 
+            if (icon.classList.contains('bi-check-square')) {
+                icon.classList.remove('bi-check-square')
+                icon.classList.add('bi-square')
+            }
+            return
+        }
+
+    }
+
 </script>
 
 {% endblock %}
