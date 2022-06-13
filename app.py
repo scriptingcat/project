@@ -775,12 +775,11 @@ def showlist():
                     updatetodostatus(status, id)
                     newstatus = db.execute("SELECT status FROM todo WHERE id=?", int(id))
                     entry = newstatus[0]['status']
-                    print(entry)
 
-                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry)    
+                    return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, entry=entry, titleelements=titleelements)    
             
                 
-                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images)
+                return render_template('list.html', nametable=nametable, namelist=namelist,elements=elements,sorttypes= sorttypes, listelements=listelements, lists_id=lists_id, images=images, titleelements=titleelements)
             
             except:
 

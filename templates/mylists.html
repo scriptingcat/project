@@ -34,8 +34,9 @@ My Lists
                         <div class="mb-3 margin-left-15">
                             <select
                                 class="bkground-color-box-white border form-select mx-auto w-auto poppins-font primary-font"
-                                name="typeoflist">
-                                <option disable selected>Type of List</option>
+                                name="typeoflist" title="Type of List">
+                                <optgroup label="Type of List">
+                                    <option selected disabled>Type of List</option>
                                 {% for element in listtypes %}
                                 {% for key,value in element.items() %}
                                 <option value="{{value}}">
@@ -43,6 +44,7 @@ My Lists
                                 </option>
                                 {% endfor %}
                                 {% endfor %}
+                            </optgroup>
                             </select>
                         </div>
                         <div class="mb-3 margin-left-15">
@@ -82,7 +84,7 @@ My Lists
                     <input id="listsid" type="hidden" value="lists">
                     <select id="sortselect"
                         class="bkground-color-box-white border form-select poppins-font mx-auto primary-font"
-                        name="typeoflist">
+                        name="sorting types" title="sorting types">
                         <option disable selected>sort by</option>
                         {% for key,value in sorttypes.items() %}
                         {% if key == nametable %}
@@ -98,11 +100,11 @@ My Lists
                 <!-- viewstyle-->
                 <div class="btn-group p-2 inline">
                     <button id="viewstyletable" name="viewstyle"
-                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" title="table view"
                         type="button" value="table"><i class="bi bi-list-ul"></i>
                     </button>
                     <button id="viewstyletitle" name="viewstyle"
-                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" title="title list view"
                         type="button" value="title"><i class="bi bi-grip-horizontal"></i>
                     </button>
                     
@@ -115,16 +117,15 @@ My Lists
         </div>
         <div id="table" align="center" class= width80"></div>
         <!--default viewstyle-->
-        <div id="elementsdefault" class="d-flex flex-row flex-wrap">
+        <div id="elementsdefault" class="container-xxl d-flex flex-row flex-wrap">
             {% for element in userslists %}
-            <div class="mb-3 margin-left-1 margin-right-3">
-               
+            <div class="mb-3 p-2">               
                 <form action="/list?{{element['id']}}" method="get">
                     <input name="lists_id" type="hidden" value="{{element['id']}}">
                     <button
                         class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
                         type="submit" value="{{element['namelist']}}">
-                        {{element['namelist'].capitalize()}}
+                        <p>{{element['namelist']}}</p>
                     </button>
                 </form>
             </div>
