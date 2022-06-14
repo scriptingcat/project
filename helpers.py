@@ -76,7 +76,8 @@ listelements = [
             "postal_code": "postal code of location",
             "province": "province of location",
             "country": "country of location",
-            "coordinates": "geographical coordinates to assciate with the element",
+            "latitude": "geographical coordinates to assciate with the element",
+            "longitude": "geographical coordinates to assciate with the element",
             "cover": "an image to associate with the element",
             "link": "a link to assciate with the element",
             "description" : "a brief text describing the element",
@@ -175,8 +176,8 @@ listelementstoedit= [
             "postal_code": "postal code of location",
             "province": "province of location",
             "country": "country of location",
-            "coordinates": "geographical coordinates to assciate with the element",
-            "link": "a link to assciate with the element",
+            "latitude": "geographical coordinates to assciate with the element",
+            "longitude": "geographical coordinates to assciate with the element",            "link": "a link to assciate with the element",
             "description" : "a brief text describing the element",
             "note": "a brief text to assciate with the element",
         },
@@ -564,10 +565,12 @@ def add_element(nametable,dictofelements, namelist, lists_id, user_id):
             dictofelements['postal_code'] = int(dictofelements['postal_code'])
             address = f"{dictofelements['street']}, {dictofelements['city']} {(dictofelements['postal_code'])}, {dictofelements['province']}, {dictofelements['country']}"
 
-        db.execute("INSERT INTO places (namelist,lists_id,user_id,name,street,city,postal_code,province, country, address, coordinates, link, description, img_id,note) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['name'],dictofelements['street'],dictofelements['city'], (dictofelements['postal_code']), dictofelements['province'], dictofelements['country'], address, dictofelements['coordinates'], dictofelements['link'],dictofelements['description'], 0 , dictofelements['note'])
+        db.execute("INSERT INTO places (namelist,lists_id,user_id,name,street,city,postal_code,province, country, address, latitude, longitude, link, description, img_id,note) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",namelist,lists_id,user_id,dictofelements['name'],dictofelements['street'],dictofelements['city'], (dictofelements['postal_code']), dictofelements['province'], dictofelements['country'], address, dictofelements['latitude'], dictofelements['longitude'], dictofelements['link'],dictofelements['description'], 0 , dictofelements['note'])
         rows = db.execute("SELECT * FROM places WHERE namelist=? AND lists_id=? AND user_id=? AND name=?", namelist, lists_id, user_id, dictofelements['name'])
         nametable_id = {'nametable': nametable, 'nametable_id': rows[0]['id'], 'lists_id': lists_id}
         db.execute("COMMIT")
+        upadateLongLat(rows)
+
         return nametable_id
     elif nametable == 'shopping':
         db.execute("BEGIN TRANSACTION")
@@ -640,6 +643,8 @@ def upadate_address(id):
     else:
         address = f"{rows[0]['street']}, {rows[0]['city']} {rows[0]['postal_code']}, {rows[0]['province']}, {rows[0]['country']}"
     db.execute("UPDATE places SET address=? WHERE id=?", address, id )
+    # updates long and lat
+    upadateLongLat(rows)
     return
 
 def send_contact_request(object, account, email, name, lastname, messagecontact):
@@ -684,6 +689,33 @@ def updatetodostatus(status, id):
     db.execute("UPDATE todo SET status=? WHERE id=?", newstatus, int(id))
     return
 
+
+# func to update long and lat in places table
+def upadateLongLat(dict):
+    # return a json to update long and lat in the table
+    for element in dict:
+        if element['address'] and len(element['address']) > 0:
+            address = element['address']
+            # url for the request
+            url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(address) +'?format=json'
+            # make a request and await a json response
+            response = requests.get(url).json()
+            if len(response) > 0:
+                latitude = (response[0]["lat"])
+                longitude = (response[0]["lon"])
+                # update db places
+                db.execute('UPDATE places SET latitude=?, longitude=? WHERE id=?', latitude, longitude, element['id'])
+            else:
+                address = f"{elements['name']} {dictofelements['city']}"
+                url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(address) +'?format=json'
+                response = requests.get(url).json()
+                if len(response) > 0:
+                    latitude = (response[0]["lat"])
+                    longitude = (response[0]["lon"])
+                    # update db places
+                    db.execute('UPDATE places SET latitude=?, longitude=? WHERE id=?', latitude, longitude, element['id'])
+                return
+        return
    
 
 #CREATE TABLE lists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user_id INTEGER,list_type_id INTEGER, namelist TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (list_type_id) REFERENCES list_types(id));
@@ -692,7 +724,7 @@ def updatetodostatus(status, id):
 
 #CREATE TABLE books (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, title TEXT NOT NULL, year VARCHAR(4), author TEXT, description TEXT, img_id INTEGER, link TEXT, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
-#CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, street TEXT, city TEXT, postal_code INTEGER, province TEXT, country TEXT, address TEXT, coordinates TEXT,link TEXT, description TEXT, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
+#CREATE TABLE places (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, street TEXT, city TEXT, postal_code INTEGER, province TEXT, country TEXT, address TEXT, latitude TEXT, longitude TEXT, link TEXT, description TEXT, img_id INTEGER, note TEXT, FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 
 #CREATE TABLE shopping (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, namelist TEXT NOT NULL, lists_id INTEGER, user_id INTEGER, name TEXT NOT NULL, brand TEXT, collection TEXT, quantity INTEGER, price FLOAT, description TEXT, img_id INTEGER, wheretobuy TEXT, note TEXT, status CHECK(status in ('to buy', 'bought')), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (lists_id) REFERENCES lists(id));
 

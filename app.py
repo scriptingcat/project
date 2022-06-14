@@ -11,12 +11,13 @@ from cs50 import SQL
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage, updatequantity, unsetMail, updatetodostatus
+from helpers import login_required, validCharPass, validLenPass, generate_token, verify_token, send_reset_email, insert_token_in_db, expire_token_status_in_db, check_token_status, addlist, deletelist, deleteoneelement, add_element_movies_tvseries, addimage, add_element, upadate_address, listelements, listelementstoedit, sorttypes, gridelements, titleelements,send_contact_request, addpaidimage, updatequantity, unsetMail, updatetodostatus,upadateLongLat
 
 from email_validator import validate_email
 
 from io import BytesIO
 import sqlite3
+import json
 
 
 # library to create jwt token 
@@ -528,6 +529,7 @@ def showlist():
                 # add the image to image db
                 addimage(img, filename, mimetype, nametable_id_info['nametable'], nametable_id_info['nametable_id'], nametable_id_info['lists_id'])
                 db.execute("COMMIT")
+                    
             return redirect("/list?lists_id=" + lists_id)
 
         # change list name
@@ -933,6 +935,11 @@ def elements():
                     apologymsg = "This view is not allowed on this kind of list"
                     return render_template("elements.html", apologymsg=apologymsg)
                 style = 'to do list'
+            elif styleview == 'map':
+                if nametable != 'places':
+                    apologymsg = "This view is not allowed on this kind of list"
+                    return render_template("elements.html", apologymsg=apologymsg)
+                style = 'map'
             else:
                 style ='grid'
             # always check user's requesting is owner of list
@@ -942,7 +949,15 @@ def elements():
                     # decode dataimage from bytes to ascii to be rendered
                     for image in images:
                         image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
-                return render_template("elements.html", elements=elements, style=style, images=images, lists_id=int(lists_id),listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+                
+                # check it's not a request from a map view func
+                if style != 'map':
+                    return render_template("elements.html", elements=elements, style=style, images=images, lists_id=int(lists_id),listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+                else:
+                    # a map view needs a json object
+                    elements = json.dumps(elements)
+                    return (elements)
+                
             else:
                 return render_template("elements.html", elements=elements, style=style, images='null', listelements=listelements, namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
     except:

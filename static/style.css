@@ -471,3 +471,10 @@ ul.none-display{
 #go-up-button:hover{
     color: #8fd694;
 }
+
+
+
+#map { 
+    width: 100%;
+    height: 360px; 
+}

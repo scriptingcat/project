@@ -276,12 +276,24 @@
                     </button>
                 </div>
                 {% endif %}
+                {% if nametable == 'places' %}
+                <div class="btn-group p-2 inline">
+                    <button id="viewstylemap" name="viewstyle"
+                        class="btn btn-primary border primary-font primary-colors text-align-left w-auto" 
+                        onclick="closealltoggle('{{elements|length}}','showelementinfo');" 
+                        title="map view" type="button"
+                        value="map"><i class="bi bi bi-map"></i>
+                    </button>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% if elements|length > 0%}
        
         <!--styleview elements-->
         <div class="">
+            <div id="map" class="container-xxl mx-auto">
+            </div>
             <div id="elementviewstylegrid" class="container-xxl mx-auto">
             </div>
             <div id="elementviewstyleshoppinglist" align="center" class="mx-auto">
@@ -290,9 +302,11 @@
             </div>
             <div id="elementviewstyletitle" class="container-xxl mx-auto">
             </div>
+
             <div id="elementsdefault" class="container-xxl mx-auto">
             </div>
             <div id="table" align="center" class="container-xxl"></div>
+
         </div>
         {% endif %}
         {% if elements|length == 0 %}
@@ -317,6 +331,7 @@
     </div>
 </div>
 <script>
+
     // change class to show input
     function changeClass(elem1, elem2) {
         if (elem1 != elem2) {
@@ -361,6 +376,7 @@
     let viewstyletitle = document.getElementById('viewstyletitle')
     let viewstyleshoppinglist = document.getElementById('viewstyleshoppinglist')
     let viewstyletodolist = document.getElementById('viewstyletodolist')
+    let viewstylemap = document.getElementById('viewstylemap')
 
     let currentstyleview = 'title'
     let currentsortby = sortselect.input
@@ -375,6 +391,7 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
+            document.getElementById('map').classList.add('display-none');
             currentstyleview = 'title';
         }
     );
@@ -389,6 +406,8 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
+            document.getElementById('map').classList.add('display-none');
+
         }
         else if (currentstyleview == 'title') {
             document.getElementById('table').innerHTML = null;
@@ -397,6 +416,8 @@
             document.getElementById('elementviewstyletitle').innerHTML = elements;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
+            document.getElementById('map').classList.add('display-none');
+
         }
         else if (currentstyleview == 'shopping list') {
             document.getElementById('table').innerHTML = null;
@@ -405,6 +426,8 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = elements;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
+            document.getElementById('map').classList.add('display-none');
+
         }
         else if (currentstyleview == 'to do list') {
             document.getElementById('elementsdefault').innerHTML = null;
@@ -413,6 +436,17 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = elements;
+            document.getElementById('map').classList.add('display-none');
+
+        }
+        else if (currentstyleview == 'map') {
+            document.getElementById('elementsdefault').innerHTML = null;
+            document.getElementById('table').innerHTML = null;
+            document.getElementById('elementviewstylegrid').innerHTML = null;
+            document.getElementById('elementviewstyletitle').innerHTML = null;
+            document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+            document.getElementById('elementviewstyletodolist').innerHTML = null;
+            document.getElementById('map').classList.remove('display-none');
         }
         else {
             document.getElementById('elementsdefault').innerHTML = null;
@@ -421,6 +455,8 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
+            document.getElementById('map').classList.add('display-none');
+
         }
         currentsortby = sortselect.value
     }
@@ -438,6 +474,7 @@
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         document.getElementById('elementviewstyletodolist').innerHTML = null;
+        document.getElementById('map').classList.add('display-none');
 
         currentstyleview = 'table'
     })}
@@ -452,6 +489,7 @@
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         document.getElementById('elementviewstyletodolist').innerHTML = null;
+        document.getElementById('map').classList.add('display-none');
 
         currentstyleview = 'grid'
     })}
@@ -466,6 +504,7 @@
         document.getElementById('elementviewstyletitle').innerHTML = elements;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         document.getElementById('elementviewstyletodolist').innerHTML = null;
+        document.getElementById('map').classList.add('display-none');
 
         currentstyleview = 'title'
     })}
@@ -480,6 +519,7 @@
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = elements;
         document.getElementById('elementviewstyletodolist').innerHTML = null;
+        document.getElementById('map').classList.add('display-none');
 
         currentstyleview = 'shopping list'
     })}
@@ -494,9 +534,75 @@
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         document.getElementById('elementviewstyletodolist').innerHTML = elements;
+        document.getElementById('map').classList.add('display-none');
+
 
         currentstyleview = 'to do list'
     })}
+
+    var jsonmap;
+    var lat = 0;
+    var long = 0;
+    if (viewstylemap != null){
+    viewstylemap.addEventListener('click', async function () {
+        let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'map' + '&sortby=' + currentsortby);
+        //this time a json object is needed, not a text, as a response
+        let elements = await response.json();
+        console.log(response);
+        console.log(elements);
+        document.getElementById('table').innerHTML = null;
+        document.getElementById('elementsdefault').innerHTML = null;
+        document.getElementById('elementviewstylegrid').innerHTML = null;
+        document.getElementById('elementviewstyletitle').innerHTML = null;
+        document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
+        document.getElementById('elementviewstyletodolist').innerHTML = null;
+        
+        document.getElementById('map').classList.remove('display-none');
+        jsonmap = elements;
+        currentstyleview = 'map'; 
+        
+        // create a marker for each element in the json if it has lat and long
+        for (element of jsonmap) {
+            console.log(element)
+            console.log(element.latitude)
+            console.log(element.longitude)
+            console.log(element.name)
+            if (element.latitude != '' && element.longitude != ''){
+
+                var marker = new L.Marker([element.latitude,element.longitude]);
+                marker.addTo(map);
+                marker.bindPopup(element.name, popupOption);
+                 
+                marker.on("mouseover",event =>{
+                    event.target.openPopup();
+                })
+
+                marker.on("mouseout", event => {
+                    event.target.closePopup();
+                })
+            };
+        };
+    })}; 
+
+    // from leaflet's documentation example
+    //center the map in a point
+    let mapOptions = {
+        center:[40.6286329,14.4880145],
+        zoom:9
+    }
+    // create a new layer in div 'map'
+    let map = new L.map('map' , mapOptions);
+    let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+        map.addLayer(layer);
+    // do not show the close button on the popup of each marker
+    let popupOption = {
+        "closeButton":false
+    }
+
+   
+    
+
+   
 
     // func to show/hide 1 element
     function displaynone(element) {
@@ -672,8 +778,8 @@
         return
     }
 
-
     
 </script>
+
 
 {% endblock %}
