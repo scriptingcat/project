@@ -706,7 +706,7 @@ def upadateLongLat(dict):
                 # update db places
                 db.execute('UPDATE places SET latitude=?, longitude=? WHERE id=?', latitude, longitude, element['id'])
             else:
-                address = f"{elements['name']} {dictofelements['city']}"
+                address = f"{element['name']} {element['city']}"
                 url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(address) +'?format=json'
                 response = requests.get(url).json()
                 if len(response) > 0:

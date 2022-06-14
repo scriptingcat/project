@@ -950,14 +950,17 @@ def elements():
                     for image in images:
                         image['imagedata'] = base64.b64encode(image['img']).decode('ascii')
                 
-                # check it's not a request from a map view func
-                if style != 'map':
-                    return render_template("elements.html", elements=elements, style=style, images=images, lists_id=int(lists_id),listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
-                else:
-                    # a map view needs a json object
-                    elements = json.dumps(elements)
-                    return (elements)
-                
+                    # check it's not a request from a map view func
+                    if style != 'map':
+                        return render_template("elements.html", elements=elements, style=style, images=images, lists_id=int(lists_id),listelements=listelements,namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
+                    else:
+                        # a map view needs a json object
+
+                        dictopass = json.dumps(elements)
+                        return dictopass
+                        
+                return render_template("elements.html", apologymsg="Something went wrong.<br>It seems like you are trying to access something that does not belong to you.")
+
             else:
                 return render_template("elements.html", elements=elements, style=style, images='null', listelements=listelements, namelist=namelist, nametable=nametable, gridelements=gridelements, titleelements=titleelements)
     except:

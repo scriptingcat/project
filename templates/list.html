@@ -212,7 +212,7 @@
             <!-- button viewstyle +sortby -->
             <div class="d-flex margin2 mb-3 w-auto">
                 <!--openallelement-->
-                <div class="p-2">
+                <div id="closeopenalldiv" class="p-2">
                     <button id="openall"
                     class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
                     onclick="openalltoggle('{{elements|length}}','showelementinfo'); displaynone('openall');  displaynone('closeall'); " type="button">OpenAll
@@ -224,7 +224,7 @@
                     </button>
                 </div>
                 <!--sortby-->
-                <div class="p-2">
+                <div id="sortbydiv" class="p-2">
                     <input id="listsid" type="hidden" value={{lists_id}}>
                     <select id="sortselect"
                         class="bkground-color-box-white border form-select poppins-font mx-auto primary-font"
@@ -292,8 +292,285 @@
        
         <!--styleview elements-->
         <div class="">
-            <div id="map" class="container-xxl mx-auto">
+            {% if nametable == 'places' %}
+            <div id="map" class="container-xxl mx-auto display-none">
             </div>
+            <!-- showelementinfo elements-->
+            <div id="containerelements" class="container-xxl">
+                {% for element in elements %}
+                    <div class="collapse" id="mapelement{{element['id']}}">
+                        <div class="d-flex flex-row flex-wrap margin2">
+                            <!--image of showelementinfo-->
+                            <div class="mb-3 width14">
+                                {% for image in images%}
+                                {% if image['nametable_id'] == element['id'] %}
+                                <div class="mb-3 ">
+                                    <div class="mb-3">
+                                        <form action="/image?{{image['nametable']}}&{{image['nametable_id']}} " method="get">
+                                            <input name="nametable_id" type="hidden" value="{{image['nametable_id']}}">
+                                            <input name="nametable" type="hidden" value="{{image['nametable']}}">
+                                            {% if image['name' == 'img_paid']%}
+                                            <input name="imgname" type="hidden" value="{{image['img_paid']}}">
+                                            {% else %}
+                                            <input name="imgname" type="hidden" value="{{image['name']}}">
+                                            {% endif %}
+            
+                                            <button class="noborder bkground-color-box-none width80" title="open image" type="submit">
+                                                <img alt="image" class="border form-control bkground-color-box-white poppins-font primary-font"
+                                                    src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <!--Download element-->
+                                    <div class="">
+                                        <form action="/list?lists_id={{lists_id}}" method="post">
+                                            {% if image['name' == 'img_paid']%}
+                                            <input name="imgname" type="hidden" value="{{image['img_paid']}}">
+                                            {% else %}
+                                            <input name="imgname" type="hidden" value="{{image['name']}}">
+                                            {% endif %}
+                                            <input name="actiononelement" type="hidden" value="downloadelement">
+                                            <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
+            
+                                            <button
+                                                class="btn btn-primary noborder primary-font primary-colors-whitebkg text-align-left w-auto"
+                                                type="submit">
+                                                <i class="i-hover bi bi-arrow-down-circle"></i>
+                                            </button>
+            
+                                        </form>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                                {% if element['img_id'] == 0 %}
+                                <button class="noborder bkground-color-box-none width80" title="open image" type="button">
+                                    <div class="border form-control bkground-color-box-white poppins-font primary-fontwidth60">
+                                    <i class="bi bi-slash-circle"></i>
+                                    <p> No image <br> for <br> this element</p>
+                                    </div>
+                                </button>
+                                {% endif %}
+            
+            
+                            </div>
+                            <!--other showelementinfo items -->
+                            <div id="elementstoshowmap{{loop.index0}}" class="mb-3 inline width60">
+                                <div class="d-flex flex-row flex-wrap">
+                                    {% for key,value in element.items() %}
+                                    {% if key != 'cover' and key != 'cover_paid' %}
+                                    {% if key != 'id' and key != 'img_id' and key != 'lists_id' and key != 'user_id' and key !=
+                                    'img_paid_id' %}
+                                    <div class="mb-3 margin-left-8 text-align-left w-auto">
+                                        <label class="abrilfatface-font">{{key.capitalize()}}</label>
+                                        {% if value == '' or value == 'null' %}
+                                        <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+                                            -
+                                        </h3>
+                                        {% else %}
+                                        <h3 class="border form-control mx-auto bkground-color-box-white poppins-font primary-font">
+                                            {{value}}
+                                        </h3>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                    </form>
+                                </div>
+                            </div>
+                            <!--edit toggle elements to edit the showelementinfo-->
+                            <div id="editinfodefault{{loop.index0}}" class="mb-3 display-none width60">
+                                <form action="/list?lists_id={{lists_id}}" method="post">
+                                    <div class="mb-3" align="center">
+                                        <div class="d-flex flex-row flex-wrap">
+                                            {% for key,value in element.items() %}
+                                            {% if key != 'cover' and key != 'address' %}
+                                            {% if key not in ['id', 'img_id','lists_id', 'user_id', 'namelist', 'year',
+                                            'note','description', 'img_paid_id','expiration_date', 'nolaterthan', 'onthisdatetime', 'time', 'datetime_of_buying', 'status'] %}
+                                            <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                                <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                                {% if value == '' or value == 'null' %}
+                                                <input name="edit{{key}}"
+                                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font "
+                                                    placeholder="{{key}}: -" type="text">
+                                                {% else %}
+                                                <input name="edit{{key}}"
+                                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                                                    placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                            {% if key == 'year' %}
+                                            <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                                <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                                <input name="edit{{key}}"
+                                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                                                    maxlength="4" placeholder="{{key}}: {{value}}" type="text" value="{{value}}">
+                                            </div>
+                                            {% endif %}
+                                            {% if key == 'expiration_date' or key == 'datetime_of_buying' or key == 'nolaterthan' or key == 'onthisdatetime' %}
+                                            <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                                <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                                <input name="edit{{key}}"
+                                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                                                    placeholder="{{key}}: {{value}}" type="date" value="{{value}}">
+                                            </div>
+                                            {% endif %}
+            
+                                            {% if key == 'time' %}
+                                            <div class="mb-3 margin-left-8 p-2 text-align-left w-auto">
+                                                <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                                <input name="edit{{key}}"
+                                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font"
+                                                    placeholder="{{key}}: {{value}}" type="time" value="{{value}}">
+                                            </div>
+                                            {% endif %}
+            
+                                            {% if key == 'note' or key =='description' %}
+                                            <div class="mb-3 margin-left-8 p-2  text-align-left w-auto">
+                                                <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                                {% if value == '' %}
+                                                <textarea name="edit{{key}}"
+                                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font resizable w-auto"
+                                                    placeholder="{{key}}: -"></textarea>
+                                                {% else %}
+                                                <textarea name="edit{{key}}"
+                                                    class="border form-control mx-auto bkground-color-box-white poppins-font primary-font resizable w-auto"
+                                                    placeholder="{{key}}: {{value}}">{{value}}</textarea>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                            {% endif %}
+                                            {% endfor %}
+                                            {% for key,value in element.items() %}
+                                            {% if key == 'status' %}
+                                            {% for el in listelements%}
+                                            {% if el['type']==nametable %}
+                                            {% for k,v in el.items() %}
+                                            {% if k=='status' %}
+                                            <div class="mb-3 margin-left-8 p-2 text-align-left">
+                                                <label class="abrilfatface-font " for="edit{{key}}">{{key.capitalize()}}</label>
+                                                <!--status-->
+                                                {% if element['status'] == v[0] %}
+                                                <div class="block border form-control w-auto mx-auto">
+            
+                                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+                                                        <div class="w-auto">
+                                                            <input id="val0-{{element['id']}}"
+                                                                class="form-check-input bkground-color-box-white poppins-font primary-font primary-colors-checkbox"
+                                                                checked name="edit{{key}}" title="{{v[0]}}" type="radio"
+                                                                value="{{v[0]}}">
+                                                        </div>
+                                                        <div class=" w-auto">
+                                                            <label class="form-check-label mx-auto " for="val0-{{element['id']}}">{{v[0]}}</label>
+                                                        </div>
+                                                    </div>
+            
+                                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+                                                        <div class="w-auto">
+                                                            <input id="val1-{{element['id']}}"
+                                                                class="form-check-input bkground-color-box-white  poppins-font primary-font primary-colors-checkbox"
+                                                                name="edit{{key}}" title="{{v[1]}}" type="radio" value="{{v[1]}}">
+                                                        </div>
+                                                        <div class=" w-auto">
+                                                            <label class="form-check-label mx-auto w-auto"
+                                                                for="val1-{{element['id']}}">{{v[1]}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% else %}
+                                                <div class="block border form-control w-auto mx-auto">
+            
+                                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+                                                        <div class="w-auto">
+                                                            <input id="val0-{{element['id']}}"
+                                                                class="form-check-input bkground-color-box-white poppins-font primary-font primary-colors-checkbox"
+                                                                name="edit{{key}}" title="{{v[0]}}" type="radio" value="{{v[0]}}">
+                                                        </div>
+                                                        <div class=" w-auto">
+                                                            <label class="form-check-label mx-auto " for="val0-{{element['id']}}">{{v[0]}}</label>
+                                                        </div>
+                                                    </div>
+            
+                                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+                                                        <div class=" w-auto">
+                                                            <input id="val1-{{element['id']}}"
+                                                                class="form-check-input bkground-color-box-white  poppins-font primary-font primary-colors-checkbox"
+                                                                name="edit{{key}}" checked title="{{v[1]}}" type="radio"
+                                                                value="{{v[1]}}">
+                                                        </div>
+                                                        <div class="w-auto">
+                                                            <label class="form-check-label mx-auto w-auto"
+                                                                for="val1-{{element['id']}}">{{v[1]}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                            {% endif %}
+                                            {% endfor %}
+            
+                                            {% endif %}
+                                            {% endfor %}
+                                            <input name="actiononelement" type="hidden" value="editelement">
+                                            <input name="ideditelement" type="hidden" value="{{element['id']}}">
+                                        </div>
+                                        <!--update button-->
+                                        <div class="mb-3 p-2">
+                                            <input
+                                                class="bkground-color-box-create btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
+                                                type="submit" value="Update">
+                                        </div>
+                                    </div>
+                                </form>
+                                
+                            </div>
+            
+                            <!--Edit, download, delete item buttons-->
+                            <div class="mb-3 inline margin-left-3" align="left">
+                                <!--Edit Toggle-->
+                                <div class="mb-3">
+                                    <button id="edittoggle{{loop.index0}}"
+                                        class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                                        onclick="changeClass('elementstoshowmap{{loop.index0}}', 'editinfodefault{{loop.index0}}');"
+                                        type="button">Edit +</button>
+                                </div>
+                                <!--Delete element-->
+                                <div class="mb-3">
+                                    <form action="/list?lists_id={{lists_id}}" method="post">
+                                        <input name="actiononelement" type="hidden" value="deleteelement">
+                                        <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
+                                        <input
+                                            class="bkground-color-box-delete btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
+                                            type="submit" value="Delete">
+                                    </form>
+                                </div>
+                                <!--close btns-->
+                                <div class="d-flex flex-row ">
+                                    <!--close toggled-->
+                                    <div class="mb-3">
+                                        <button id="{{loop.index0}}"
+                                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left " onclick="closethis('{{loop.index0}}');"
+                                            type="button">Close</button>
+                                    </div>
+                                    <!--close All toggled-->
+                                    <div class="mb-3 margin-left-8">
+                                        <button id="closealltoggle{{element['id']}}"
+                                        onclick="closeall();"
+                                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                                             type="button">CloseAll</button>
+                                    </div>
+                                </div>
+            
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div id="elementviewstylegrid" class="container-xxl mx-auto">
             </div>
             <div id="elementviewstyleshoppinglist" align="center" class="mx-auto">
@@ -338,30 +615,30 @@
             let shown = document.getElementById(String(elem2));
             let hidden = document.getElementById(String(elem1));
             if (shown.classList.contains('display-none')) {
-                shown.classList.remove('display-none')
-                shown.classList.add('inline')
-                hidden.classList.add('display-none')
-                hidden.classList.remove('inline')
+                shown.classList.remove('display-none');
+                shown.classList.add('inline');
+                hidden.classList.add('display-none');
+                hidden.classList.remove('inline');
 
             }
             else {
-                shown.classList.add('display-none')
-                shown.classList.remove('inline')
-                hidden.classList.remove('display-none')
-                hidden.classList.add('inline')
+                shown.classList.add('display-none');
+                shown.classList.remove('inline');
+                hidden.classList.remove('display-none');
+                hidden.classList.add('inline');
 
             }
         }
         else {
             let shown = document.getElementById(String(elem1));
             if (shown.classList.contains('display-none')) {
-                shown.classList.remove('display-none')
-                shown.classList.add('inline')
+                shown.classList.remove('display-none');
+                shown.classList.add('inline');
 
             }
             else {
-                shown.classList.add('display-none')
-                shown.classList.remove('inline')
+                shown.classList.add('display-none');
+                shown.classList.remove('inline');
 
             }
         }
@@ -369,17 +646,17 @@
     }
 
     // manage sort by select and grid-list-title buttons
-    let listsid = document.getElementById('listsid')
-    let sortselect = document.getElementById('sortselect')
-    let viewstyletable = document.getElementById('viewstyletable')
-    let viewstylegrid = document.getElementById('viewstylegrid')
-    let viewstyletitle = document.getElementById('viewstyletitle')
-    let viewstyleshoppinglist = document.getElementById('viewstyleshoppinglist')
-    let viewstyletodolist = document.getElementById('viewstyletodolist')
-    let viewstylemap = document.getElementById('viewstylemap')
+    let listsid = document.getElementById('listsid');
+    let sortselect = document.getElementById('sortselect');
+    let viewstyletable = document.getElementById('viewstyletable');
+    let viewstylegrid = document.getElementById('viewstylegrid');
+    let viewstyletitle = document.getElementById('viewstyletitle');
+    let viewstyleshoppinglist = document.getElementById('viewstyleshoppinglist');
+    let viewstyletodolist = document.getElementById('viewstyletodolist');
+    let viewstylemap = document.getElementById('viewstylemap');
 
-    let currentstyleview = 'title'
-    let currentsortby = sortselect.input
+    let currentstyleview = 'title';
+    let currentsortby = sortselect.input;
 
     // func to load elements of a list, sort type and style view 
     window.addEventListener("load", async function () {
@@ -391,7 +668,16 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
+            if ( document.getElementById('map') != null){
             document.getElementById('map').classList.add('display-none');
+            document.getElementById('table').classList.remove('display-none');
+            document.getElementById('elementsdefault').classList.remove('display-none');
+            document.getElementById('elementviewstylegrid').classList.remove('display-none');
+            document.getElementById('elementviewstyletitle').classList.remove('display-none');
+            document.getElementById('elementviewstyleshoppinglist').classList.remove('display-none');
+            document.getElementById('elementviewstyletodolist').classList.remove('display-none');
+
+            }            
             currentstyleview = 'title';
         }
     );
@@ -406,7 +692,15 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
-            document.getElementById('map').classList.add('display-none');
+            if ( document.getElementById('map') != null){
+                document.getElementById('map').classList.add('display-none');
+                document.getElementById('table').classList.remove('display-none');
+                document.getElementById('elementsdefault').classList.remove('display-none');
+                document.getElementById('elementviewstylegrid').classList.remove('display-none');
+                document.getElementById('elementviewstyletitle').classList.remove('display-none');
+                document.getElementById('elementviewstyleshoppinglist').classList.remove('display-none');
+                document.getElementById('elementviewstyletodolist').classList.remove('display-none');
+            }
 
         }
         else if (currentstyleview == 'title') {
@@ -416,7 +710,15 @@
             document.getElementById('elementviewstyletitle').innerHTML = elements;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
-            document.getElementById('map').classList.add('display-none');
+            if ( document.getElementById('map') != null){
+                document.getElementById('map').classList.add('display-none');
+                document.getElementById('table').classList.remove('display-none');
+                document.getElementById('elementsdefault').classList.remove('display-none');
+                document.getElementById('elementviewstylegrid').classList.remove('display-none');
+                document.getElementById('elementviewstyletitle').classList.remove('display-none');
+                document.getElementById('elementviewstyleshoppinglist').classList.remove('display-none');
+                document.getElementById('elementviewstyletodolist').classList.remove('display-none');
+            }
 
         }
         else if (currentstyleview == 'shopping list') {
@@ -426,8 +728,7 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = elements;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
-            document.getElementById('map').classList.add('display-none');
-
+            
         }
         else if (currentstyleview == 'to do list') {
             document.getElementById('elementsdefault').innerHTML = null;
@@ -436,8 +737,7 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = elements;
-            document.getElementById('map').classList.add('display-none');
-
+            
         }
         else if (currentstyleview == 'map') {
             document.getElementById('elementsdefault').innerHTML = null;
@@ -455,58 +755,99 @@
             document.getElementById('elementviewstyletitle').innerHTML = null;
             document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
             document.getElementById('elementviewstyletodolist').innerHTML = null;
-            document.getElementById('map').classList.add('display-none');
-
+            if ( document.getElementById('map') != null){
+                document.getElementById('map').classList.add('display-none');
+            }
         }
-        currentsortby = sortselect.value
+        currentsortby = sortselect.value;
     }
     );
 
+    let divcloseopenall = document.getElementById('closeopenalldiv');
+    let divsortby = document.getElementById('sortbydiv');
 
     // func to change styleview
     if (viewstyletable != null){
     viewstyletable.addEventListener('click', async function () {
         let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'table' + '&sortby=' + currentsortby);
         let elements = await response.text();
+        if ( document.getElementById('map') != null){
+            document.getElementById('map').classList.add('display-none');
+        }        
         document.getElementById('table').innerHTML = elements;
         document.getElementById('elementsdefault').innerHTML = null;
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         document.getElementById('elementviewstyletodolist').innerHTML = null;
-        document.getElementById('map').classList.add('display-none');
+        if (mapelement.length > 0){
+            closeall()
+            document.getElementById('sortbydiv').classList.remove('display-none');
+            document.getElementById('closeopenalldiv').classList.remove('display-none');
+            document.getElementById('table').classList.remove('display-none');
+            document.getElementById('elementsdefault').classList.remove('display-none');
+            document.getElementById('elementviewstylegrid').classList.remove('display-none');
+            document.getElementById('elementviewstyletitle').classList.remove('display-none');
+            document.getElementById('elementviewstyleshoppinglist').classList.remove('display-none');
+            document.getElementById('elementviewstyletodolist').classList.remove('display-none');
 
-        currentstyleview = 'table'
+        }
+        currentstyleview = 'table';
     })}
 
     if (viewstylegrid != null){
     viewstylegrid.addEventListener('click', async function () {
         let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'grid' + '&sortby=' + currentsortby);
         let elements = await response.text();
+        if ( document.getElementById('map') != null){
+            document.getElementById('map').classList.add('display-none');
+        }        
         document.getElementById('table').innerHTML = null;
         document.getElementById('elementsdefault').innerHTML = null;
         document.getElementById('elementviewstylegrid').innerHTML = elements;
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         document.getElementById('elementviewstyletodolist').innerHTML = null;
-        document.getElementById('map').classList.add('display-none');
+        if (mapelement.length > 0){
+            closeall()
+            document.getElementById('sortbydiv').classList.remove('display-none');
+            document.getElementById('closeopenalldiv').classList.remove('display-none');
+            document.getElementById('table').classList.remove('display-none');
+            document.getElementById('elementsdefault').classList.remove('display-none');
+            document.getElementById('elementviewstylegrid').classList.remove('display-none');
+            document.getElementById('elementviewstyletitle').classList.remove('display-none');
+            document.getElementById('elementviewstyleshoppinglist').classList.remove('display-none');
+            document.getElementById('elementviewstyletodolist').classList.remove('display-none');
 
-        currentstyleview = 'grid'
+        }
+        currentstyleview = 'grid';
     })}
 
     if (viewstyletitle != null){
     viewstyletitle.addEventListener('click', async function () {
         let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'title' + '&sortby=' + currentsortby);
         let elements = await response.text();
+        if ( document.getElementById('map') != null){
+            document.getElementById('map').classList.add('display-none');
+        }
         document.getElementById('table').innerHTML = null;
         document.getElementById('elementsdefault').innerHTML = null;
         document.getElementById('elementviewstylegrid').innerHTML = null;
         document.getElementById('elementviewstyletitle').innerHTML = elements;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         document.getElementById('elementviewstyletodolist').innerHTML = null;
-        document.getElementById('map').classList.add('display-none');
-
-        currentstyleview = 'title'
+        if (mapelement.length > 0){
+            closeall()
+            document.getElementById('sortbydiv').classList.remove('display-none');
+            document.getElementById('closeopenalldiv').classList.remove('display-none');
+            document.getElementById('table').classList.remove('display-none');
+            document.getElementById('elementsdefault').classList.remove('display-none');
+            document.getElementById('elementviewstylegrid').classList.remove('display-none');
+            document.getElementById('elementviewstyletitle').classList.remove('display-none');
+            document.getElementById('elementviewstyleshoppinglist').classList.remove('display-none');
+            document.getElementById('elementviewstyletodolist').classList.remove('display-none');
+        }
+        currentstyleview = 'title';
     })}
 
     if (viewstyleshoppinglist != null){
@@ -519,7 +860,7 @@
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = elements;
         document.getElementById('elementviewstyletodolist').innerHTML = null;
-        document.getElementById('map').classList.add('display-none');
+       
 
         currentstyleview = 'shopping list'
     })}
@@ -534,39 +875,54 @@
         document.getElementById('elementviewstyletitle').innerHTML = null;
         document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
         document.getElementById('elementviewstyletodolist').innerHTML = elements;
-        document.getElementById('map').classList.add('display-none');
 
+        
 
-        currentstyleview = 'to do list'
+        currentstyleview = 'to do list';
     })}
 
     var jsonmap;
-    var lat = 0;
-    var long = 0;
+    toggleclose = [];
+    mapelement = [];
     if (viewstylemap != null){
     viewstylemap.addEventListener('click', async function () {
-        let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'map' + '&sortby=' + currentsortby);
-        //this time a json object is needed, not a text, as a response
-        let elements = await response.json();
-        console.log(response);
-        console.log(elements);
-        document.getElementById('table').innerHTML = null;
-        document.getElementById('elementsdefault').innerHTML = null;
-        document.getElementById('elementviewstylegrid').innerHTML = null;
-        document.getElementById('elementviewstyletitle').innerHTML = null;
-        document.getElementById('elementviewstyleshoppinglist').innerHTML = null;
-        document.getElementById('elementviewstyletodolist').innerHTML = null;
         
         document.getElementById('map').classList.remove('display-none');
+        document.getElementById('sortbydiv').classList.add('display-none');
+        document.getElementById('closeopenalldiv').classList.add('display-none');
+        document.getElementById('table').classList.add('display-none');
+        document.getElementById('elementsdefault').classList.add('display-none');
+        document.getElementById('elementviewstylegrid').classList.add('display-none');
+        document.getElementById('elementviewstyletitle').classList.add('display-none');
+        document.getElementById('elementviewstyleshoppinglist').classList.add('display-none');
+        document.getElementById('elementviewstyletodolist').classList.add('display-none');
+        // from leaflet's documentation example
+        //center the map in a point
+        let mapOptions = {
+            center:[40.6286329,14.4880145],
+            zoom:9
+        }
+        // create a new layer in div 'map'
+        let map = new L.map('map' , mapOptions);
+        let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+            map.addLayer(layer);
+        // do not show the close button on the popup of each marker
+        let popupOption = {
+            "closeButton":false
+        }
+
+        let response = await fetch('elements?lists_id=' + listsid.value + '&styleview=' + 'map' + '&sortby=' + currentsortby);
+
+        //this time a json object is needed, not a text, as a response
+        let elements = await response.json();
+        
+        
         jsonmap = elements;
         currentstyleview = 'map'; 
         
         // create a marker for each element in the json if it has lat and long
         for (element of jsonmap) {
-            console.log(element)
-            console.log(element.latitude)
-            console.log(element.longitude)
-            console.log(element.name)
+
             if (element.latitude != '' && element.longitude != ''){
 
                 var marker = new L.Marker([element.latitude,element.longitude]);
@@ -580,38 +936,47 @@
                 marker.on("mouseout", event => {
                     event.target.closePopup();
                 })
+
+                let divtoshow ='mapelement' + String(element.id)
+                marker.on("click", () =>{
+                    displayshow(divtoshow);
+                })
+                mapelement.push(divtoshow);  
             };
         };
     })}; 
-
-    // from leaflet's documentation example
-    //center the map in a point
-    let mapOptions = {
-        center:[40.6286329,14.4880145],
-        zoom:9
+    
+    function closethis(i){
+        closethistoggle(mapelement[i]);
     }
-    // create a new layer in div 'map'
-    let map = new L.map('map' , mapOptions);
-    let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
-        map.addLayer(layer);
-    // do not show the close button on the popup of each marker
-    let popupOption = {
-        "closeButton":false
+    
+    function closeall(){
+        for (let i = 0; i < mapelement.length; i++){
+        closethistoggle(mapelement[i]);
     }
-
+    }
    
     
-
-   
+    
 
     // func to show/hide 1 element
     function displaynone(element) {
         let xy = document.getElementById(String(element));
         if (xy.classList.contains('display-none')) {
-            xy.classList.remove('display-none')
+            xy.classList.remove('display-none');
         }
         else {
-            xy.classList.add('display-none')
+            xy.classList.add('display-none');
+        }
+    }
+    // func to show/hide 1 element
+    function displayshow(element) {
+        let xy = document.getElementById(String(element));
+        if (xy.classList.contains('show')) {
+            xy.classList.remove('show');
+        }
+        else {
+            xy.classList.add('show');
         }
     }
 
@@ -621,7 +986,7 @@
         var val = document.getElementById(String(elementtochange)).innerText
         // handle value
         if (val == '-') {
-            var newval = 0
+            var newval = 0;
         }
         else if (val == 0) {
             return
@@ -635,9 +1000,9 @@
 
     // func to update async the quantity
     async function updatetable(elementtochange, listsid, id, type) {
-        let lists_id = document.getElementById(String(listsid))
-        let el_id = document.getElementById(String(id))
-        let quantity = document.getElementById(String(elementtochange))
+        let lists_id = document.getElementById(String(listsid));
+        let el_id = document.getElementById(String(id));
+        let quantity = document.getElementById(String(elementtochange));
         let response = await fetch('/list?lists_id=' + lists_id.value + '&id=' + el_id.value + '&quantity=' + quantity.innerText + '&actiononelement=' + 'updateqnty' + '&type=' + type);
         return;
     };
@@ -645,9 +1010,9 @@
 
     // func to increase value
     function increaseqnty(elementtochange) {
-        var val = document.getElementById(String(elementtochange)).innerText
+        var val = document.getElementById(String(elementtochange)).innerText;
         if (val == '-') {
-            var newval = 1
+            var newval = 1;
             document.getElementById(String(elementtochange)).innerText = newval;
             return
         }
@@ -659,10 +1024,10 @@
 
     // func to close toggled
     function closethistoggle(element) {
-        var eltoclose = document.getElementById(String(element))
+        var eltoclose = document.getElementById(String(element));
         if (eltoclose != null) {
             if (eltoclose.classList.contains('show')) {
-                eltoclose.classList.remove('show')
+                eltoclose.classList.remove('show');
             }
         }
         return
@@ -673,10 +1038,10 @@
     // func to close all collapse toggled
     function closealltoggle(numb, element) {
         for (let i = 0; i < parseInt(numb); i++) {
-            var eltoclose = document.getElementById(String(element) + String(i))
+            var eltoclose = document.getElementById(String(element) + String(i));
             if (eltoclose != null) {
                 if (eltoclose.classList.contains('show')) {
-                    eltoclose.classList.remove('show')
+                    eltoclose.classList.remove('show');
                 }
             }
         }
@@ -685,10 +1050,10 @@
     // func to open all collapse toggled
     function openalltoggle(numb, element) {
         for (let i = 0; i < parseInt(numb); i++) {
-            var eltoclose = document.getElementById(String(element) + String(i))
+            var eltoclose = document.getElementById(String(element) + String(i));
             if (eltoclose != null) {
                 if (!(eltoclose.classList.contains('show'))) {
-                    eltoclose.classList.add('show')
+                    eltoclose.classList.add('show');
                 }
             }
         }
@@ -698,65 +1063,65 @@
 
      // func to update async the to do status
     async function updatetodostatus(elementtochange, listsid, id) {
-        let lists_id = document.getElementById(String(listsid))
-        let el_id = document.getElementById(String(id))
-        let status = document.getElementById(String(elementtochange))
+        let lists_id = document.getElementById(String(listsid));
+        let el_id = document.getElementById(String(id));
+        let status = document.getElementById(String(elementtochange));
         let response = await fetch('/list?lists_id=' + lists_id.value + '&id=' + el_id.value + '&status=' + status.innerText + '&actiononelement=' + 'updatetodostatus');
         let entry = await response.text();
 
        if (status.innerText == 'to do'){
-            document.getElementById(String(elementtochange)).innerText = 'done'
+            document.getElementById(String(elementtochange)).innerText = 'done';
         }
         else if (status.innerText == 'done'){
-            document.getElementById(String(elementtochange)).innerText = 'to do'
+            document.getElementById(String(elementtochange)).innerText = 'to do';
         }
         return;
     };
 
     // func to show/hide 1 element
     function displaynonetodolist(element,defaultel, statusel, defaulticn, icn) {
-        let status = document.getElementById(String(statusel))
-        let defaultelem = document.getElementById(String(defaultel))
-        let defaulticon = document.getElementById(String(defaulticn))
-        let icon = document.getElementById(String(icn))
+        let status = document.getElementById(String(statusel));
+        let defaultelem = document.getElementById(String(defaultel));
+        let defaulticon = document.getElementById(String(defaulticn));
+        let icon = document.getElementById(String(icn));
 
         // hide default style
         if (defaultelem != null){
-            defaultelem.classList.add('display-none')
+            defaultelem.classList.add('display-none');
         }
         if (!(defaulticon.classList.contains('display-none')))
         {
-            defaulticon.classList.add('display-none')
+            defaulticon.classList.add('display-none');
         }
         // show new style
         if (icon.classList.contains('display-none')){
-            icon.classList.remove('display-none')
+            icon.classList.remove('display-none');
         }
 
         let xy = document.getElementById(String(element));
 
         if (status.innerText == 'to do'){
             if (xy.classList.contains('display-none')) {
-                xy.classList.remove('display-none')
+                xy.classList.remove('display-none');
             }
             
 
             if (icon.classList.contains('bi-square')) {
-                icon.classList.remove('bi-square')
-                icon.classList.add('bi-check-square')
+                icon.classList.remove('bi-square');
+                icon.classList.add('bi-check-square');
             }
             return
         }   
         else if (status.innerText == 'done'){
             if (xy.classList.contains('display-none')) {
-                xy.classList.add('display-none')
+                xy.classList.add('display-none');
             } 
             if (!(xy.classList.contains('display-none'))) {
-                xy.classList.add('display-none')
+                xy.classList.add('display-none');
             } 
             if (icon.classList.contains('bi-check-square')) {
-                icon.classList.remove('bi-check-square')
-                icon.classList.add('bi-square')
+                icon.classList.remove('bi-check-square');
+                icon.classList.add('bi-square');
             }
             return
         }
@@ -771,7 +1136,7 @@
             var i = document.getElementById(String(i))
             if (el != i) {
                 if (i.classList.contains('show')) {
-                    i.classList.remove('show')
+                    i.classList.remove('show');
                 }
             }
         }
