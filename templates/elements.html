@@ -260,9 +260,53 @@
                         </form>
                     </div>
                 </div>
-
+                 <!--Edit, download, delete item buttons responsive-->
+                <div class="actnbtnonelementresponsive position-relative left25pc " align="left">
+                    <!--Edit Toggle-->
+                    <div class="mb-3">
+                        <button id="edittoggle{{loop.index0}}" title="make all element's details of this list ready to be changed"
+                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                            onclick="changeClass('elementstoshow{{loop.index0}}', 'editinfo{{loop.index0}}'); changeClass('updatepaidbtn{{loop.index0}}', 'updatepaidbtn{{loop.index0}}');"
+                            type="button"><i class="bi bi-pencil-square"></i></button>
+                    </div>
+                    <!--Upload Cover_Paid toggle-->
+                    {% if nametable == 'bills' %}
+                    {% if element['img_paid_id'] == 0 %}
+                    <div class="mb-3">
+                        <button id="updatepaidbtn{{loop.index0}}" title="open aria to add a new image"
+                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left display-none"
+                            onclick="changeClass('updatepaidinfo{{loop.index0}}', 'updatepaidinfo{{loop.index0}}');"
+                            type="button"><i class="bi bi-file-earmark-arrow-up"></i></button>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    <!--Delete element-->
+                    <div class="mb-3">
+                        <form action="/list?lists_id={{lists_id}}" method="post">
+                            <input name="actiononelement" type="hidden" value="deleteelement">
+                            <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
+                            <button title="delete this element"
+                                class="bkground-color-box-delete btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
+                                type="submit" value="Delete"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                    <!--close btns-->
+                    <!--close toggled-->
+                    <div class="mb-3">
+                        <button title="close this element's details"
+                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                            onclick="closethistoggle('showelementinfo{{loop.index0}}');"
+                            type="button"><i class="bi bi-x"></i></button>
+                    </div>
+                    <!--close All toggled-->
+                    <div class="mb-3">
+                        <button title="close all elements' details of this list"
+                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                            onclick="closealltoggle('{{elements|length}}','showelementinfo');" type="button"><i class="bi bi-x-circle"></i></button>
+                    </div>
+                </div>
                 <!--Edit, download, delete item buttons-->
-                <div class="mb-3 inline margin-left-3" align="left">
+                <div class="actnbtnonelement mb-3 inline margin-left-3" align="left">
                     <!--Edit Toggle-->
                     <div class="mb-3">
                         <button id="edittoggle{{loop.index0}}" title="make all element's details of this list ready to be changed"
@@ -448,12 +492,12 @@
 <!--viewstyle shoppinglist-->
 {% elif style == 'shopping list' %}
 {% if nametable != 'lists'%}
-<div align="center" class="width80 mx-auto">
-    <div class=" p-2 poppins-font primary-font primary-colors border width60">
+<div align="center" class="width80 width-sl-responsive-header mx-auto">
+    <div class=" p-2 poppins-font primary-font primary-colors border width60  width-sl-responsive">
     This is your shopping list: {{namelist}}
     </div>
     {% for element in elements %}
-    <div class="border d-flex flex-row flex-wrap mb-2 mt-2 py-2 width60 position-relative">
+    <div class="border d-flex flex-row flex-wrap mb-2 mt-2 py-2 width60  width-sl-responsive position-relative">
     <!-- actions buttons-->
     <div class="w-auto margin-left-3 align-self-center z-i-30">
         
@@ -461,12 +505,12 @@
             <form action="/list?lists_id={{lists_id}}" method="post">
                 <input name="actiononelement" type="hidden" value="deleteelement">
                 <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
-                <button class="noborder bkground-color-box-none" type="submit" title="delete this element"><i class="primary-font-delete-hover bkground-color-box-none font-size1 bi bi-trash3"></i></button>
+                <button class="noborder bkground-color-box-none" type="submit" title="delete this element"><i class="primary-font-delete-hover bkground-color-box-none font-size1 bi bi-trash3 font-size1-tdl"></i></button>
             </form>
         </div>
         <div class="w-auto">
             <button class="noborder bkground-color-box-none" onclick="displaynone('overcolor{{loop.index0}}');" type="button" title="change color of this element">
-                <i class="primary-font-hover font-size1 bi bi-bag-check-fill"></i>
+                <i class="font-size1-tdl primary-font-hover font-size1 bi bi-bag-check-fill"></i>
             </button>
         </div>
     </div>
@@ -483,7 +527,7 @@
         {% endif %}
     </div>
     <!-- name + quantity + note + price-->
-    <div class="width65">
+    <div class="width65 width-sl-responsive">
         <!-- name + quantity-->
         <div align="left" class="d-flex w-auto align-self-stretch">
             <!--name-->
@@ -577,12 +621,12 @@
 <!--viewstyle to do list-->
 {% elif style == 'to do list' %}
 {% if nametable != 'lists'%}
-<div id="elementviewstyletodolist" align="center" class="width80 mx-auto">
-<div class=" p-2 poppins-font primary-font primary-colors border width60">
+<div id="elementviewstyletodolist" align="center" class="width80  width-sl-responsive-header mx-auto">
+<div class=" p-2 poppins-font primary-font primary-colors border width60 width-sl-responsive">
     This is your to do list: {{namelist}}
 </div>
 {% for element in elements %}
-<div class="border d-flex flex-row flex-wrap mb-2 mt-2 py-2 width60 position-relative">
+<div class="border d-flex flex-row flex-wrap mb-2 mt-2 py-2 width60 width-sl-responsive position-relative">
     <!-- actions buttons-->
     <div class="w-auto margin-left-3 align-self-center z-i-30">
         
@@ -590,7 +634,7 @@
             <form action="/list?lists_id={{lists_id}}" method="post">
                 <input name="actiononelement" type="hidden" value="deleteelement">
                 <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
-                <button class="noborder bkground-color-box-none" title="delete this element" type="submit"><i class="primary-font-delete-hover bkground-color-box-none font-size1 bi bi-trash3"></i></button>
+                <button class="noborder bkground-color-box-none" title="delete this element" type="submit"><i class="primary-font-delete-hover bkground-color-box-none font-size1 font-size1-tdl bi bi-trash3"></i></button>
             </form>
         </div>
         <div class="w-auto">
@@ -598,11 +642,11 @@
             <input id="id{{loop.index0}}" type="hidden" value="{{element['id']}}">
             <button class="noborder bkground-color-box-none" onclick=" displaynonetodolist('overcolor{{loop.index0}}', 'overcolordefault{{loop.index0}}', 'status{{loop.index0}}','defaulticon{{loop.index0}}','icon{{loop.index0}}'); updatetodostatus('status{{loop.index0}}','lists_id{{loop.index0}}','id{{loop.index0}}','overcolor{{loop.index0}}');" title="change status and color of this element" type="button">
             {% if element['status'] == 'done'%}
-                <i id="defaulticon{{loop.index0}}" class="primary-font-hover font-size1 bi bi-check-square"></i>
+                <i id="defaulticon{{loop.index0}}" class="primary-font-hover font-size1 bi font-size1-tdl bi-check-square"></i>
             {% else %}
-                <i id="defaulticon{{loop.index0}}" class="primary-font-hover font-size1 bi bi-square"></i>
+                <i id="defaulticon{{loop.index0}}" class="primary-font-hover font-size1 font-size1-tdl bi bi-square"></i>
             {% endif %}
-            <i id="icon{{loop.index0}}" class="display-none primary-font-hover font-size1 bi bi-square"></i>
+            <i id="icon{{loop.index0}}" class="display-none primary-font-hover font-size1 font-size1-tdl bi bi-square"></i>
 
             </button>
         </div>
@@ -622,7 +666,7 @@
         {% endif %}
     </div>
     <!-- name + nolaterthan + note + price-->
-    <div class="width65">
+    <div class="width65 width-sl-responsive">
         <!-- name + nolaterthan + status-->
         <div align="left" class="d-flex w-auto align-self-stretch">
             <!--name-->
@@ -639,7 +683,7 @@
             <!--nolaterthan-->
             <div class="w-auto margin-left-8">
                 <div class="w-auto">
-                    <label class="abrilfatface-font block">No Later Than</label>
+                    <label class="abrilfatface-font block">NoLaterThan</label>
                 </div>
                 <div class="d-flex flex-row w-auto">
                     <div class="w-auto">
@@ -729,10 +773,10 @@
 {% else %}
     <!--viewstyle grid (image only)-->
     {% if nametable != 'lists'%}
-    <div class="container-xxl d-flex align-items-start flex-wrap mx-auto">
+    <div class="container-xxl d-flex align-items-start flex-wrap width100 mx-auto">
     {% for element in elements %}
-    <div class="mb-3 p-2">
-        <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto" type="button"  title="open this element's details"
+    <div class="mb-3 p-2 margin-right-3 border btn widthresponsive">
+        <button class=" noborder bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto" type="button"  title="open this element's details"
             data-bs-toggle="collapse" data-bs-target="#showelementinfo{{loop.index0}}" aria-expanded="false"
             aria-controls="showelementinfo{{loop.index0}}" type="submit" value="">
             <div class="d-flex flex-wrap">

@@ -24,6 +24,9 @@ main{
 
 
 /*by class*/
+.actnbtnonelementresponsive{
+    display: none!important;
+   }
 .bkground-color{
     background-color: #8fd694;
 }
@@ -81,6 +84,9 @@ button.bkground-color-box-create:hover{
 }
 .border-bottom5{
     border-bottom: #8fd694 5px solid!important;
+}
+.bottom0{
+    top:70%!important;
 }
 .btnfocus:focus{
     background-color: #8fd694!important;
@@ -177,6 +183,9 @@ button.bkground-color-box-create:hover{
 .left13pc{
     left: 13%;
 }
+.left25pc{
+    left: 25%;
+}
 .linear-gradient-bottom{
     background: linear-gradient(to bottom, #fff 0%, #77AD78 100%);
 }
@@ -226,6 +235,9 @@ button.bkground-color-box-create:hover{
 }
 .margin-left-70{
     margin-left: 70%;
+}
+.margin-left-58{
+    margin-left: 58%;
 }
 .margin-left-85{
     margin-left: -85%;
@@ -318,6 +330,9 @@ button.bkground-color-box-create:hover{
 .resizable{
     overflow:hidden!important;
     resize: both!important;
+}
+.right0{
+    right: 0%!important;
 }
 .round-corner{
     border-radius: 2.25rem;
@@ -435,6 +450,7 @@ ul.none-display{
     width: 180px;
     height: 300px;
 }
+
 .z-i-10{
     z-index: 10;
 }
@@ -451,7 +467,9 @@ ul.none-display{
     outline: none!important;
     text-decoration: none;
 }
-
+#closeopenalldivresponsive{
+    display: none;
+}
 #go-up-button {
     display: none;
     position: fixed;
@@ -478,3 +496,81 @@ ul.none-display{
     width: 100%;
     height: 360px; 
 }
+
+#menubtnresponsive{
+    display: none;
+}
+
+/*responsive*/
+@media screen and (max-width: 800px) {
+    #closeopenalldiv{
+        display: none!important;
+    }
+    #closeopenalldivresponsive{
+        display: inline-block;
+        padding: 0%!important;
+        padding-top: .5rem!important;
+        
+    }
+    #menubtnresponsive{
+        display: inline;
+    }
+    #menuaccount1{
+        display: none!important;
+    }
+    #menuaccount2{
+        display: none!important;
+    }
+    .actnbtnonelement{
+        display: none!important;
+    }
+    .actnbtnonelementresponsive{
+    display: block!important;
+    }
+    .font-size085{
+    font-size: 2.3vw;
+    }
+    .font-size1-0{
+    font-size: 2.5vw;
+    }
+    .font-size1{
+    font-size: 3vw;
+    }
+    .font-size1-tdl{
+    font-size: 5vw!important;
+    }
+    .font-size25{
+        font-size: 4vw;
+    }
+    .font-size2{
+        font-size: 3.5vw;
+    }
+    .font-size3{
+        font-size: 4.5vw;
+    }
+    .font-size7{
+        font-size:8.5vw;
+    }
+    
+    .objective-fit-cover, .width-image-grid{
+        width: 50%;
+        height: 80px;
+        object-fit: cover;
+        font-size: 70%;
+    }
+    .width20, .width14{
+        width: auto;
+    }
+    .widthresponsive{
+        width: 30%!important;
+
+    }
+    .width-sl-responsive{
+        width: 95%!important;
+
+    }
+    .width-sl-responsive-header{
+        width: 100%!important;
+    }
+
+}  

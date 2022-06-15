@@ -13,7 +13,7 @@
     <!--upper bar toggles + their elements-->
     <div class="width100">
         <!--change namelist, add element, delete list-->
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-between flex-row flex-wrap">
             <!--div left-->
             <div class="p-2 d-flex justify-content-between">
                 <!--toggle for change namelist elements-->
@@ -210,19 +210,8 @@
                 <h2 class="abrilfatface-font fontw100 primary-font">{{namelist}}</h2>
             </div>
             <!-- button viewstyle +sortby -->
-            <div class="d-flex margin2 mb-3 w-auto">
-                <!--openallelement-->
-                <div id="closeopenalldiv" class="p-2">
-                    <button id="openall"
-                    class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
-                    onclick="openalltoggle('{{elements|length}}','showelementinfo'); displaynone('openall');  displaynone('closeall'); " title="open all elements' details of this list" type="button">OpenAll
-                    </button>
-                    <!-- close allelement-->
-                    <button id="closeall" title="close all elements' details of this list"
-                    class="display-none abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
-                    onclick="closealltoggle('{{elements|length}}','showelementinfo');  displaynone('openall');  displaynone('closeall'); " type="button">CloseAll
-                    </button>
-                </div>
+            <div class="d-flex flex-row flex-wrap margin2 mb-3 w-auto">
+                
                 <!--sortby-->
                 <div id="sortbydiv" class="p-2">
                     <input id="listsid" type="hidden" value={{lists_id}}>
@@ -240,6 +229,29 @@
                         {% endif %}
                         {% endfor %}
                     </select>
+                </div>
+                <!--openallelement-->
+                <div id="closeopenalldiv" class="p-2">
+                    <button id="openall"
+                    class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                    onclick="openalltoggle('{{elements|length}}','showelementinfo'); displaynone('openall');  displaynone('closeall'); " title="open all elements' details of this list" type="button">OpenAll
+                    </button>
+                    <!-- close allelement-->
+                    <button id="closeall" title="close all elements' details of this list"
+                    class="display-none abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                    onclick="closealltoggle('{{elements|length}}','showelementinfo');  displaynone('openall');  displaynone('closeall'); " type="button">CloseAll
+                    </button>
+                </div>
+                <div id="closeopenalldivresponsive" class="w-auto p-2">
+                    <button id="openallresponsivebtn"
+                    class="btn btn-primary border primary-font primary-colors text-align-left w-auto"
+                    onclick="openalltoggle('{{elements|length}}','showelementinfo'); displaynone('openallresponsivebtn');  displaynone('closeallresponsivebtn'); " title="open all elements' details of this list" type="button"><i class="bi bi-ticket-detailed"></i>
+                    </button>
+                    <!-- close allelement-->
+                    <button id="closeallresponsivebtn" title="close all elements' details of this list"
+                    class="display-none btn btn-primary border primary-font primary-colors text-align-left w-auto"
+                    onclick="closealltoggle('{{elements|length}}','showelementinfo');  displaynone('openallresponsivebtn');  displaynone('closeallresponsivebtn'); " type="button"><i class="bi bi-x-circle"></i>
+                    </button>
                 </div>
                 <!-- viewstyle-->
                 <div class="btn-group p-2 inline">
@@ -286,6 +298,7 @@
                     </button>
                 </div>
                 {% endif %}
+                
             </div>
         </div>
         {% if elements|length > 0%}
@@ -529,17 +542,52 @@
                                 
                             </div>
             
-                            <!--Edit, download, delete item buttons-->
-                            <div class="mb-3 inline margin-left-3" align="left">
+                            <!--Edit, download, delete item buttons responsive-->
+                            <div class="actnbtnonelementresponsive position-relative left25pc" align="left">
                                 <!--Edit Toggle-->
                                 <div class="mb-3">
+                                    <button id="edittoggle{{loop.index0}}" title="make all element's details of this list ready to be changed"
+                                        class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                                        onclick="changeClass('elementstoshowmap{{loop.index0}}', 'editinfodefault{{loop.index0}}');"
+                                        type="button"><i class="bi bi-pencil-square"></i></button>
+                                </div>
+                                <!--Delete element-->
+                                <div class="mb-3">
+                                    <form action="/list?lists_id={{lists_id}}" method="post">
+                                        <input name="actiononelement" type="hidden" value="deleteelement">
+                                        <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
+                                        <button title="delete this element"
+                                            class="bkground-color-box-delete btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
+                                            type="submit" value="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                                <!--close btns-->
+                                    <!--close toggled-->
+                                    <div class="mb-3">
+                                        <button id="{{loop.index0}}" title="close this element's details"
+                                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left " onclick="closethis('{{loop.index0}}');"
+                                            type="button"><i class="bi bi-x"></i></button>
+                                    </div>
+                                    <!--close All toggled-->
+                                    <div class="mb-3"> 
+                                        <button id="closealltoggle{{element['id']}}" title="close all elements' details of this list"
+                                        onclick="closeall();"
+                                            class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
+                                             type="button"><i class="bi bi-x-circle"></i></button>
+                                    </div>
+            
+                            </div>
+                            <!--Edit, download, delete item buttons-->
+                            <div class="actnbtnonelement mb-3 inline margin-left-3" align="left">
+                                <!--Edit Toggle-->
+                                <div class="actnbtnonelement mb-3">
                                     <button id="edittoggle{{loop.index0}}" title="make all element's details of this list ready to be changed"
                                         class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
                                         onclick="changeClass('elementstoshowmap{{loop.index0}}', 'editinfodefault{{loop.index0}}');"
                                         type="button">Edit +</button>
                                 </div>
                                 <!--Delete element-->
-                                <div class="mb-3">
+                                <div class="actnbtnonelement mb-3">
                                     <form action="/list?lists_id={{lists_id}}" method="post">
                                         <input name="actiononelement" type="hidden" value="deleteelement">
                                         <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
@@ -549,7 +597,7 @@
                                     </form>
                                 </div>
                                 <!--close btns-->
-                                <div class="d-flex flex-row ">
+                                <div class="actnbtnonelement d-flex flex-row ">
                                     <!--close toggled-->
                                     <div class="mb-3">
                                         <button id="{{loop.index0}}" title="close this element's details"
@@ -573,9 +621,9 @@
             {% endif %}
             <div id="elementviewstylegrid" class="container-xxl mx-auto">
             </div>
-            <div id="elementviewstyleshoppinglist" align="center" class="mx-auto">
+            <div id="elementviewstyleshoppinglist" align="center" class="container-xxl mx-auto">
             </div>
-            <div id="elementviewstyletodolist" align="center" class=" mx-auto">
+            <div id="elementviewstyletodolist" align="center" class="container-xxl mx-auto">
             </div>
             <div id="elementviewstyletitle" class="container-xxl mx-auto">
             </div>
