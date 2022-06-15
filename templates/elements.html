@@ -24,7 +24,7 @@
                                 <input name="imgname" type="hidden" value="{{image['name']}}">
                                 {% endif %}
 
-                                <button class="noborder bkground-color-box-none width80" title="open image" type="submit">
+                                <button class="noborder bkground-color-box-none width80" title="open this image" type="submit">
                                     <img alt="image" class="border form-control bkground-color-box-white poppins-font primary-font"
                                         src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
                                 </button>
@@ -242,7 +242,7 @@
                             {% if key == 'img_paid_id' %}
                             <div class="mb-3 p-2">
                                 <label class="abrilfatface-font " for="updatepaidcover">Paid Bill</label>
-                                <input
+                                <input title="add one more image for paid bill receipt"
                                     class="border form-control mx-auto w-auto bkground-color-box-white poppins-font primary-font"
                                     name="inputimage" title="{{value}}" type="file">
                             </div>
@@ -250,7 +250,7 @@
                             <input name="idupdatepaidelement" type="hidden" value="{{element['id']}}">
                             <!--update button-->
                             <div class="mb-3 p-2">
-                                <input
+                                <input  title="add one more image for paid bill receipt"
                                     class="bkground-color-box-create btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
                                     type="submit" value="Update">
                             </div>
@@ -265,7 +265,7 @@
                 <div class="mb-3 inline margin-left-3" align="left">
                     <!--Edit Toggle-->
                     <div class="mb-3">
-                        <button id="edittoggle{{loop.index0}}"
+                        <button id="edittoggle{{loop.index0}}" title="make all element's details of this list ready to be changed"
                             class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
                             onclick="changeClass('elementstoshow{{loop.index0}}', 'editinfo{{loop.index0}}'); changeClass('updatepaidbtn{{loop.index0}}', 'updatepaidbtn{{loop.index0}}');"
                             type="button">Edit +</button>
@@ -274,7 +274,7 @@
                     {% if nametable == 'bills' %}
                     {% if element['img_paid_id'] == 0 %}
                     <div class="mb-3">
-                        <button id="updatepaidbtn{{loop.index0}}"
+                        <button id="updatepaidbtn{{loop.index0}}" title="open aria to add a new image"
                             class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left display-none"
                             onclick="changeClass('updatepaidinfo{{loop.index0}}', 'updatepaidinfo{{loop.index0}}');"
                             type="button">Upload Paid Bill +</button>
@@ -286,7 +286,7 @@
                         <form action="/list?lists_id={{lists_id}}" method="post">
                             <input name="actiononelement" type="hidden" value="deleteelement">
                             <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
-                            <input
+                            <input title="delete this element"
                                 class="bkground-color-box-delete btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
                                 type="submit" value="Delete">
                         </form>
@@ -295,14 +295,14 @@
                     <div class="d-flex flex-row ">
                         <!--close toggled-->
                         <div class="mb-3">
-                            <button
+                            <button title="close this element's details"
                                 class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
                                 onclick="closethistoggle('showelementinfo{{loop.index0}}');"
                                 type="button">Close</button>
                         </div>
                         <!--close All toggled-->
                         <div class="mb-3 margin-left-8">
-                            <button
+                            <button title="close all elements' details of this list"
                                 class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
                                 onclick="closealltoggle('{{elements|length}}','showelementinfo');" type="button">CloseAll</button>
                         </div>
@@ -358,7 +358,7 @@
                 <form action="/list?{{element['id']}}" method="get">
                     <input name="lists_id" type="hidden" value="{{element['id']}}">
                     <input name="namelist" type="hidden" value="{{element['namelist']}}">
-                    <button
+                    <button title="open this list"
                     class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
                     value="{{element['namelist']}}" type="submit"
                     >Go</button>
@@ -368,7 +368,7 @@
 
             <td class="padding-left-5"><button
                     class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{loop.index0}}"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#showelementinfo{{loop.index0}}" title="open this element's details"
                     aria-expanded="false" aria-controls="showelementinfo{{loop.index0}}" type="submit"
                     value=""></button></td>
             {% endif %}
@@ -385,13 +385,13 @@
     <div class="mb-3 p-2">
         {% if nametable != 'lists'%}
         <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
-            data-bs-toggle="collapse" data-bs-target="#showelementinfo{{loop.index0}}" aria-expanded="false"
+            data-bs-toggle="collapse" data-bs-target="#showelementinfo{{loop.index0}}" aria-expanded="false" title="open this element's details"
             aria-controls="showelementinfo{{loop.index0}}" type="submit" value="">
             <div align="left" class="height-width25">
         {% else %}
         <form action="/list?{{element['id']}}" method="get">
             <input name="lists_id" type="hidden" value="{{element['id']}}">
-            <button
+            <button title="open this list"
                 class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
                 type="submit" value="{{element['namelist']}}">
         {% endif %}
@@ -461,11 +461,11 @@
             <form action="/list?lists_id={{lists_id}}" method="post">
                 <input name="actiononelement" type="hidden" value="deleteelement">
                 <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
-                <button class="noborder bkground-color-box-none" type="submit"><i class="primary-font-delete-hover bkground-color-box-none font-size1 bi bi-trash3"></i></button>
+                <button class="noborder bkground-color-box-none" type="submit" title="delete this element"><i class="primary-font-delete-hover bkground-color-box-none font-size1 bi bi-trash3"></i></button>
             </form>
         </div>
         <div class="w-auto">
-            <button class="noborder bkground-color-box-none" onclick="displaynone('overcolor{{loop.index0}}');" type="button">
+            <button class="noborder bkground-color-box-none" onclick="displaynone('overcolor{{loop.index0}}');" type="button" title="change color of this element">
                 <i class="primary-font-hover font-size1 bi bi-bag-check-fill"></i>
             </button>
         </div>
@@ -504,7 +504,7 @@
                 </div>
                 <div class="d-flex flex-row w-auto">
                     <div class="w-auto">
-                        <input id="actiononelement{{loop.index0}}" name="actiononelement" type="hidden" value="updateqnty">
+                        <input id="actiononelement{{loop.index0}}" name="actiononelement" title="update quantity for this element" type="hidden" value="updateqnty">
                         <h3 id="quantity{{loop.index0}}" class="w-auto border form-control bkground-color-box-white poppins-font primary-font margin0" > 
                         {%if element['quantity'] == '' or element['quantity'] == 'null' %}
                         -
@@ -518,11 +518,11 @@
                         <div class="w-auto position-relativei top--95">
                             <input id="lists_id{{loop.index0}}" type="hidden" value="{{lists_id}}">
                             <input id="id{{loop.index0}}" type="hidden" value="{{element['id']}}">
-                            <button id="increase{{loop.index0}}" class="noborder bkground-color-box-none" onclick="increaseqnty('quantity{{loop.index0}}'); updatetable('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}', 'add' );" " type="button">
+                            <button id="increase{{loop.index0}}" class="noborder bkground-color-box-none" onclick="increaseqnty('quantity{{loop.index0}}'); updatetable('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}', 'add' );" title="increase quantity for this element" " type="button">
                                 <i class="primary-font-hover  bi bi-plus-square"></i>
                             </button>
 
-                            <button id="decrease{{loop.index0}}" class="noborder bkground-color-box-none " onclick="decreaseqnty('quantity{{loop.index0}}'); updatetable('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}', 'remove' );" type="button">
+                            <button id="decrease{{loop.index0}}" class="noborder bkground-color-box-none " onclick="decreaseqnty('quantity{{loop.index0}}'); updatetable('quantity{{loop.index0}}','lists_id{{loop.index0}}', 'id{{loop.index0}}', 'remove' );" title="decrease quantity for this element" type="button">
                                 <i class="primary-font-hover  bi bi-dash-square"></i>
                             </button>
                         </div>
@@ -590,13 +590,13 @@
             <form action="/list?lists_id={{lists_id}}" method="post">
                 <input name="actiononelement" type="hidden" value="deleteelement">
                 <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
-                <button class="noborder bkground-color-box-none" type="submit"><i class="primary-font-delete-hover bkground-color-box-none font-size1 bi bi-trash3"></i></button>
+                <button class="noborder bkground-color-box-none" title="delete this element" type="submit"><i class="primary-font-delete-hover bkground-color-box-none font-size1 bi bi-trash3"></i></button>
             </form>
         </div>
         <div class="w-auto">
             <input id="lists_id{{loop.index0}}" type="hidden" value="{{lists_id}}">
             <input id="id{{loop.index0}}" type="hidden" value="{{element['id']}}">
-            <button class="noborder bkground-color-box-none" onclick=" displaynonetodolist('overcolor{{loop.index0}}', 'overcolordefault{{loop.index0}}', 'status{{loop.index0}}','defaulticon{{loop.index0}}','icon{{loop.index0}}'); updatetodostatus('status{{loop.index0}}','lists_id{{loop.index0}}','id{{loop.index0}}','overcolor{{loop.index0}}');" type="button">
+            <button class="noborder bkground-color-box-none" onclick=" displaynonetodolist('overcolor{{loop.index0}}', 'overcolordefault{{loop.index0}}', 'status{{loop.index0}}','defaulticon{{loop.index0}}','icon{{loop.index0}}'); updatetodostatus('status{{loop.index0}}','lists_id{{loop.index0}}','id{{loop.index0}}','overcolor{{loop.index0}}');" title="change status and color of this element" type="button">
             {% if element['status'] == 'done'%}
                 <i id="defaulticon{{loop.index0}}" class="primary-font-hover font-size1 bi bi-check-square"></i>
             {% else %}
@@ -621,9 +621,9 @@
         <i class="objective-fit-cover-sl bi bi-slash-circle"></i>No image for this element
         {% endif %}
     </div>
-    <!-- name + quantity + note + price-->
+    <!-- name + nolaterthan + note + price-->
     <div class="width65">
-        <!-- name + quantity-->
+        <!-- name + nolaterthan + status-->
         <div align="left" class="d-flex w-auto align-self-stretch">
             <!--name-->
             <div class="w-auto margin-left-8">
@@ -732,7 +732,7 @@
     <div class="container-xxl d-flex align-items-start flex-wrap mx-auto">
     {% for element in elements %}
     <div class="mb-3 p-2">
-        <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto" type="button"
+        <button class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto" type="button"  title="open this element's details"
             data-bs-toggle="collapse" data-bs-target="#showelementinfo{{loop.index0}}" aria-expanded="false"
             aria-controls="showelementinfo{{loop.index0}}" type="submit" value="">
             <div class="d-flex flex-wrap">

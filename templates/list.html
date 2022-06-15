@@ -19,7 +19,7 @@
                 <!--toggle for change namelist elements-->
                 <div class="p-2">
                     <button
-                        class="btn btn-primary abrilfatface-font border primary-font primary-colors text-align-left w-auto"  onclick="closeothertoggle('changenamelistinfo', ['deletelistinfo', 'addelementinfo']);"
+                        class="btn btn-primary abrilfatface-font border primary-font primary-colors text-align-left w-auto"  onclick="closeothertoggle('changenamelistinfo', ['deletelistinfo', 'addelementinfo']);" title="open aria to change the name of this list"
                         type="button" data-bs-toggle="collapse" data-bs-target="#changenamelistinfo"
                         aria-expanded="false" aria-controls="changenamelistinfo"> Change List Name +
                     </button>
@@ -27,7 +27,7 @@
                 <!--toggle for addelement elements-->
                 <div class="p-2">
                     <button 
-                        class="btn btn-primary abrilfatface-font border primary-font primary-colors text-align-left w-auto" onclick="closeothertoggle('addelementinfo', ['deletelistinfo', 'changenamelistinfo']);"
+                        class="btn btn-primary abrilfatface-font border primary-font primary-colors text-align-left w-auto" onclick="closeothertoggle('addelementinfo', ['deletelistinfo', 'changenamelistinfo']);" title="open aria to add a new element to this list"
                         type="button" data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false"
                         aria-controls="addelementinfo"> Add New Element +
                     </button>
@@ -35,7 +35,7 @@
                 <!--toggle for deletelist-->
                 <div class="p-2">
                     <button
-                        class="btn btn-primary abrilfatface-font border primary-font primary-colors text-align-left w-auto" onclick="closeothertoggle('deletelistinfo', ['addelementinfo', 'changenamelistinfo']);"
+                        class="btn btn-primary abrilfatface-font border primary-font primary-colors text-align-left w-auto" onclick="closeothertoggle('deletelistinfo', ['addelementinfo', 'changenamelistinfo']);" title="open aria to delete this list"
                         type="button" data-bs-toggle="collapse" data-bs-target="#deletelistinfo" aria-expanded="false"
                         aria-controls="deletelistinfo"> Delete List +
                     </button>
@@ -47,7 +47,7 @@
                 <div class="p-2 ">
                     <input id="lists_id" type="hidden" value="{{lists_id}}">
                     <input id="search"
-                        class="bkground-color-box-white border form-control mx-auto poppins-font primary-font"
+                        class="bkground-color-box-white border form-control mx-auto poppins-font primary-font" title="look for an element in this list"
                         name="searchbar" autocomplete="off" autofocus type="search" placeholder="search">
                     <ul id="result"></ul>
                     <script>
@@ -215,10 +215,10 @@
                 <div id="closeopenalldiv" class="p-2">
                     <button id="openall"
                     class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
-                    onclick="openalltoggle('{{elements|length}}','showelementinfo'); displaynone('openall');  displaynone('closeall'); " type="button">OpenAll
+                    onclick="openalltoggle('{{elements|length}}','showelementinfo'); displaynone('openall');  displaynone('closeall'); " title="open all elements' details of this list" type="button">OpenAll
                     </button>
                     <!-- close allelement-->
-                    <button id="closeall"
+                    <button id="closeall" title="close all elements' details of this list"
                     class="display-none abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
                     onclick="closealltoggle('{{elements|length}}','showelementinfo');  displaynone('openall');  displaynone('closeall'); " type="button">CloseAll
                     </button>
@@ -315,7 +315,7 @@
                                             <input name="imgname" type="hidden" value="{{image['name']}}">
                                             {% endif %}
             
-                                            <button class="noborder bkground-color-box-none width80" title="open image" type="submit">
+                                            <button class="noborder bkground-color-box-none width80" type="submit"  title="open this image">
                                                 <img alt="image" class="border form-control bkground-color-box-white poppins-font primary-font"
                                                     src="data:{{image['mimetype']}};base64,{{image['imagedata']}}">
                                             </button>
@@ -330,9 +330,9 @@
                                             <input name="imgname" type="hidden" value="{{image['name']}}">
                                             {% endif %}
                                             <input name="actiononelement" type="hidden" value="downloadelement">
-                                            <input name="iddownloadelement" type="hidden" value="{{element['id']}}">
+                                            <input name="iddownloadelement"  type="hidden" value="{{element['id']}}">
             
-                                            <button
+                                            <button title="download this image"
                                                 class="btn btn-primary noborder primary-font primary-colors-whitebkg text-align-left w-auto"
                                                 type="submit">
                                                 <i class="i-hover bi bi-arrow-down-circle"></i>
@@ -533,7 +533,7 @@
                             <div class="mb-3 inline margin-left-3" align="left">
                                 <!--Edit Toggle-->
                                 <div class="mb-3">
-                                    <button id="edittoggle{{loop.index0}}"
+                                    <button id="edittoggle{{loop.index0}}" title="make all element's details of this list ready to be changed"
                                         class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
                                         onclick="changeClass('elementstoshowmap{{loop.index0}}', 'editinfodefault{{loop.index0}}');"
                                         type="button">Edit +</button>
@@ -543,7 +543,7 @@
                                     <form action="/list?lists_id={{lists_id}}" method="post">
                                         <input name="actiononelement" type="hidden" value="deleteelement">
                                         <input name="iddeleteelement" type="hidden" value="{{element['id']}}">
-                                        <input
+                                        <input title="delete this element"
                                             class="bkground-color-box-delete btn abrilfatface-font fontw100 mx-auto primary-colors shadow"
                                             type="submit" value="Delete">
                                     </form>
@@ -552,13 +552,13 @@
                                 <div class="d-flex flex-row ">
                                     <!--close toggled-->
                                     <div class="mb-3">
-                                        <button id="{{loop.index0}}"
+                                        <button id="{{loop.index0}}" title="close this element's details"
                                             class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left " onclick="closethis('{{loop.index0}}');"
                                             type="button">Close</button>
                                     </div>
                                     <!--close All toggled-->
-                                    <div class="mb-3 margin-left-8">
-                                        <button id="closealltoggle{{element['id']}}"
+                                    <div class="mb-3 margin-left-8"> 
+                                        <button id="closealltoggle{{element['id']}}" title="close all elements' details of this list"
                                         onclick="closeall();"
                                             class="abrilfatface-font btn btn-primary border mx-auto primary-font primary-colors text-align-left "
                                              type="button">CloseAll</button>
@@ -587,9 +587,9 @@
         </div>
         {% endif %}
         {% if elements|length == 0 %}
-            <button class="mt-5 border-dashed bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
+            <button class="mt-5 border-dashed bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button" title="open all elements' details of this list"
             data-bs-toggle="collapse" data-bs-target="#addelementinfo" aria-expanded="false"
-            aria-controls="addelementinfo" type="submit" value="">
+            aria-controls="addelementinfo"  title="open aria to add a new element to this list" type="submit" value="">
             <div align="left" class="mt-2 container-xxl d-flex align-items-start flex-wrap mx-auto">
                 <div align="left" class="width50">
                     <h6 class="">Add a new<br> element</h6>

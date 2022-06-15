@@ -66,7 +66,7 @@
             <div class="container-xxl margin0 width100 mb-3">
                 <!--left part-->
                 <div>
-                <a class="navbar-brand" href="/">
+                <a class="navbar-brand" href="/"  title="go to the homepage">
                     <span><img alt="keeptrack logo icon" src="/static/favicon.ico"></span>
                     <span class="abrilfatface-font primary-font vertical-align-middle">keep track{% block span %}{% endblock %}</span>
                 </a>
@@ -77,8 +77,8 @@
                 {% if session["user_id"] %}
                 <!--right part-->
                         <div align="right" class="dropdown">
-                        <a class="abrilfatface-font bkground-color-box no-underline primary-colors primary-font" href="{{url_for('mylists')}}"><button class="bkground-color-box btn btnfocus btn-secondary fontw100 noborder primary-colors" type="button">My Lists</button></a>
-                        <button class=" btn btnfocus btn-secondary fontw100 abrilfatface-font fontw100 dropdown-toggle noborder primary-colors w-auto" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">Account</button>
+                        <a class="abrilfatface-font bkground-color-box no-underline primary-colors primary-font" href="{{url_for('mylists')}}"><button title="go to your lists" class="bkground-color-box btn btnfocus btn-secondary fontw100 noborder primary-colors" type="button">My Lists</button></a>
+                        <button class=" btn btnfocus btn-secondary fontw100 abrilfatface-font fontw100 dropdown-toggle noborder primary-colors w-auto" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false"  title="open aria for account menu links">Account</button>
                         <ul class="dropdown-menu abrilfatface-font  fontw100 margindropdown primary-font" aria-labelledby="dropdownMenu2">
                             <li><form action="/mylists" method="get"><button class="dropdown-item fontw100 shadow-item" type="submit">My Lists</button></form></li>
                             <li><form action="/changepassword" method="get"><button class="dropdown-item fontw100 shadow-item" type="submit">Change Password</button></form></li>

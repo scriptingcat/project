@@ -21,7 +21,7 @@ My Lists
             <div class="p-2 d-flex flex-row align-content-strech justify-content-start flex-wrap">
                 <!--add a new list button-->
                 <div class="mb-3 margin-left-1">
-                    <button
+                    <button  title="open aria to add a new list"
                         class="btn btn-primary abrilfatface-font border mx-auto primary-font primary-colors text-align-left w-auto"
                         type="button" data-bs-toggle="collapse" data-bs-target="#selecttypelist" aria-expanded="false"
                         aria-controls="selecttypelist">
@@ -122,7 +122,7 @@ My Lists
             <div class="mb-3 p-2">               
                 <form action="/list?{{element['id']}}" method="get">
                     <input name="lists_id" type="hidden" value="{{element['id']}}">
-                    <button
+                    <button  title="open this list"
                         class="border bkground-color-box btn btnfocus btn-primary poppins-font primary-font w-auto h-auto"
                         type="submit" value="{{element['namelist']}}">
                         <p>{{element['namelist']}}</p>
@@ -134,7 +134,7 @@ My Lists
     </div>
     {% endif %}
     {% if not userslists %}
-    <button class="mt-5 border-dashed bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"
+    <button class="mt-5 border-dashed bkground-color-box btn btnfocus btn-primary poppins-font primary-font" type="button"  title="open aria to add a new element to this list"
             data-bs-toggle="collapse" data-bs-target="#selecttypelist" aria-expanded="false"
             aria-controls="selecttypelist" type="submit" value="">
             <div align="left" class="mt-2 container-xxl d-flex align-items-start flex-wrap mx-auto">
