@@ -12,6 +12,7 @@ from flask import Flask, redirect, render_template, request, session, send_file
 from flask_mail import Mail, Message
 from functools import wraps
 
+
 # library to create jwt token 
 import jwt
 
@@ -31,7 +32,7 @@ mail_default_sender = os.environ["MAIL_DEFAULT_SENDER"]
 app.config['MAIL_DEFAULT_SENDER'] = mail_default_sender
 app.config['MAIL_PASSWORD'] = os.environ["MAIL_PASSWORD"]
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ["MAIL_USERNAME"]
 mail=Mail(app)
