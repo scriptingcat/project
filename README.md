@@ -65,6 +65,26 @@ If the venv is correctly activated, (.env) will precede your account in the term
 Click on the link provided in the terminal and the web-app will open in the browser.
 
 ***
+### Style:
+
+It is the CSS file where all the css styles are collected and stored in by tag, class, and id.
+Every change is very basic in terms of styling (they concern margins, font-size, colors, hover transformations and so on) since I have used bootstrap framework.
+
+***
+### Keeptrack.db:
+
+This is the database where all the tables used to make this web-app work are stored.
+It cointains:
+
+* 
+
+***
+### App.py and Helpers.py:
+App.py contains all the app.routes while in helpers.py are stored all the functions used to help and called by app.routes' functions.
+In helpers.py all the dictionaries to correctly render each type of list are stored, too.
+
+
+***
 ### Index:
 
 The index page is the first one opening; from this page you can choose to log in or sign up by clicking on the button on the navbar on the right side or on the a-link on the footer of the page.
@@ -139,25 +159,70 @@ Never trust the user.
 When the user's lists cointains more than one list, the user can choose to sort by its lists and/or change the view mode  - from the title view which is the default view, into the table view - by clicking on the specific buttons.
 Sort by select and view mode buttons call javascript async functions requesting the sorted elements and views to app.route /elements which renders elements.html.
 
-By clicking on the title of the list, the user can access to its elements.
+By clicking on the title of the list, the user can access to that list and its elements.
 
 ***
 ### List:
 
+App.route /list renders list.html when a get request is made to the server.
+showlist function reads lists_id get request and looks for that list id in the lists table, if the id belongs to the session['user_id'], that list's items and their images will be selected and rendered.
+If no item has been stored for the specific list, a central toggle will show the inputs to create a new element by clicking on it.
 
+From this page, by a post request the user can:
 
+* change the name of the list 
+   first, the server makes sure the lists_id belongs to the session['user_id], then it updates its name withe new provided one in the lists table where the namelist is stored;
 
+* delete the whole list
+    having done all the checks required, the server delets the whole list and all its items as well as its images from the specific tables;
 
-The same happens to the search bar where, by providing inputs, an async function calls /search.
+* add a new element to the list
+    the server collects and checks all the inputs provided by the user and saves them in a dictionary whose keys change based on the type of that list.
+    This dictionary will be used to store/insert into the data in the specific type table and, if there is an image, this one will be stored in images table and its id stored in the image id in type table;
+  
+* search
+    By providing inputs in the search bar, an async function calls /search route where the function looks for that list's element with that provided title/name which is always required - meaning no list's item can be stored if the user does not provide a title/name;
+
+* edit an element
+    all elements of a list, no matter what view style is being displayed, is a toggle that opens all the details of that element.
+    By clicking on edit button, it is possible to update the data stored in the type table for that element id.
+    Only for the type list 'bills' it is possible to also update/add a new image.
+
+* delete an element
+    the element and all its details, image included, are deleted from the specific tables;
+
+* close and close all buttons
+    they close all the toggles clicked - meaning they remove show class from those elements which is added when clicked on a bootstrap toggle - via javascript functions;
+
+* show the image
+    by clicking on the image is possible to open it in the browser, each image stored in the table is accessible only if it belongs to the session['user_id']
+    Images are stored in the db table images by saving each filestorage object's filename, mimetype and data.
+    When the images' data is sent to be rendered in mage.html (this also happens to list.html), what is actually sent is a decoded version of that data that img tag element is ready to receive and read;
+
+* download the image
+    by clicking on the icon under the image a download of that image starts.
+    Send_file function converts that image's data, filename and mimetype into bytes and sends it to the user;
+
+From this page, it is also possible to sort the elements in different ways and to change the view style, both depending on the type of that particular list.
+These two functions call async javascript functions requesting the /elements route which renders styling and sorting of list's elements.
+
+There are three basic view style:
+* title view, showing the title;
+* grid view, showing the images;
+* table view, showing a table;
+
+Some other extra view style are provided for:
+* type of table 'places', where it is also possible to see markers on a map of all the elements stored;
+* type of table 'todo', where it is also possible to see checked and unchecked to do elements;
+* type of table 'shoppinglist', where it is also possible to see detailed information of each element such as quantity or price.
 
 ***
-### Search:
-This path is called
+### About:
 
+It is a simple route that renders a page that explains how to use the web-app.
 
+***
+### Contact:
 
-
-
-
-
-
+From this page the user can send a message to the administrator of the app.
+The message sent is an email collecting the user's inputs, which is sent using the email information provided as previous explained for the forgot password.
